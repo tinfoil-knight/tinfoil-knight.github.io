@@ -18,7 +18,7 @@ export default function About() {
 			<Helmet>
 				<title>Kunal K • About</title>
 			</Helmet>
-			<div className="space-y-4 mt-20 px-16">
+			<div className="space-y-4 mt-20 md:px-16">
 				<p>
 					I'm a software developer. Currently working remotely at&nbsp;
 					<a className="hover:text-blue-500" href="https://bimape.com">

@@ -3,7 +3,7 @@ import { Link } from 'gatsby'
 
 export default function Layout({ children }) {
 	return (
-		<div className="px-28">
+		<div className="px-4 sm:px-8 md:px-24">
 			<NavBar />
 			<Content>{children}</Content>
 			<Footer />
@@ -19,9 +19,9 @@ const Content = ({ children }) => {
 
 const NavBar = () => {
 	return (
-		<section className="my-8 flex justify-between">
-			<div className="text-2xl">Kunal Kundu</div>
-			<nav className="flex space-x-4 items-center">
+		<section className="my-8 sm:flex sm:justify-between">
+			<div className="text-2xl text-center sm:text-left">Kunal Kundu</div>
+			<nav className="flex space-x-2 sm:space-x-4 justify-center sm:justify-start">
 				<Link to="/archive" className="hover:text-blood-red">
 					Posts
 				</Link>
