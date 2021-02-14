@@ -28,11 +28,11 @@ export default function About() {
 				</p>
 				<p>
 					I like to dabble in everything from design systems on the frontend to
-					Infrastructure-as-Code alongside writing silly shell scripts to
+					infrastructure as code alongside writing silly shell scripts to
 					automate everything.
 				</p>
 				<p>
-					I occasionally write stuff{' '}
+					I occasionally write stuff&nbsp;
 					<Link to="/posts" className="underline">
 						here
 					</Link>
@@ -41,8 +41,8 @@ export default function About() {
 				<p>
 					Feel free to reach out on kunal99kundu@gmail.com or just DM me
 					on&nbsp;
-					<A text="Twitter" to="https://twitter.com/kunal__kundu" /> for
-					anything. I'm also on&nbsp;
+					<A text="Twitter" to="https://twitter.com/kunal__kundu" />. I'm also
+					on&nbsp;
 					<A text="LinkedIn" to="https://www.linkedin.com/in/kunal-kundu/" />
 					&nbsp;and&nbsp;
 					<A text="Github" to="https://github.com/tinfoil-knight" />.

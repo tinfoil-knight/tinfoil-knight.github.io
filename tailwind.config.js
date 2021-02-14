@@ -11,5 +11,6 @@ module.exports = {
 	plugins: [],
 	corePlugins: {
 		fontFamily: false,
+		gridTemplateColumns: false,
 	},
 }

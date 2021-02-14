@@ -22,7 +22,7 @@ const NavBar = () => {
 		<section className="my-8 sm:flex sm:justify-between">
 			<div className="text-2xl text-center sm:text-left">Kunal Kundu</div>
 			<nav className="flex space-x-2 sm:space-x-4 justify-center sm:justify-start">
-				<Link to="/archive" className="hover:text-blood-red">
+				<Link to="/posts" className="hover:text-blood-red">
 					Posts
 				</Link>
 				<Link to="/" className="hover:text-blood-red">
