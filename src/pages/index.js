@@ -21,7 +21,12 @@ export default function About() {
 			<div className="space-y-4 mt-20 md:px-16">
 				<p>
 					I'm a software developer. Currently working remotely at&nbsp;
-					<a className="hover:text-blue-500" href="https://bimape.com">
+					<a
+						className="hover:text-blue-500"
+						href="https://bimape.com"
+						target="_blank"
+						rel="noreferrer"
+					>
 						BimaPe
 					</a>
 					.
