@@ -37,7 +37,7 @@ export default function About() {
 					automate everything.
 				</p>
 				<p>
-					I occasionally write stuff&nbsp;
+					I occasionally put out some things I've written&nbsp;
 					<Link to="/posts" className="underline">
 						here
 					</Link>

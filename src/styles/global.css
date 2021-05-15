@@ -5,7 +5,6 @@ body {
 	scroll-behavior: smooth;
 	min-height: 100%;
 	font-family: Chivo, 'sans-serif' !important;
-	/* Disables horizontal scroll */
 	overflow-x: hidden;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;

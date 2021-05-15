@@ -11,9 +11,12 @@ export default function BlogPost({ data }) {
 			<Helmet>
 				<title>Kunal K • {post.frontmatter.title}</title>
 			</Helmet>
-			<div>
+			<div className="custom-md">
 				<h1 className="text-2xl mb-6">{post.frontmatter.title}</h1>
-				<div dangerouslySetInnerHTML={{ __html: post.html }} />
+				<div
+					className="space-y-4"
+					dangerouslySetInnerHTML={{ __html: post.html }}
+				/>
 			</div>
 		</Layout>
 	)
