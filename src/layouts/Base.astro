@@ -1,5 +1,6 @@
 ---
-    import NavBar from './components/NavBar.astro';
+    import '../styles/global.css';
+    import NavBar from "./components/NavBar.astro"
 ---
 
 <html lang="en">
@@ -13,9 +14,9 @@
 <body>
     <div class="px-4 sm:px-8 md:px-24">
         <NavBar />
-        <article class="container mx-auto max-w-screen-sm">
+        <main class="container mx-auto max-w-screen-sm">
             <slot />
-        </article>
+        </main>
         <footer class="mt-20"></footer>
     </div>
 </body>

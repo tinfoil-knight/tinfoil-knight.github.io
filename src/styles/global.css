@@ -1,0 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap");
+
+body {
+  color: #333;
+  scroll-behavior: smooth;
+  min-height: 100%;
+  font-family: Chivo, "sans-serif" !important;
+  overflow-x: hidden;
+  background: whitesmoke;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}

@@ -1,5 +1,10 @@
 ---
 	import Base from '../layouts/Base.astro'
+	import { Content as About } from '../snippets/about.md';
 ---
 
-	<Base>Hello</Base>
+<Base>
+<div class="space-y-4 mt-20 md:px-16">
+	<About />
+</div>
+</Base>
