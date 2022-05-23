@@ -1,0 +1,23 @@
+---
+    import NavBar from './components/NavBar.astro';
+---
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Kunal's Site</title>
+</head>
+
+<body>
+    <div class="px-4 sm:px-8 md:px-24">
+        <NavBar />
+        <article class="container mx-auto max-w-screen-sm">
+            <slot />
+        </article>
+        <footer class="mt-20"></footer>
+    </div>
+</body>
+
+</html>
