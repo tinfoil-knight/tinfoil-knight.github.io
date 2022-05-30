@@ -1,10 +1,13 @@
 ---
-    const { content } = Astro.props;
+import Base from '../layouts/Base.astro'
+const { content } = Astro.props;
 ---
 
-<div class="custom-md">
-    <h1 class="text-2xl mb-6">{content.title}</h1>
-    <article class="space-y-4">
-        <slot />
-    </article>
+<Base title={"Kunal's | " + content.title}>
+<div class=" custom-md">
+<h1 class="text-2xl mb-6">{content.title}</h1>
+<article class="space-y-4">
+    <slot />
+</article>
 </div>
+</Base>
