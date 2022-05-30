@@ -1,6 +1,8 @@
 ---
-    import '../styles/global.css';
-    import NavBar from "./components/NavBar.astro"
+import '../styles/global.css';
+import NavBar from "./components/NavBar.astro"
+
+const { title = "Kunal's Site" } = Astro.props
 ---
 
 <html lang="en">
@@ -8,7 +10,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Kunal's Site</title>
+    <title>{title}</title>
 </head>
 
 <body>
