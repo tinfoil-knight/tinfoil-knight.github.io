@@ -16,3 +16,11 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Markdown */
+
+.custom-md a {
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 0, 0, 0.6);
+  text-decoration-thickness: 0.5px;
+}

@@ -1,7 +1,7 @@
 ---
 ---
 
-I'm a software developer. Currently working remotely at [Verak (YC W21)](https://verak.in).
+I'm a software developer. Currently working remotely at [Verak](https://verak.in) (YC W21).
 
 I like to dabble in everything from design systems on the frontend to
 infrastructure as code alongside writing silly shell scripts to
