@@ -24,3 +24,12 @@ body {
   text-decoration-color: rgba(0, 0, 0, 0.6);
   text-decoration-thickness: 0.5px;
 }
+
+/* Override for Tailwind Plugin */
+
+/* Remove "" from blockquotes */
+.prose
+  :where(blockquote p:first-of-type):not(:where([class~="not-prose"]
+      *))::before {
+  content: none !important;
+}

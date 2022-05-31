@@ -7,7 +7,7 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
   corePlugins: {
     fontFamily: false,
     gridTemplateColumns: false,
