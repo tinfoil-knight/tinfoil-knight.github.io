@@ -6,7 +6,8 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "deploy": "astro build && gh-pages -d dist -f"
+    "deploy": "astro build && gh-pages -d dist -f",
+    "clean": "rm -rf dist"
   },
   "devDependencies": {
     "@astrojs/tailwind": "^0.2.1",
