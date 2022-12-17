@@ -1,11 +1,13 @@
 ---
 import Base from '../layouts/Base.astro'
 let allPosts = await Astro.glob('./posts/*.md')
-allPosts = allPosts.sort(
-	(a, b) =>
-		new Date(a.frontmatter.date).valueOf() -
-		new Date(b.frontmatter.date).valueOf()
-)
+allPosts = allPosts
+	.filter(x => !x.frontmatter.draft)
+	.sort(
+		(a, b) =>
+			new Date(a.frontmatter.date).valueOf() -
+			new Date(b.frontmatter.date).valueOf()
+	)
 ---
 
 <Base title="Kunal's Posts">
