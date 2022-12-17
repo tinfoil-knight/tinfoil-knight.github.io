@@ -1,35 +1,36 @@
-@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap');
 
 body {
-  color: #333;
-  scroll-behavior: smooth;
-  min-height: 100%;
-  font-family: Chivo, "sans-serif" !important;
-  overflow-x: hidden;
-  background: whitesmoke;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	color: #333;
+	scroll-behavior: smooth;
+	min-height: 100%;
+	font-family: Chivo, 'sans-serif' !important;
+	overflow-x: hidden;
+	background: whitesmoke;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
 }
 
 /* Markdown */
 
 .custom-md a {
-  text-decoration: underline;
-  text-decoration-color: rgba(0, 0, 0, 0.6);
-  text-decoration-thickness: 0.5px;
+	text-decoration: underline;
+	text-decoration-color: rgba(0, 0, 0, 0.6);
+	text-decoration-thickness: 0.5px;
 }
 
 /* Override for Tailwind Plugin */
 
 /* Remove "" from blockquotes */
 .prose
-  :where(blockquote p:first-of-type):not(:where([class~="not-prose"]
-      *))::before {
-  content: none !important;
+	:where(blockquote p:first-of-type):not(
+		:where([class~='not-prose'] *)
+	)::before {
+	content: none !important;
 }
