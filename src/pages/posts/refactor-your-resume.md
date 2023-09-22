@@ -12,7 +12,7 @@ A lot of friends reach out to me for help with their resume. I also found myself
 
 > Prefer putting skills that are present in the Job Description first. Don't put everything you've barely worked with here. Showcase your best skills that you're confident enough in to be interviewed on.
 
-A few categories of things that I've seen which are **not required**:
+A few categories of things that I've seen which are **not** required:
 
 - **Deployment Tools** (eg: Vercel, Netlify, Heroku): A lot of these platforms have single-click deploys. Having this says nothing apart from you being able to click a few buttons and write a bit of configuration.
 - **Version Control** (eg: git, Github): While these tools are very useful, I'd assume you know how to use this & aren't sending code through email in zip archives.
@@ -33,7 +33,7 @@ A few categories of things that I've seen which are **not required**:
 
 ### Unrelated Interests
 
-It's likely that someone will ask you about your hobbies in your interview. Saying that you like "cycling or dancing" doesn't give you any edge over other resumes. Unless you're interests are relevant, it's best to leave them out of the resume.
+It's likely that someone will ask you about your hobbies in your interview. Saying that you like "cycling or dancing" doesn't give you any edge over other resumes. Unless your interests are relevant, it's best to leave them out of the resume.
 
 ## Some More Advice
 
