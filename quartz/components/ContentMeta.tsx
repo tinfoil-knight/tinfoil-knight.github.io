@@ -4,6 +4,9 @@ import readingTime from "reading-time"
 
 export default (() => {
   function ContentMetadata({ cfg, fileData, displayClass }: QuartzComponentProps) {
+    if (fileData.slug == "index") {
+      return null
+    }
     const text = fileData.text
     if (text) {
       const segments: string[] = []
