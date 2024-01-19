@@ -1,5 +1,7 @@
-#cpp 
-
+---
+tags:
+  - cpp
+---
 Note: I mainly use C++17.
 
 - `switch` statement

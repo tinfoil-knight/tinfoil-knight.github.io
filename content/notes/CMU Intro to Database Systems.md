@@ -2,6 +2,7 @@
 tags:
   - db
   - sql
+created: 2024-08-13
 ---
 
 Taught By: #AndyPavlo
@@ -1673,7 +1674,7 @@ Dependency Graphs / Precedence Graphs
 // Cascading Abort
 
 
-| T1.         | T2           |
+| T1          | T2           |
 |-------------|--------------|
 | BEGIN       |              |
 | X-LOCK(A)   |              |
@@ -1760,10 +1761,11 @@ Note:
 		- Intention Shared (IS) : indicates explicit locking at lower level with shared locks
 		- Intention Exclusive (IX) : indicates explicit locking at lower level with exclusive locks
 		- Shared+Intention Exclusive (SIX) : subtree rooted by that node is locked explicitly in shared mode & explicit locking is being done at a lower level with exclusive-mode locks.
+![[Pasted image 20240114024509.png]]
 - Locking Protocol
 	- Each txn obtains appropriate lock at highest level of the database hierarchy.
-	- To get S or IS lock on a node, the txn must hold at least IS on parent node.
-	- To get X, IX, or SIX on a node, the txn must hold at least IX on parent node.
+	- **To get S or IS lock on a node, the txn must hold at least IS on parent node.**
+	- **To get X, IX, or SIX on a node, the txn must hold at least IX on parent node.**
 - Lock Escalation
 	- DBMS can switch to coarser-grained locks when a txn acquires too many low level locks.
 	- Reduces the no. of requests that the lock manager must process.
@@ -2267,7 +2269,7 @@ Conclusion
 - Use incremental updates (STEAL + NO-FORCE) w/ checkpoints.
 - On recovery: undo uncommitted txns + redo committed txns.
 
-## Database Recovery
+## 20 : Database Recovery
 Agenda: Log Sequence Numbers, Normal Commit & Abort Operations, Fuzzy Checkpointing, Recovery Algorithm
 
 Actions after a failure to recover the database to a state that ensures atomicity, consistency, and durability.
@@ -2442,5 +2444,267 @@ Main Ideas in ARIES
 - Undo txns that never commit
 - Write CLRs when undoing, to survive failures during restarts
 
+## 21: Introduction to Distributed Databases
 
+Agenda: System Architecture, Design Issues, Partitioning Schemes, Distributed Concurrency Control
+
+| Parallel DBMSs                            | Distributed DBMSs                                |
+|-------------------------------------------|--------------------------------------------------|
+| Nodes are physically close                | Nodes can be far                                 |
+| Nodes connected w/ high-speed LAN         | Nodes connected using public network             |
+| Communication cost is assumed to be small | Communication cost and problems can't be ignored |
+
+**System Architecture**
+A distributed DBMS's system architecture specified what shared resources are directly accessible to CPUs.
+
+Kinds
+- Shared Everything
+	- Disk, Memory, CPU are local to each other.
+	- Messages b/w two queries are passed in memory.
+	- Note: There seems to be some difference in the terminology in the lecture & what's available online. A "shared everything" architecture in some places online is servers accessing common resources while in the lecture, shared everything refers to a non-distributed system. 
+		- See https://blogs.sap.com/2013/02/21/shared-everything-vs-shared-nothing-get-the-best-of-both-with-sap-sybase-iq-16/
+- Shared Memory
+	- CPUs aren't co-located but Memory & Disk are shared.
+	- CPUs have access to common memory address via a fast interconnect.
+		- Note: The interconnect is not guaranteed to be reliable.
+	- Each processor has a global view of all the in-memory data structures.
+	- Each DBMS instance on a processor must "know" about other instances.
+	- No distributed DB implements this. HPC (High Performance Computing) applications that operate on TBs on data (stored locally) implement this.
+	- Sidenote: see RDMA (remote direct memory access)
+- Shared Disk
+	- Separate nodes with local CPU & Memory but Disk is shared.
+	- All CPUs can access a single logical disk directly via an interconnect but each have their own private memory.
+	- Messages are passed b/w nodes over network to learn about their current state.
+	- Execution layer can be scaled independently from the storage layer.
+	- Eg: Snowflake, Druid, Spark, Dremio, Yugabyte, Spanner, Amazon Aurora
+	- Sidenotes
+		- Nodes can have locally attached storage but as a cache instead of the final state storage.
+		- Some systems split workload by key so that a specific node handles a particular record. Others just send messages to nodes whenever a change occurs so that their cache can be updated or invalidated.
+		- Amazon Aurora uses an interface over EBS that's aware of replication, transaction etc. & they can send messages at storage layer b/w different nodes.
+- Shared Nothing
+	- Every node has its local CPU, Memory & Disk.
+	- Nodes only communicate via network.
+	- Better performance & efficiency
+	- Issues: Harder to scale, ensure consistency
+		- Adding new nodes can require physically migrating data.
+	- Sidenote: Older systems used this. It's easier to build Shared Disk systems w/ the cloud now using something like S3 (for analytical workloads) or EBS (for transactional workloads).
+	- Eg: Cassandra, Redis, TiDB, SingleStore, MongoDB, CockroachLabs, Clickhouse, Citus, etcd
+
+Sidenote: Early Distributed DBMS
+- Muffin (1979) by Stonebraker (multiple Ingress nodes w/ a processing layer on top)
+- SDD-1 by Bernstein
+- System R by IBM (1984)
+- Gamma (1986)
+- NonStop SQL (1987) - still running & widely used (banks use it)
+
+**Design Issues**
+- How does the application find data?
+- Where does the application send queries?
+	- Situation: Query goes to one node, data is is another.
+- Query Execution on Distributed Data
+	- Push query to data (Shared disk always uses this)
+	- Pull data to query
+- Correctness
+- Division of DB across resources
+
+| Homogenous Nodes | Heterogenous Nodes |
+| ---- | ---- |
+| Every node in the cluster can perform the same set of tasks | Nodes are assigned specific tasks |
+| Make provisioning & failover easy | Can allow a single physical node to host multiple virtual node types for dedicated tasks |
+
+Data Transparency : Applications shouldn't be required to know where data is physically located in a distributed DBMS. In practice, developers need to be aware of the communication costs of queries to avoid expensive data movement.
+
+Database Partitioning
+- Split DB across multiple resources (disks, nodes, processors)
+- DB executes query fragments on each partition & then combines the results to produce a single answer.
+- DBMS can partition DB physically (shared nothing) or logically (shared disk)
+- Note: In general terminology online, partitioning is splitting data on a single server while sharding is splitting data across multiple servers.
+- Partitioning Schemes
+	- Naive Table Partitioning
+		- Assign an entire table to a single node. Assume that each node has enough space for an entire table.
+		- Ideal if queries never join data across tables stored on different nodes & access patterns are uniform.
+		- Eg: MongoDB can do this. Most systems don't.
+	- Vertical Partitioning
+		- Split a table's attributes into separate partitions.
+		- Must store tuple info. to reconstruct the original record.
+		- Say we have a column w/ really large text fields occupying the space. We can separate it out & keep it in another partition.
+	- Horizontal Partitioning
+		- Split a table's tuple into disjoint subsets based on some partitioning key and scheme.
+		- Choose column(s) that divide the DB equally in terms of size, load or usage.
+		- Schemes
+			- Hashing
+			- Range
+			- Predicate
+- Kinds
+	- Logical Partitioning
+		- A node is responsible for a set of keys, but it doesn’t actually store those keys.
+		- This is commonly used in a shared disk architecture.
+	- Physical Partitioning
+		- A node is responsible for a set of keys, and it physically stores those keys.
+		- This is commonly used in a shared nothing architecture.
+- Note: If a node gets a request from the application requesting different keys than the ones its responsible for, then it makes a request to the peer node (instead of doing the round trip w/ the application) that's responsible for those keys & gets the result from there. It can also store a local copy.
+
+- You can use consistent hashing with a fixed replication factor so that each insert goes to multiple fixed number of adjacent nodes & is replicated. 
+	- Technique was introduced by this paper: https://pdos.csail.mit.edu/papers/chord:sigcomm01/chord_sigcomm.pdf
+	- DynamoDB, Memcached, Riak, Cassandra use this.
+- Scope of Txn.
+	- A single node txn only accesses data that is contained on 1 partition.
+	- A distributed txn accesses data at 1 or more partitions. (Requires expensive coordination)
+- Transaction Coordination
+	- Centralized
+		- Sidenote:
+			- TP Monitors
+				- Centralized coordinator for distributed DBMSs developed in 1970-80s to provide txns b/w terminals & mainframe DBs. (Used by ATMs, airlines)
+				- Coordinator would hold locks similar to a Lock Manager in a DB.
+				- Process
+					- App sends Lock Request to Coordinator 
+					- Coordinator grants the Lock Request
+					- App sends requests to Partitions
+					- When app wants to commit, it sends a Commit Request to Coordinator
+					- Coordinator checks w/ the partition nodes & makes them commit
+			- Nowadays
+				- There's usually a middleware component is b/w which receives the request from the application & executes it on behalf of the application. The application doesn't need to know of the partitions in this case since the middleware manages everything (like query routing, txn).
+				- Eg: MongoDB (kinda), Vitess
+	- Decentralized
+- Distributed Concurrency Control
+	- Need to allow multiple txns. to execute simul. across multiple nodes.
+	- Challenges: Replication, Network Communications Overhead, Node Failures, Clock Skew
+
+## 22 : Distributed OLTP Database Systems
+- Agenda: Atomic Commit Protocols, Replication, Consistency Issues (CAP / PACELC), Google Spanner
+- OLTP
+	- Short-lived read/write txns.
+	- Small footprint
+	- Repetitive operations
+- OLAP
+	- Long running, read-only queries
+	- Complex joins
+	- Exploratory queries
+- Decentralized Coordinator
+	- App sends request to the primary node
+	- Queries are sent to different partitions
+	- Once changes are done, request primary node to commit txn.
+	- Primary node checks with other nodes to confirm if txn is safe to commit & commits it
+- Assumption: All nodes in a distributed DBMS are well-behaved & under the same administrative domain i.e. if we tell a node to commit a txn, then it'll commit the txn (if there isn't a failure).
+	- Sidenote: Byzantine Fault Tolerant protocol is used if you don't trust other nodes (like in blockchains).
+
+### Atomic Commit Protocol
+- When a multi-node txn finishes, the DBMS needs to ask all the nodes involved whether it is safe to commit.
+- Examples:
+	- **Two Phase Commit**
+	- **Paxos**
+	- Raft
+	- ZAB (used in Apache Zookeeper)
+	- Viewstamped Replication
+- Two Phase Commit (2PC)
+	- Phase 1 : Prepare
+		- App sends request to coordinator node to commit.
+		- Coordinator node asks other nodes if txn is safe to commit.
+		- Each node sends back its vote.
+	- Phase 2 : Commit or Abort
+		- Commit Scenario (each participant agrees)
+			- Coordinator node asks the other nodes to commit, changes are applied & an ack is sent back to the coordinator.
+			- Coordinator sends an acknowledgement to the app.
+		- Abort Scenario (one participant disagrees)
+			- Coordinator notifies the app that the txn is aborted.
+			- Coordinator sends an abort message to the participants & gets an ack from them.
+	- See https://en.wikipedia.org/wiki/Two-phase_commit_protocol
+	- Each node records the inbound/outbound messages & outcome for each phase in a non-volatile storage log.
+	- On recovery, examine the log & if local txn:
+		- In prepared state -> Contact coordinator
+		- Not in prepared state -> Abort it
+		- Was committing & node is the coordinator -> Send COMMIT message to nodes
+	- If coordinator crashes
+		- Participants must decide what to do after a timeout.
+			- Easiest thing to do is to abort the txn. A participant has to become the new coordinator.
+		- System isn't available during this time.
+	- If participant crashes
+		- Coordinator assumes that it responded with an abort if it hasn't send an acknowledgement yet.
+		- Nodes use a timeout to determine that participant is dead.
+	- Optimizations
+		- Early Prepare Voting (Rare)
+			- If you send a query to a remote node that you know will be the last one you execute there then that node will also return their vote for the prepare phase with the query result.
+			- Rare because people don't write compatible code in applications. This shows up in systems where txns are running as stored procedures.
+		- Early Ack After Prepare (Common)
+			- If all nodes vote to commit a txn, the coordinator can send the client an acknowledgement that their txn was successful before the commit phase finishes.
+	- 
+- Paxos
+	- Coordinator (Proposer) proposes an outcome & then the participant (acceptor) vote on whether the outcome should succeed.
+	- Doesn't block if a majority of participants are available & has provably minimal message delays in best case.
+	- Participants decline txn if they receive another with a higher logical counter from another proposer (doesn't have to commit, only needs to receive the "higher" txn)
+	- Read https://15799.courses.cs.cmu.edu/fall2013/static/slides/paxos_made_live.pdf
+		- Sidenote: The original paper was released in 90s & is much harder to read so it's better to read the paper published by Google.
+- Multi Paxos
+	- If a single leader that oversees proposing changes is elected for some period then it can skip the Propose phase.
+		- Fall back to full Paxos whenever there is a failure.
+	- The system periodically renews the leader (known as lease) using another Paxos round.
+		- Nodes must exchange log entires during leader election so that everyone is up to date.
+- 2PC vs Paxos
+	- 2PC blocks if coordinator fails after the prepare message is sent until coordinator recovers.
+	- Paxos is non-blocking if majority of participants are alive.
+
+### Replication
+- DBMS can replicate data across redundant nodes to increase availability.
+- Design Decisions
+	- Replica Configuration
+	- Propagation Scheme
+	- Propagation Timing
+	- Update Method
+- Replica Configurations
+	- Primary-Replica (old term : Master-Slave)
+		- All updates go to a designated primary for each object.
+		- Primary propagates updates to its replicas **without** an atomic commit protocol.
+		- Read-only txns may be allowed to access replicas.
+		- If the primary goes down, then hold an election to select a new primary.
+	- Multi-Primary (Multi-Home)
+		- Txns can update data objects at any replica.
+		- Replicas must sync with each other using an atomic commit protocol.
+- K-safety
+	- Threshold for determining the fault tolerance of the replicated database.
+	- The value K represents the no. of replicas per data object that must always be available.
+	- If the no. of replicas goes below this threshold, DBMS halts and goes offline.
+- Propagation Scheme
+	- When a txn commits on a replicated DB, the DBMS decides whether it must wait for that txn's changes to propagate to other nodes before it can send the acknowledgement to application.
+	- Propagation Levels
+		- Synchronous (Strong Consistency)
+		- Asynchronous (Eventual Consistency)
+			- Note: There could be a small window when you'd lose the data in case the primary goes down after sending the commit ack to app without syncing the commit to the other nodes.
+	- Propagation Timing Approaches
+		- Continuous
+			- DBMS sends log messages immediately as it generates them.
+			- Also need to send a commit/abort message.
+		- On Commit
+			- DBMS sends the log messages for a txn to the replicas once the txn commits.
+			- Doesn't waste time sending log records for aborted txns.
+			- Assumption: Txn's log records fits entirely in memory.
+	- Active vs. Passive Approaches
+		- Active-Active
+			- A txn executes at each replica independently.
+			- Need to check if the txn ends up with the same result at each replica.
+		- Active-Passive (more common)
+			- Each txn executes at a single location & propagates the changes to the replica.
+			- Can either do physical or logical replication.
+			- Not the same as Primary-Replica vs Multi-Primary. How????
+### Google Spanner
+- Geo-replicated
+- Schematized, semi-relational? data model
+- Decentralized shared-disk architecture
+- Log-structured on-disk storage
+- Concurrency Control
+	- MVCC + Strict 2PL w/ Wound-Wait Deadlock Prevention + Multi-Paxos + 2PC
+	- Externally consistent global write-transactions with synchronous replication
+	- ? Lock-free read-only transactions
+	- DBMS ensures ordering through globally unique timestamps generated from atomic clocks & GPS devices.
+- DB is broken up into tablets (partitions):
+	- Use Paxos to elect leader in tablet group
+	- Use 2PC for txns that span tablets
+
+### CAP Theorem
+- It's not possible for a distributed system to always be:
+	- Consistent (Linerazibility)
+	- Available (All up nodes can satisfy all requests)
+	- Network Partition Tolerant (Operate correctly despite message loss)
+- See the [PACELC theorem](https://en.wikipedia.org/wiki/PACELC_theorem) which is a newer extension to the CAP theorem.
+- Traditional/Distributed Relational DBMS would choose consistency & availability over network partition tolerance.
+- NoSQL DBMS chose high availability over consistency & then resolved conflicts after nodes are reconnected.
 

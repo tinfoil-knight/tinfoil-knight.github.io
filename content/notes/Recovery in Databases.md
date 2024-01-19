@@ -1,8 +1,12 @@
-#db 
+---
+tags:
+  - db
+---
+
 
 
 How you can check if a clean exit happened in a DB?
-Shared by: #avinassh
+Shared by: #AvinashS
 
 ```rust
 // https://github.com/tursodatabase/libsql/blob/49e3c04d191592e7a17f7a51d767b0a76bf12007/libsql-server/src/lib.rs#L237-#L250

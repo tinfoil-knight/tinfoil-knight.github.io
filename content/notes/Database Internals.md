@@ -1,4 +1,9 @@
-#db 
+---
+tags:
+  - db
+created: 2024-11-02
+---
+
 Written By: #AlexPetrov
 Created At: 02/11/23
 

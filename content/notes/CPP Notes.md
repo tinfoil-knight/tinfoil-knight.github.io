@@ -1,4 +1,7 @@
-#cpp
+---
+tags:
+  - cpp
+---
 Note: Was mainly working with C++17
 ## Templates
 - `template <>` 

@@ -1,5 +1,7 @@
-#db 
-
+---
+tags:
+  - db
+---
 [https://youtu.be/GFQaEYEc8_8](https://youtu.be/GFQaEYEc8_8)  
 
 First NF (1NF)  
