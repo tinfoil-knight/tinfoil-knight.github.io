@@ -14,10 +14,11 @@ function FolderContent(props: QuartzComponentProps) {
   const allPagesInFolder = allFiles.filter((file) => {
     const fileSlug = _stripSlashes(simplifySlug(file.slug!))
     const prefixed = fileSlug.startsWith(folderSlug) && fileSlug !== folderSlug
-    const folderParts = folderSlug.split(path.posix.sep)
-    const fileParts = fileSlug.split(path.posix.sep)
-    const isDirectChild = fileParts.length === folderParts.length + 1
-    return prefixed && isDirectChild
+    // const folderParts = folderSlug.split(path.posix.sep)
+    // const fileParts = fileSlug.split(path.posix.sep)
+    // const isDirectChild = fileParts.length === folderParts.length + 1
+    // return prefixed && isDirectChild
+    return prefixed
   })
 
   const listProps = {
