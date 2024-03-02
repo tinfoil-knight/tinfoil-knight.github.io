@@ -43,7 +43,7 @@ const config: QuartzConfig = {
   plugins: {
     transformers: [
       Plugin.FrontMatter(),
-      Plugin.TableOfContents(),
+      Plugin.TableOfContents({ maxDepth: 2, collapseByDefault: true }),
       Plugin.CreatedModifiedDate({
         // you can add 'git' here for last modified from Git
         // if you do rely on git for dates, ensure defaultDateType is 'modified'
