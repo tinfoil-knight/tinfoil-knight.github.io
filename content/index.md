@@ -1,8 +1,7 @@
 ---
 title: kunal
+publish: true
 ---
-
-(This site is currently in-progress.)
 
 I'm a software engineer working at [ImageKit](https://imagekit.io/) on media delivery & optimization.
 

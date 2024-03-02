@@ -1,12 +1,11 @@
 ---
 tags:
   - db
+created: 2023-10-25
+origin: Avinash Sajjanshetty
+publish: true
 ---
-
-
-
-How you can check if a clean exit happened in a DB?
-Shared by: #AvinashS
+How you can check if a clean exit or a dirty shutdown happened in a DB?
 
 ```rust
 // https://github.com/tursodatabase/libsql/blob/49e3c04d191592e7a17f7a51d767b0a76bf12007/libsql-server/src/lib.rs#L237-#L250

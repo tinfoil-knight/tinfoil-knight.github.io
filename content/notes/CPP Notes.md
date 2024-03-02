@@ -1,13 +1,14 @@
 ---
 tags:
   - cpp
+publish: false
 ---
 Note: Was mainly working with C++17
 ## Templates
 - `template <>` 
 ```c++
 // Creating specialized templated functions, that do different things for different types.
-// Take the following contrived example, which prints the type if its a float type, but just prints hello world for all other types.
+// Take the following example, which prints the type if its a float type, but just prints hello world for all other types.
 
 template <typename T> void print_msg() {
 	std::cout << "Hello world!\n";
@@ -62,6 +63,52 @@ int main(){
 - Passing a `shared_ptr` by reference to another function doesn't increase the reference count. (Passing as value does increase the ref count though)
 - Copies of `shared_ptr` refer to the same object instance.
 - You can check whether a smart pointer is empty or not by just checking if they're truthy. Eg: `ptr ? "not empty" : "empty"`
+
+### Examples
+```cpp
+#include <memory>
+#include <iostream>
+
+class Person {
+	public:
+		Person(const std::string& name) : name(name) {};
+		
+		void introduce() const {
+			std::cout << "Hi, I'm " << name << std::endl;
+		}
+	
+	private:
+		std::string name;
+
+};
+
+  
+
+int main()
+{
+	Person* rawPtr = nullptr;
+	{
+	std::shared_ptr<Person> personSharedPtr = std::make_shared<Person>("John");
+	
+	// Getting a raw pointer from the shared_ptr
+	rawPtr = personSharedPtr.get();
+	}
+	// shared_ptr goes out of scope, and the Person object is destructed when the last shared_ptr owning it is destroyed
+	
+	// Accessing the object using the raw pointer
+	if (rawPtr) {
+		rawPtr->introduce();
+		// Accessing *rawPtr after personSharedPtr is destructed leads to undefined behavior
+	}
+	
+	return 0;
+}
+```
+
+
+## Sync & Threads
+- You can use a [condition variable](https://en.cppreference.com/w/cpp/thread/condition_variable) to block a thread on a shared condition. `wait` takes an acquired lock, releases it & then suspends the thread. When the thread is awakened (using `notify` etc.) then the awakened thread tries to re-acquire the lock & check if the condition is true. If the lock is acquired & the condition is true, the thread proceeds with further execution.
+
 
 ## Misc
 - [Incompatibilities Between ISO C and ISO C++](http://david.tribble.com/text/cdiffs.htm#C99-vs-CPP98)

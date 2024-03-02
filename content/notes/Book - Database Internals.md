@@ -1,12 +1,10 @@
 ---
 tags:
   - db
-created: 2024-11-02
+created: 2023-11-02
+source: https://www.databass.dev/
+origin: Alex Petrov
 ---
-
-Written By: #AlexPetrov
-Created At: 02/11/23
-
 > The most significant distinctions between database systems are concentrated around two aspects: how they store and how they distribute the data. The book is arranged into parts that discuss the subsystems and components responsible for storage (Part I) and distribution (Part II).
 
 > Note to Self: These notes were taken when I was doing the CMU DB course so they only include things which piqued my interest (or reminded me something I forgot) so these notes aren't exhaustive. 

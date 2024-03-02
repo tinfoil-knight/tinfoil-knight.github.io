@@ -1,12 +1,12 @@
 ---
 tags:
   - db
-  - sql
-created: 2024-08-13
+created: 2023-08-13
+updated: 2024-02-09
+source: https://15445.courses.cs.cmu.edu/fall2022/
+origin: Andy Pavlo
+publish: true
 ---
-
-Taught By: #AndyPavlo
-
 Note:
 - Lectures watched were of the Fall 2022 session. Schedule: https://15445.courses.cs.cmu.edu/fall2022/schedule.html
 - Some paragraphs in these notes are used as is from the provided lecture notes or slides.
@@ -2708,3 +2708,156 @@ Database Partitioning
 - Traditional/Distributed Relational DBMS would choose consistency & availability over network partition tolerance.
 - NoSQL DBMS chose high availability over consistency & then resolved conflicts after nodes are reconnected.
 
+## 23 : Distributed OLAP Database Systems
+- Agenda: Execution Models for OLAP Systems, Query Planning, Distributed Join Algorithms, Cloud Systems
+- Star Schema
+	- Involves a Fact table and many Dimension tables.
+	- The Fact table holds references (as foreign keys) to other Dimension tables.
+- Snowflake: More normalised than a Star schema. Tables can hold references to multiple levels of lookup tables for better normalisation.
+- Star vs Snowflake Schema
+	- Issue 1 : Normalization
+		- Snowflake schema take up less storage space.
+		- Denormalised data models may incur integrity & consistency violations.
+	- Issue 2 : Query Complexity
+		- Snowflake schemas require more joins to get the data needed for query.
+		- Queries on star schemas will usually be faster.
+		- Star schemas have more accurate statistics & get better query plans.
+- Design Decision : Push vs Pull
+	- Push Query to Data
+		- Send the query (or a portion of it) to the node that contains the data.
+		- Perform as much filtering, processing as possible where data resides before transmitting over network.
+	- Pull Data to Query
+		- Bring data to node that's executing a query that needs it for processing.
+- Observation
+	- Data received in node from remote sources are cached in the buffer pool which allows the DBMS to support intermediate results that are larger than amount of available memory. But these ephemeral pages are persisted on restarts.
+	- What happens to a long-running OLAP query if a node crashes during execution?
+- Query Fault Tolerance
+	- Most shared-nothing distributed OLAP DBMSs are designed to assume that nodes do not fail during query execution. If 1 node fails during query execution then the whole query fails.
+		- Traditionally, systems made the trade-off to not store the intermediate results since writing the intermediate results to disk impacted performance significantly for small clusters.
+	- The DBMS could take a snapshot of intermediate results fro a query during execution to allow it to recover if nodes fail.
+		- Newer cloud systems allow writing the intermediate results to a shared disk which can be used by some other node to continue the query if the current one fails.
+	- Sidenote: Hadoop stores the intermediate result after every step in the query pipeline. Most modern systems decide when checkpointing results is required & do it rather than performing it after each step.
+- Query Planning
+	- We need to consider the physical location of data & network transfer costs.
+	- Sidenote: DB2 runs a benchmark on startup to determine the network latency to other nodes & factor that in query costs.
+	- Query Plan Fragments
+		- Physical Operators
+			- Generate a query plan & then break it up into partition specific fragments.
+			- Most systems implement this approach.
+		- SQL
+			- Rewrite original query into partition-specific queries.
+				- SQL -> Query Plan -> Physical Operators -> SQL for partitions
+			- Allows for local optimization at each node.
+			- Eg: SingleStore, Vitess do this.
+	- Observation
+		- Efficiency of a distributed join depends on the target tables' partitioning schemes.
+		- An approach is putting entire tables on a single node & then doing the join. But,
+			- Parallelism of a distributed DBMS is lost.
+			- Data transfer over network is costly.
+- Distributed Join Algorithms
+	- To join tables R & S, the DBMS needs to get the proper tuples on the same node. Once data is at the node, the DBMS executes the same join algorithms as single node systems.
+	- `SELECT * FROM R JOIN S ON R.id = S.id`
+	- Scenarios
+		- 1 table is replicated at every node.
+			- Each node joins its local data in parallel & then sends their results to a coordinating node.
+		- Tables are partitioned on the join attribute.
+			- Each node performs the join on local data & then sends to a coordinator node for coalescing. 
+		- Both tables are partitioned on different keys.
+			- If 1 of the tables is small, then the DBMS "broadcasts" that table to all nodes.
+			- "Broadcast Hash Join"
+		- Both tables are not partitioned on the join key.
+			- DBMS copies the tables by "shuffling" them across nodes.
+			- Eg: One node would end up with all records for R & S w/ id 1 to 100 & another node with 101-200. They can then perform the join on the id (which isn't the join key for these tables) on each node.
+	- Optimisation : Semi Join
+		- Join type where result only contains columns from the left table.
+		- `SELECT R.id FROM R JOIN S ON R.id = S.id WHERE R.id IS NOT NULL`
+		- Used by distributed DBMSs to minimize the amount of data sent during joins.
+		- Sidenote: If SEMI JOIN isn't explicitly supported, you can fake it with EXISTS.
+- Cloud Systems
+	- Managed DBMS
+		- No significant modification to the DBMS to be aware that it's running in a cloud environment.
+	- Cloud-Native DBMS
+		- Designed explicitly to run in a cloud environment.
+		- Usually based on a shared-disk architecture.
+		- Eg: Snowflake, Google BigQuery, Amazon, Redshift, MS SQL Azure
+- Serverless Databases
+	- Evicts "tenants" when they become idle to save compute resources.
+	- Eg: Neon, CockroachDB, Planetscale, MS SQL Azure, Fauna
+	- You'd have a cold start for the first query since there's no buffer pool keeping the pages in cache once a "tenant" is evicted.
+- Data Lakes
+	- Repository for storing large amounts of structured, semi-structured & unstructured data without having to define a schema or ingest the data into proprietary internal formats.
+	- Eg: Trino, Presto, Amazon Redshift, Google BigQuery, Hive, Databricks, Snowflake
+- Universal Formats
+	- Most systems use a proprietary on-disk binary file format. The only way to share data b/w these systems is to convert data to some text based format like CSV, XML, JSON.
+	- There are new open-source binary file formats for easy access to data across systems.
+		- Eg: Apache Parquet (from Twitter), Apache ORC, Apache Arrow (from Pandas/Dremio, in-mem compressed columnar storage), Apache Iceberg (from Netflix), HDF5 (multi-dimensional arrays used in scientific workloads)
+- Disaggregated Components
+	- System Catalogs: HCatalog, Google Data Catalog
+	- Node Management: Kubernetes, Apache Yarn
+	- Query Optimizers: Apache Calcite, Greenplum Orca
+
+## 24 : Embedded Database Logic
+- Agenda: User-defined Functions, Stored Procedures, Triggers, Change Notifications, User-defined Types, Views
+ - (Potential) Benefits of moving application logic
+	 - Less network round-trips
+	 - Immediate notification of changes
+	 - DBMS spends less time waiting during transactions
+	 - Developers don't have to reimplement functionality (if we end we rewriting the application in some other language)
+ - User-Defined Functions (UDF)
+	 - Function written by application developer that extends the system's functionality beyond its built-in operations.
+	 - Takes in input args (scalars) -> Perform computation -> Return a results (scalars, tables)
+	 - UDFs can either be written using SQL Functions or an External Programming Language (depending upon the DB)
+		 - SQL Standard: SQL/PSM
+		 - Oracle/DB2: PL/SQL
+		 - Postgres: PL/pgSQL (inspired by Ada)
+	 - Other systems support more common PLs in sandbox or non-sandbox environments.
+	 - Disadvantages
+		 - Query optimizers treat UDFs as black boxes & are unable to estimate cost or optimize the queries.
+		 - Difficult to parallelize UDFs due to correlated queries inside of them. Some DBMSs will only execute queries with a single thread if they contain a UDF.
+		 - Complex UDFs in SELECT/WHERE clauses force the DBMS to execute iteratively.
+		 - DBMS can't perform cross-statement optimizations (?) since it executes the commands in UDF one by one. 
+		 - Sidenote: Some DBMSs allow specifying hints to mark the UDF for parallelization. SQL Server has read only functions which don't let you update the DB.
+ - Stored Procedures
+	 - Self contained function that performs more complex logic inside of the DBMS.
+	 - Can have many input/output parameters.
+	 - Can modify the database table/structures.
+	 - Sidenote:
+		 - Some DBMSs distinguish UDFs vs. stored procedures but not all.
+		- A UDF is meant to perform a subset of a read-only computation within a query. A stored procedure is meant to perform a complete computation that is independent of a query. (Not all DBs enforce this though.)
+-  Triggers
+	- A trigger instructs the DBMS to invoke a UDF when some even occurs in the DB.
+	- Requires developer to define:
+		- type of event that'll cause it to run (INSERT, DELETE, ALTER, DROP etc.)
+		- scope of event (TABLE, DATABASE, VIEW, SYSTEM)
+		- when it runs relative to the event (before query, after query, before each row, after each row, instead of the query)
+- Change Notification
+	- Like a trigger except DBMS sends a message to an external entity that something has happened in the database.
+		- Can be chained w/ trigger to pass along whenever a change occurs.
+	- SQL Standard: LISTEN + NOTIFY
+- User-Defined Types / Structured Types
+	- Special data type that is defined by the application developer that the DBMS can store natively.
+	- Each DBMS exposes a different API that allows you to create a UDT.
+		- Postgres/DB2 : In-built support
+		- Oracle: PL/SQL
+		- MSSQL: Using external languages (.Net, C)
+- Views
+	- Creates a virtual table containing the output from a SELECT query which can be accessed as if it was a real table.
+	- Allows programmer to simplify a complex query that is executed often.
+		- Doesn't make the DBMS run faster though.
+	- Often used a mechanism to hide a subset of table's attributes from certain users.
+	- Sidenote: With "VIEW", dynamic results are only materialized when needed while "SELECT...INTO" creates static table that doesn't get updated when student gets updated.
+	- The SQL standard allow modifying a VIEW if it only contain 1 base table & doesn't contain grouping, distinction, union or aggregation.
+	- Materialized Views
+		- Creates a view containing the output from a SELECT query that is retained (i.e. not recomputed each time it's accessed)
+		- Some DBMS (like SQL Server) automatically updated matviews when underlying tables change.
+		- Other DBMSs (like Postgres) require manual refresh.
+- Conclusion
+	- Moving application logic into the DBMS has lots of benefits:
+		- Better efficiency
+		- Reusable across applications
+	- But it has problems:
+		- Debugging is difficult.
+		- Not portable.
+		- Potentially need to maintain different versions.
+		- DBAs don't like constant change.
+		- Things like PL/SQL are quite archaic.
