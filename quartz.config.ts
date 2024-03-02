@@ -37,6 +37,16 @@ const config: QuartzConfig = {
           tertiary: "#84a59d",
           highlight: "rgba(143, 159, 169, 0.15)",
         },
+        // darkMode: {
+        //   light: "#2D3250",
+        //   lightgray: "#393639",
+        //   gray: "#A47963",
+        //   darkgray: "#FEFBF6",
+        //   dark: "#ebebec",
+        //   secondary: "#6DA34D",
+        //   tertiary: "#A5DD9B",
+        //   highlight: "rgba(143, 159, 169, 0.15)",
+        // }, // Alternative Color Scheme
       },
     },
   },
@@ -57,7 +67,7 @@ const config: QuartzConfig = {
       Plugin.CrawlLinks({ markdownLinkResolution: "shortest" }),
       Plugin.Description(),
     ],
-    filters: [Plugin.RemoveDrafts()],
+    filters: [Plugin.ExplicitPublish()],
     emitters: [
       Plugin.AliasRedirects(),
       Plugin.ComponentResources({ fontOrigin: "googleFonts" }),
