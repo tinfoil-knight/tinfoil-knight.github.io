@@ -50,7 +50,15 @@ export function getFullSlug(window: Window): FullSlug {
 function sluggify(s: string): string {
   return s
     .split("/")
-    .map((segment) => segment.replace(/\s/g, "-").replace(/%/g, "-percent").replace(/\?/g, "-q")) // slugify all segments
+    .map(
+      (segment) =>
+        segment
+          .replace(/\s/g, "-")
+          .replace(/%/g, "-percent")
+          .replace(/\?/g, "-q") // slugify all segments
+          .toLowerCase()
+          .replace(/\((\d{4})\)/g, "$1"), // Replace four-digit years wrapped in brackets
+    )
     .join("/") // always use / as sep
     .replace(/\/$/, "")
 }
