@@ -1,6 +1,7 @@
 ---
 tags:
   - db
+  - talks
 created: 2024-02-29
 source: https://www.youtube.com/watch?v=drgriZCRyrQ
 origin: Ben Johnson <benbjohnson>
@@ -65,11 +66,10 @@ publish: true
 > - PUT requests are 0.005$ / 1000 req.
 > - Replicating every second costs $13 / month & every 10 seconds costs $1.30/month.
 
-
 ## LiteFS
 - People wanted realtime read replication & high availability. So, they made LiteFS.
-- Distributed File System for SQLite databases.
-- FUSE-based file system.
+- LiteFS is a Distributed File System for SQLite databases.
+- FUSE-based.
 - Cluster of nodes share the same SQLite data.
 - Single-writer elected via Consul lease.
 - Instant point-in-time restores.
@@ -102,11 +102,12 @@ publish: true
 		- Implemented via virtual file system within SQLite
 		- Must be compiled/linked into the application
 	- Postgres & MySQL
-- Q/A
-	- How big can the DB be for these tools to work well?
-		- Targeting around 1-10GB DBs.
-	- Litestream is blindly copying pages w/o parsing them. Have you thought about some optimizations you could do?
-		- Litestream does parse the WAL file. There's a header for the whole WAL & one for each frame which is used to delineate txn. 
-		- We could do Change Data Capture (CDC).
-	- How much load does running Litestream add onto a machine?
-		- Not much really. Most of the pages are recent & will be in the page cache. Analysis is pretty minimal since the WAL is mostly copied so it doesn't require much processing time.
+
+## Q/A
+- How big can the DB be for these tools to work well?
+	- Targeting around 1-10GB DBs.
+- Litestream is blindly copying pages w/o parsing them. Have you thought about some optimizations you could do?
+	- Litestream does parse the WAL file. There's a header for the whole WAL & one for each frame which is used to delineate txn. 
+	- We could do Change Data Capture (CDC).
+- How much load does running Litestream add onto a machine?
+	- Not much really. Most of the pages are recent & will be in the page cache. Analysis is pretty minimal since the WAL is mostly copied so it doesn't require much processing time.

@@ -7,9 +7,6 @@ source: https://15445.courses.cs.cmu.edu/fall2022/
 origin: Andy Pavlo
 publish: true
 ---
-Note:
-- Lectures watched were of the Fall 2022 session. Schedule: https://15445.courses.cs.cmu.edu/fall2022/schedule.html
-- Some paragraphs in these notes are used as is from the provided lecture notes or slides.
 ## 1 : Relational Model & Relational Algebra
 Inventor of Relational Model : Edgar Frank "Ted" Codd at IBM
 A Relational Model of Data for Large Shared Data Banks

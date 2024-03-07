@@ -1,6 +1,7 @@
 ---
 tags:
   - db
+  - talks
 created: 2024-02-26
 source: https://www.youtube.com/watch?v=pS2_AJNIxzU
 origin: Thomas Neumann
@@ -211,7 +212,7 @@ publish: true
 	- Same grammar & wire protocol so a pg driver can be used.
 	- A few catalog tables are exposed for drivers to work.
 
-Appendix
+## Appendix
 - https://umbra-db.com/
 - Paper : [Umbra: A Disk-Based System with In-Memory Performance, Thomas Neumann and Michael J. Freitag](https://www.cidrdb.org/cidr2020/papers/p29-neumann-cidr20.pdf)
 - https://dbdb.io/db/umbra

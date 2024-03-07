@@ -1,6 +1,7 @@
 ---
 tags:
   - db
+  - talks
 created: 2024-02-11
 source: https://www.youtube.com/watch?v=xnuv6vr8USE
 origin: Bowei Chen, Kavinder Dhaliwal, Libo Wang
@@ -129,17 +130,18 @@ publish: true
 		- Instead of maintaining a materialized view for every DML, maintain materialized views of different partitions
 	- Result Reuse (exact match caching)
 	- Query Acceleration Service (QAS)
-- Query Acceleration Service (QAS)
-	- Problem : Warehouse size has to be decided by human. Unable to scale based on actual compute demand of each individual query. Workload is different for large & small queries. Keeping a large warehouse has unnecessary costs while a smaller warehouse would have high query execution time for large queries. Table scan is to blame in many cases for these execution times.
-	- QAS executes a fragment of the plan at larger scale. It targets plan fragments with:
-		- Large Table Scans
-		- High reduction (lots of data in -> small amount out after filtering, grouping)
-		- No data exchange (b/w servers with different fragments) required until the last step when the fragments merge 
-	- ![[Pasted image 20240212164951.png]]
-	- Intermediate results are materialized as regular data files. They can also be re-used.
-	- QAS Query Execution
-		- Normally, files for a scan are distributed during compilation time. In a Continuous ScanSet, files are distributed in batches at runtime upon request. (Server asks for files from query coordinator which provided it in batches)
-		- ![[Pasted image 20240212170326.png]]
-		- Failed batches are sent to warehouse for retry. Successful ones are checkpointed in the staging area & removed.
-		- Warehouse fetches the materialized result files after everything is done.
-	- QAS Insert Optimization : For some INSERT queries (where a table scan is being done to insert data into some other table), the entire plan can be accelerated directly.
+
+### Query Acceleration Service (QAS)
+- Problem : Warehouse size has to be decided by human. Unable to scale based on actual compute demand of each individual query. Workload is different for large & small queries. Keeping a large warehouse has unnecessary costs while a smaller warehouse would have high query execution time for large queries. Table scan is to blame in many cases for these execution times.
+- QAS executes a fragment of the plan at larger scale. It targets plan fragments with:
+	- Large Table Scans
+	- High reduction (lots of data in -> small amount out after filtering, grouping)
+	- No data exchange (b/w servers with different fragments) required until the last step when the fragments merge 
+- ![[Pasted image 20240212164951.png]]
+- Intermediate results are materialized as regular data files. They can also be re-used.
+- QAS Query Execution
+	- Normally, files for a scan are distributed during compilation time. In a Continuous ScanSet, files are distributed in batches at runtime upon request. (Server asks for files from query coordinator which provided it in batches)
+	- ![[Pasted image 20240212170326.png]]
+	- Failed batches are sent to warehouse for retry. Successful ones are checkpointed in the staging area & removed.
+	- Warehouse fetches the materialized result files after everything is done.
+- QAS Insert Optimization : For some INSERT queries (where a table scan is being done to insert data into some other table), the entire plan can be accelerated directly.
