@@ -2,11 +2,13 @@
 tags:
   - db
   - talks
+  - cmudb-seminar
 created: 2024-03-01
 updated: 2024-03-03
 source: https://www.youtube.com/watch?v=bZOvAKGkzpQ
 origin: Mark Raasveldt <mytherin>
 publish: true
+rating: 4
 ---
 > **Remarks**
 > The Unified Vector Format was really neat. It's nice to see the adaptive string format from Umbra being used by DuckDB too.

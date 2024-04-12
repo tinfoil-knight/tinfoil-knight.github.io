@@ -2,10 +2,12 @@
 tags:
   - db
   - talks
+  - cmudb-seminar
 created: 2024-02-26
 source: https://www.youtube.com/watch?v=pS2_AJNIxzU
 origin: Thomas Neumann
 publish: true
+rating: 5
 ---
 > **Remarks**
 > Umbra has done a lot optimisations to get in-memory performance on a hybrid system. They adaptive query compiler that uses LLVM & generates machine code is the most interesting part.

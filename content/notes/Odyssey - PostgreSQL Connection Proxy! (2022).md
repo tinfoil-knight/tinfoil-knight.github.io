@@ -2,11 +2,13 @@
 tags:
   - db
   - talks
+  - cmudb-seminar
 created: 2024-03-06
-updated: 2024-04-07
+updated: 2024-03-07
 source: https://www.youtube.com/watch?v=VEYdZL0bU-I
 origin: Andrey Borodin <x4m>
 publish: true
+rating: 5
 ---
 - Andrey has worked on the database team at Yandex. Also a Postgres contributor since 2016.
 - He has worked on a disaster recovery system for DBs: https://github.com/wal-g/wal-g & a stateless postgres query router: https://github.com/pg-sharding/spqr for sharded pg.

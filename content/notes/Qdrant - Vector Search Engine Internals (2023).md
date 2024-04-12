@@ -5,13 +5,14 @@ tags:
   - db
   - search
   - talks
+  - cmudb-seminar
 source: https://www.youtube.com/watch?v=bU38Ovdh3NY
 origin: Andrey Vasnetsov
 publish: true
+rating: 4
 ---
 - Andrey is co-founder, CTO at Qdrant. Working w/ search engines since 2014.
-- Qdrant : Vector Similarity Search Engine
-	- Open-source, Written in Rust
+- Qdrant : Vector Similarity Search Engine, OSS, Written in Rust
 
 ## Vector Search : Overview
 - You've an encoder (typically a neural network) which can convert some input data into dense vector representations (also called embeddings). They've an interesting property that pair of vectors in vector space which are close to each other usually corresponds to objects which are also similar in some sense.

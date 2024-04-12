@@ -2,10 +2,12 @@
 tags:
   - db
   - talks
+  - cmudb-seminar
 created: 2024-02-11
 source: https://www.youtube.com/watch?v=xnuv6vr8USE
 origin: Bowei Chen, Kavinder Dhaliwal, Libo Wang
 publish: true
+rating: 4
 ---
 > **Remarks**
 > Snowflake has a lot of moving parts so it was great to hear from multiple engineers on different things they've worked on.

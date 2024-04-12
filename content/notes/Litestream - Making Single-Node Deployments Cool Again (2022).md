@@ -2,10 +2,12 @@
 tags:
   - db
   - talks
+  - cmudb-seminar
 created: 2024-02-29
 source: https://www.youtube.com/watch?v=drgriZCRyrQ
 origin: Ben Johnson <benbjohnson>
 publish: true
+rating: 3
 ---
 - Ben is the author of [Litestream](https://github.com/benbjohnson/litestream) & the key-value store [BoltDB](https://github.com/boltdb/bolt).
 - What Litestream Does
