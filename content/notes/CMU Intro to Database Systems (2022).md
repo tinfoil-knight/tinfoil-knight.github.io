@@ -7,20 +7,21 @@ source: https://15445.courses.cs.cmu.edu/fall2022/
 origin: Andy Pavlo
 publish: true
 ---
+Lectures: https://15445.courses.cs.cmu.edu/fall2022/schedule.html
+Assignments: https://15445.courses.cs.cmu.edu/spring2023/assignments.html
+
 ## 1 : Relational Model & Relational Algebra
 Inventor of Relational Model : Edgar Frank "Ted" Codd at IBM
-A Relational Model of Data for Large Shared Data Banks
-Derivability, Redundancy and Consistency of Relations stored in Large Data Banks
+- [A Relational Model of Data for Large Shared Data Banks](https://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf)
+- [Derivability, Redundancy and Consistency of Relations stored in Large Data Banks](https://technology.amis.nl/wp-content/uploads/images/RJ599.pdf)
 
 - Relation / Table : Unordered set containing relationship of attributes that represent an entity.
 - Tuple / Row / Record : Set of attribute values (domain) in the relation.
 - Primary key identifies a single tuple.
 
 - Data Manipulation Languages (DML)
-	- Procedural
-		- Relational Algebra
-	- Declarative (like SQL)
-		- Relational Calculus
+	- Procedural : Relational Algebra
+	- Declarative (like SQL) : Relational Calculus
 
 Relational Algebra
 - Based on Sets
@@ -31,89 +32,84 @@ Fun Fact: SQL was Sequel (Structured English Query Language) initially but IBM h
 
 ## 2 : Modern SQL
 - SQL is a combination of
-	- Data Manipulation Language (DML)
-		- retrieve or modify data
-	- Data Definition Language (DDL)
-		- specify what data looks like, indexes, namespaces, triggers, functions
-	- Data Control Language (DCL)
-		- access control
-- SQL is not based on sets (no duplicates) but bags (can have duplicates).
--  Nested Queries: ALL, ANY, IN, EXISTS
-- Window Functions: "Sliding" calculations
-- You can do recursion in CTEs
+	- Data Manipulation Language (DML) : retrieve or modify data
+	- Data Definition Language (DDL) : specify what data looks like, indexes, namespaces, triggers, functions
+	- Data Control Language (DCL) : access control
+- SQL is not based on sets (no duplicates) but on bags (can have duplicates).
 
 ## 3 : Database Storage 1
 - Sequential access can be faster than random access
 	- Case in point: Think about getting 1MB of data that is contiguously laid out
 	- Sometimes algorithms might seem slow on paper but we want to optimise for sequential access in DBMS.
-- TODO: Put the other memory levels here
 - "Memory" in this course will refer to DRAM.
+
 - Disk Oriented DBMS
 	- Disk: Blocks/Pages
 	- Memory: Buffer Pool / Page Cache / Buffer Manager
 - We don't want to rely on the OS to do anything apart from giving the DBMS memory and not letting the process get killed.
+
+### mmap
 - mmap can store contents of a file into the address space of a program but it has some issues:
-	- Issues:
-		- Transaction Safety : OS can flush dirty pages at any time (you might not want to save changes yet if you're updating multiple pages but the OS will flush the pages and lead to corrupt data)
-		- I/O Stalls :  DBMS doesn't know which pages are in memory so it'll get a page fault every time it tries to access a page not in memory & be stalled by the OS then.
-		- Error Handling : Difficult to validate pages. (DBMS can maintain checksums if it is controlling read, writes unlike mmap)
-		- Performance Issues : OS has it's own data structure for page table which can become a bottleneck.
-	- mmap might be okay for really light workloads on small DBs. It's quick and easy to start with.
-	- mmap is used by elasticsearch, leveldb
-	- mmap was partially used by mongodb earlier but they stopped using it since they faced problems
-	- sqlite also partially uses mmap
-	- For more info on why you shouldn't use mmaps for a DBMS: Read https://db.cs.cmu.edu/mmap-cidr2022/
-- Problem 1 : How the DBMS represents the database in files on disk
-	- File Storage
-		- A file is a collection of pages.
-			- Page is a fixed-size block of data.
-			- Page can also have metadata about itself.
-		- Different notions of "pages" in a DBMS
-			- Hardware : usually 4KB
-			- OS : usually 4KB
-			- Database : 512B - 16KB
-		- A hardware page is the largest block of data that the storage device can guarantee failsafe writes.
-		- We want to keep OS pages larger to make less syscalls for read/writes. We also don't want to enlarge it too much since then we'll be fetching unnecessary data.
-	- Page Storage Architecture
-		- Heap
-			- unordered collection of pages
-			- support create, get, write, delete, iteration over pages
-			- page directory are special pages which track location of data pages in DB files
-			- a data pages being self-contained (having metadata about it's location, table etc.) can help in data recovery if something happens to page directory
-		- Tree
-		- Sequential / Sorted
-		- Hashing
-	- Some reasons for storing things in small files
-		-  easier to obtain a lock on specific data
-		- reduces the blast radius if a single file gets corrupted or deleted
-		-  we can symlink particular directories on a faster disk for faster access
-	- Page Layout
-		- Log Oriented
-		- Tuple Oriented
-			- Strawman Idea: Keep track of number of tuples in a page and then just append a new tuple to end.
-				- Issues
-					- Deleting a tuple
-						- If a tuple is deleted from between, there's no way to know that free space is available there for putting a tuple in
-					- Variable-length attribute
-						- Allocating empty space is wasteful
-			- Slotted Pages
-				- Slot Array in the beginning of the page maps to the starting positions of the tuples. (Also contains tuple size)
-				- Slot Array grows from beginning to end. Tuple data grows from end to beginning.
-				- We consider the page full when we can't enter any more slots or tuples.
-				- Header keeps track of number of used slots.
-				- You can readjust tuple locations if you want to on deletion to reduce fragmentation in a particular page.
-				- You can use other compaction processes to reduce the amount of space required.
-			- Record Ids : DBMS needs a way to keep track of individual tuples. Each tuple has unique record id.
-				- simple method: page_id + offset/slot
-				- can also contain file location info
-				- also: see ctid in postgres (you can query it)
-					- VACCUM in pg would does the re-adjustment of deleted rows
-					- sqlite has rowid
-				- pg's auto-vaccum keeps tracks of pages changes since last Vaccum & then compacts only those pages
-					- pages can also be merged together if they're half-full
-	- Tuple Layout
-		- Tuples also have a header which can store visibility info & bit map for null values in the data attributes.
-		- For variable length data, you can also have pointers to some other location stored in the tuple.
+- Issues:
+	- Transaction Safety : OS can flush dirty pages at any time (you might not want to save changes yet if you're updating multiple pages but the OS will flush the pages and lead to corrupt data)
+	- I/O Stalls :  DBMS doesn't know which pages are in memory so it'll get a page fault every time it tries to access a page not in memory & be stalled by the OS then.
+	- Error Handling : Difficult to validate pages. (DBMS can maintain checksums if it is controlling read, writes unlike mmap)
+	- Performance Issues : OS has it's own data structure for page table which can become a bottleneck.
+- mmap might be okay for really light workloads on small DBs. It's quick and easy to start with.
+- Sidenote: mmap is used by elasticsearch, leveldb ; sqlite also partially uses mmap ; mmap was partially used by mongodb earlier but they stopped using it since they faced problems
+- For more info on why you shouldn't use mmaps for a DBMS: Read https://db.cs.cmu.edu/mmap-cidr2022/
+
+### How the DBMS represents the database in files on disk
+- File Storage
+	- A file is a collection of pages.
+		- Page is a fixed-size block of data.
+		- Page can also have metadata about itself.
+	- Different notions of "pages" in a DBMS
+		- Hardware : usually 4KB
+		- OS : usually 4KB
+		- Database : 512B - 16KB
+	- A hardware page is the largest block of data that the storage device can guarantee failsafe writes.
+	- We want to keep OS pages larger to make less syscalls for read/writes. We also don't want to enlarge it too much since then we'll be fetching unnecessary data.
+- Page Storage Architecture
+	- Heap
+		- unordered collection of pages
+		- support create, get, write, delete, iteration over pages
+		- page directory are special pages which track location of data pages in DB files
+		- a data pages being self-contained (having metadata about it's location, table etc.) can help in data recovery if something happens to page directory
+	- Tree
+	- Sequential / Sorted
+	- Hashing
+- Some reasons for storing things in small files
+	- easier to obtain a lock on specific data
+	- reduces the blast radius if a single file gets corrupted or deleted
+	-  we can symlink particular directories on a faster disk for faster access
+- Page Layout
+	- Log Oriented
+	- Tuple Oriented
+		- Strawman Idea: Keep track of number of tuples in a page and then just append a new tuple to end.
+			- Issues
+				- Deleting a tuple
+					- If a tuple is deleted from between, there's no way to know that free space is available there for putting a tuple in
+				- Variable-length attribute
+					- Allocating empty space is wasteful
+		- Slotted Pages
+			- Slot Array in the beginning of the page maps to the starting positions of the tuples. (Also contains tuple size)
+			- Slot Array grows from beginning to end. Tuple data grows from end to beginning.
+			- We consider the page full when we can't enter any more slots or tuples.
+			- Header keeps track of number of used slots.
+			- You can readjust tuple locations if you want to on deletion to reduce fragmentation in a particular page.
+			- You can use other compaction processes to reduce the amount of space required.
+		- Record Ids : DBMS needs a way to keep track of individual tuples. Each tuple has unique record id.
+			- simple method: page_id + offset/slot
+			- can also contain file location info
+			- also: see ctid in postgres (you can query it)
+				- VACCUM in pg would does the re-adjustment of deleted rows
+				- sqlite has rowid
+			- pg's auto-vaccum keeps tracks of pages changes since last Vaccum & then compacts only those pages
+				- pages can also be merged together if they're half-full
+- Tuple Layout
+	- Tuples also have a header which can store visibility info & bit map for null values in the data attributes.
+	- For variable length data, you can also have pointers to some other location stored in the tuple.
 - Misc
 	- Postgres does MVCC the wrong way:
 		- To Read: https://db.cs.cmu.edu/papers/2017/p781-wu.pdf
@@ -133,58 +129,58 @@ Fun Fact: SQL was Sequel (Structured English Query Language) initially but IBM h
 	- Useless Disk I/O (page may have data we don't care about which we'll need to read since we can't get exact bytes)
 	- Random Disk I/O (eg: tuples that need to updated may reside on different pages)
 	- Note to Remember: Sequential I/O is great for non-volatile storage compared to random access.
-- Log Structured Storage
-	- What if DBMS couldn't overwrite data in pages & could only create new pages?
-		- Eg: AWS S3, HDFS
-	- (Think of just a key-value store here, PUT contains the entire value that needs to be stored)
-	- DBMS stores log records that contain changes to tuples (PUT, DELETE).
-		- Each log record must contain the tuple's unique id.
-		- Put records contain the tuple contents.
-		- Deletes marks the tuple as deleted.
-	- When the page gets full, the DBMS writes it from in-memory page out to disk.
-	- Writes are batched (in-memory page is fast, updating 20 tuples at once just involves appending the changes to log now) 
-	- Getting a tuple with some Id
-		- Scanning log from newest to oldest is slow
-		- Maintain an index mapping tuple id to newest log record for that id
-	- Compaction
-		- Merging pages to reduce the amount of space taken up by actions on the same tuple id.
-		- TODO: Write a simple script that merges two files with data in the format: ACTION ID Value(if applicable)
-		- After a page is compacted, the DBMS doesn't need to maintain temporal ordering of records within the page since each tuple id appears at most once in the page.
-		- (We don't need to track deletes post compaction, could just remove the key from index)
-		- DBMS can sort page by id to improve lookup. See SSTables.
-		- Types of Compaction
-			- Universal : combine 2 contiguous sorted files
-			- Level : Files of same "level" are compacted one by one as they move up each level. (used by LevelDB & it's fork RocksDB)
-	- Eg: RocksDB, LevelDB, Apache HBASE, Fauna, AWS Aurora etc.
-	- Downsides
-		- write-amplification : same record is getting compacted multiple times even if it doesn't change
-		- compaction is expensive
-	- Tuple Storage
-		- DBMS catalogs contain schema info about tables that is used to figure out tuple's layout.
-		- Data Representation
-			- Common Types: Integers, Floats or Numeric/Decimal, Varchar or Blob, Time
-			- Variable Precision Numbers, Fixed Precision Numbers
-			- Handling fixed precision numbers is slow
-			- Large values (like Varchar) that are larger than a page use separate **overflow storage pages**. Fields in tuple point to these overflow pages instead of storing the data in the tuple itself.
-			- Number of columns is also limited since a tuple can't exceed the size of the page in most DBMS.
-			- Some systems allow storing really large value in **external files**. DBMS can't update the contents of these files. 
-		- Paper Suggestion: 'To Blog or Not to Blob: Large Object Storage in a Database or a Filesystem" by Jim Gray
-	- Quotes from Chapter 24 (24.2)
-		- "B+-tree indices are not efficient for workloads with a very high number of writes" Why?
-		- "The key idea of the log-structured merge tree (LSM tree) is to replace random I/O operations during tree inserts, updates, and deletes with a smaller number of sequen- tial I/O operations."
-		- Index Inserts & Lookups
-			- "An LSM tree consists of several B+-trees, starting with an in-memory tree, called L0, and on-disk trees L1, L2, ... , Lk for some k, where k is called the level."
-			- "An index lookup is performed by using separate lookup operations on each of the trees L0, ... , Lk, and merging the results of the lookups."
-			- "When a record is first inserted into an LSM tree, it is inserted into the in-memory B+- tree structure L0. A fairly large amount of memory space is allocated for this tree." How much space though?
-			- "As the tree grows to fill the memory allocated to it, we need to move data from the in-memory structure to a B+-tree on disk."
-				- If L1 is empty the entire in-memory tree L0 is written to disk to create the initial tree L1.
-				- If L1 is not empty, the leaf level of L0 is scanned in increasing key order, and entries are merged with the leaf level entries of L1. The merged entries are used to create a new B+-tree using the bottom-up build process. The new tree with the merged entries then replaces the old L1.
-				- All entries in the leaf level of the old L1 tree, including those in leaf nodes that do not have any updates, are copied to the new tree instead of being inserted into the existing L1 tree node.
-					- The leaves of the new tree are sequentially located, avoiding random I/O during subsequent merges.
-					- The leaves are full, avoiding the overhead of partially occupied leaves that can occur with page splits.
-			- "Cost to using the LSM structure: the entire contents of the tree are copied each time a set of entries from L0 are copied into L1."
-			- "To ensure we get a benefit for cases where the index size on disk is much bigger than the in-memory index, the maximum size of L1 is chosen as k times the target size of L0, for some k. Similarly, the maximum size of each Li+1 is set to k times the target size of Li. Once a particular Li reaches its maximum size, its entries are merged into the next component Li+1. When Li+1 reaches its target size, its entries are in turn merged into Li+2, and so on."
-			- "We assumed for simplicity that when a particular level is full, its entries are entirely merged with the next level. This would result in more I/O load during merges with an unused I/O capacity between merges. To avoid this problem, merging is done on a continuous basis; this is called rolling merge. With **rolling merge**, a few pages of Li are merged into corresponding pages of Li+1 at a time, and removed from Li."
+### Log Structured Storage
+- What if DBMS couldn't overwrite data in pages & could only create new pages?
+	- Eg: AWS S3, HDFS
+- (Think of just a key-value store here, PUT contains the entire value that needs to be stored)
+- DBMS stores log records that contain changes to tuples (PUT, DELETE).
+	- Each log record must contain the tuple's unique id.
+	- Put records contain the tuple contents.
+	- Deletes marks the tuple as deleted.
+- When the page gets full, the DBMS writes it from in-memory page out to disk.
+- Writes are batched (in-memory page is fast, updating 20 tuples at once just involves appending the changes to log now) 
+- Getting a tuple with some Id
+	- Scanning log from newest to oldest is slow
+	- Maintain an index mapping tuple id to newest log record for that id
+- Compaction
+	- Merging pages to reduce the amount of space taken up by actions on the same tuple id.
+	- TODO: Write a simple script that merges two files with data in the format: ACTION ID Value(if applicable)
+	- After a page is compacted, the DBMS doesn't need to maintain temporal ordering of records within the page since each tuple id appears at most once in the page.
+	- (We don't need to track deletes post compaction, could just remove the key from index)
+	- DBMS can sort page by id to improve lookup. See SSTables.
+	- Types of Compaction
+		- Universal : combine 2 contiguous sorted files
+		- Level : Files of same "level" are compacted one by one as they move up each level. (used by LevelDB & it's fork RocksDB)
+- Eg: RocksDB, LevelDB, Apache HBASE, Fauna, AWS Aurora etc.
+- Downsides
+	- write-amplification : same record is getting compacted multiple times even if it doesn't change
+	- compaction is expensive
+- Tuple Storage
+	- DBMS catalogs contain schema info about tables that is used to figure out tuple's layout.
+	- Data Representation
+		- Common Types: Integers, Floats or Numeric/Decimal, Varchar or Blob, Time
+		- Variable Precision Numbers, Fixed Precision Numbers
+		- Handling fixed precision numbers is slow
+		- Large values (like Varchar) that are larger than a page use separate **overflow storage pages**. Fields in tuple point to these overflow pages instead of storing the data in the tuple itself.
+		- Number of columns is also limited since a tuple can't exceed the size of the page in most DBMS.
+		- Some systems allow storing really large value in **external files**. DBMS can't update the contents of these files. 
+	- Paper Suggestion: 'To Blob or Not to Blob: Large Object Storage in a Database or a Filesystem" by Jim Gray
+### Quotes from Chapter 24 (24.2)
+- "B+-tree indices are not efficient for workloads with a very high number of writes" Why?
+- "The key idea of the log-structured merge tree (LSM tree) is to replace random I/O operations during tree inserts, updates, and deletes with a smaller number of sequen- tial I/O operations."
+- Index Inserts & Lookups
+	- "An LSM tree consists of several B+-trees, starting with an in-memory tree, called L0, and on-disk trees L1, L2, ... , Lk for some k, where k is called the level."
+	- "An index lookup is performed by using separate lookup operations on each of the trees L0, ... , Lk, and merging the results of the lookups."
+	- "When a record is first inserted into an LSM tree, it is inserted into the in-memory B+- tree structure L0. A fairly large amount of memory space is allocated for this tree." How much space though?
+	- "As the tree grows to fill the memory allocated to it, we need to move data from the in-memory structure to a B+-tree on disk."
+		- If L1 is empty the entire in-memory tree L0 is written to disk to create the initial tree L1.
+		- If L1 is not empty, the leaf level of L0 is scanned in increasing key order, and entries are merged with the leaf level entries of L1. The merged entries are used to create a new B+-tree using the bottom-up build process. The new tree with the merged entries then replaces the old L1.
+		- All entries in the leaf level of the old L1 tree, including those in leaf nodes that do not have any updates, are copied to the new tree instead of being inserted into the existing L1 tree node.
+			- The leaves of the new tree are sequentially located, avoiding random I/O during subsequent merges.
+			- The leaves are full, avoiding the overhead of partially occupied leaves that can occur with page splits.
+	- "Cost to using the LSM structure: the entire contents of the tree are copied each time a set of entries from L0 are copied into L1."
+	- "To ensure we get a benefit for cases where the index size on disk is much bigger than the in-memory index, the maximum size of L1 is chosen as k times the target size of L0, for some k. Similarly, the maximum size of each Li+1 is set to k times the target size of Li. Once a particular Li reaches its maximum size, its entries are merged into the next component Li+1. When Li+1 reaches its target size, its entries are in turn merged into Li+2, and so on."
+	- "We assumed for simplicity that when a particular level is full, its entries are entirely merged with the next level. This would result in more I/O load during merges with an unused I/O capacity between merges. To avoid this problem, merging is done on a continuous basis; this is called rolling merge. With **rolling merge**, a few pages of Li are merged into corresponding pages of Li+1 at a time, and removed from Li."
 
 ## 5 : Storage Models & Compression
 - DB Workloads
@@ -214,34 +210,36 @@ Fun Fact: SQL was Sequel (Structured English Query Language) initially but IBM h
 	- Tuple (NSM only)
 	- Attribute
 	- Column (DSM only)
-- Naive Compression (DB doesn't know about the data)
-	- Things to consider: Computation overhead, Compress vs. Decompress speed
-	- MySQL InnoDB Compression
-		- Default size is 16KB
-		- Pages are compressed & then padded to nearest power of 2 (1, 2, 4, 8 KB)
-		- Page goes to buffer pool when it needs to be used
-		- Update queries won't necessarily need to know the previous value. If an update just appends the value to the page it can be put after the compressed data in the page & metadata can store offsets for compressed & non-compressed data.
-	- DBMS must decompress data first before reading & (potentially) modifying it. Naive schemes also don't consider high-level semantics of the data.
-- Columnar Compression
-	- Run-length Encoding
-		- data to be sorted for max compression
-		- value -> (value, start offset, # of elements in the run)
-		- works for highly categorical data (eg: list of values with genders as M/F/Other)
-	- Bit-packing
-		- store value as smaller data type (eg: int64 -> int8) if the value doesn't need the full size
-		- DBs handle the conversion during aggregations. How??? TODO: check in detail
-		- A marker is stored for larger values (eg: larger than int8) which maps to a separate lookup table.
-	- Bitmap
-		-  If number of distinct values is low (i.e. value cardinality is low), each unique value can be stored as a bitmap
-		- i-th position in bitmap corresponds to i-th tuple
-	- Delta
-		- Instead of storing all values, record the difference in values
-		- Can combine w/ RLE to get better compression ratios if repetition is likely
-		- Eg: temperature stored as `99, +1, +1` instead of being stored as actual values `99, 100, 101`
-	- Incremental
-		- Type of delta compression that avoids storing common prefix / suffix b/w consecutive tuple.
-		- Eg: rob, robbed, robbing, robot -> rob, 3bed, 4ing, 3ot (common prefix: "rob" -> "robb" -> "rob")
-	- Dictionary
+### Naive Compression
+- DB doesn't know about the data
+- Things to consider: Computation overhead, Compress vs. Decompress speed
+- MySQL InnoDB Compression
+	- Default size is 16KB
+	- Pages are compressed & then padded to nearest power of 2 (1, 2, 4, 8 KB)
+	- Page goes to buffer pool when it needs to be used
+	- Update queries won't necessarily need to know the previous value. If an update just appends the value to the page it can be put after the compressed data in the page & metadata can store offsets for compressed & non-compressed data.
+- DBMS must decompress data first before reading & (potentially) modifying it. Naive schemes also don't consider high-level semantics of the data.
+
+### Columnar Compression
+- Run-length Encoding
+	- data to be sorted for max compression
+	- value -> (value, start offset, # of elements in the run)
+	- works for highly categorical data (eg: list of values with genders as M/F/Other)
+- Bit-packing
+	- store value as smaller data type (eg: int64 -> int8) if the value doesn't need the full size
+	- DBs handle the conversion during aggregations. TODO: check in detail
+	- A marker is stored for larger values (eg: larger than int8) which maps to a separate lookup table.
+- Bitmap
+	- If number of distinct values is low (i.e. value cardinality is low), each unique value can be stored as a bitmap
+	- i-th position in bitmap corresponds to i-th tuple
+- Delta
+	- Instead of storing all values, record the difference in values
+	- Can combine w/ RLE to get better compression ratios if repetition is likely
+	- Eg: temperature stored as `99, +1, +1` instead of being stored as actual values `99, 100, 101`
+- Incremental
+	- Type of delta compression that avoids storing common prefix / suffix b/w consecutive tuple.
+	- Eg: rob, robbed, robbing, robot -> rob, 3bed, 4ing, 3ot (common prefix: "rob" -> "robb" -> "rob")
+- Dictionary
 		- Map variable length values to a small int identifier
 		- Lookups for data can use the compressed data instead of the actual value if the DB is aware. For eg: If a string "Andrea" is mapped to an int "30" then the DB can look for that value without decompressing the data.
 		- This isn't hashing since the dict needs to support both encoding, decoding.
@@ -256,90 +254,92 @@ Fun Fact: SQL was Sequel (Structured English Query Language) initially but IBM h
 - How the DBMS manages its memory and moves data back & forth from disk?
 - Goal: Build DB that can store more data than memory available to it.
 - Spatial Control (layout of data on device), Temporal Control (when to read from, write data to disk)
-- Buffer Pool Manager / Buffer Manager / Page Cache / Buffer Cache
-	- Memory regions organised as array of fixed size pages. Each entry in the array is called frame.
-	- When DBMS requests a page, an exact copy is placed into one of these frames.
-	- Dirty pages are buffered & not written to disk immediately. (Write back cache)
-		- Dirty Page : it is different from its corresponding page on disk.
-	- Page table keeps track of pages currently in memory along with metadata like dirty flag, pin/reference counter for each page.
-		- Dirty flag tells if the page has been modified by a query & not saved to disk yet.
-			- Sidenote: DB waits for entry to be written to the log page before it makes changes in the table page.
-		- Pin prevents buffer pool from evicting the page when you're running a query that'll need the page. Pin counter tracks how many queries are using the particular page.
-		- Latch can be acquired on page table for a page that'll prevent other thread from using the same page & overwriting it.
-			- Lock Vs Latch
-				- Lock
-					- protects DB's logical contents from other transactions
-					- held for transaction duration
-					- need to be able to rollback changes
-				- Latch
-					- protects critical sections of DB's internal data structure from other threads
-					- held for operation duration
-					- don't need to be able to rollback changes
-					- mutex
-		- Why not use a hashmap instead of maintaining 2 tables?
-			- Prof mentions that the page table is like a hashtable only.
-	- Do we lose the contents of buffer pool on crash? Yes
-		- Prof mentions that we want to do this for correctness reasons. Why?
-	- Page Table Vs Page Directory
-		- Page directory is the mapping from page ids to page locations in the DB files. (on disk)
-		- Page table is the mapping from page ids to a copy of the page in buffer pool frames. (in memory)
+### Buffer Pool Manager
+- Also knows by : Buffer Manager / Page Cache / Buffer Cache
+- Memory regions organised as array of fixed size pages. Each entry in the array is called frame.
+- When DBMS requests a page, an exact copy is placed into one of these frames.
+- Dirty pages are buffered & not written to disk immediately. (Write back cache)
+	- Dirty Page : it is different from its corresponding page on disk.
+- Page table keeps track of pages currently in memory along with metadata like dirty flag, pin/reference counter for each page.
+	- Dirty flag tells if the page has been modified by a query & not saved to disk yet.
+		- Sidenote: DB waits for entry to be written to the log page before it makes changes in the table page.
+	- Pin prevents buffer pool from evicting the page when you're running a query that'll need the page. Pin counter tracks how many queries are using the particular page.
+	- Latch can be acquired on page table for a page that'll prevent other thread from using the same page & overwriting it.
+		- Lock Vs Latch
+			- Lock
+				- protects DB's logical contents from other transactions
+				- held for transaction duration
+				- need to be able to rollback changes
+			- Latch
+				- protects critical sections of DB's internal data structure from other threads
+				- held for operation duration
+				- don't need to be able to rollback changes
+				- mutex
+	- Why not use a hashmap instead of maintaining 2 tables?
+		- Prof mentions that the page table is like a hashtable only.
+- Do we lose the contents of buffer pool on crash? Yes
+	- Prof mentions that we want to do this for correctness reasons. Why?
+- Page Table Vs Page Directory
+	- Page directory is the mapping from page ids to page locations in the DB files. (on disk)
+	- Page table is the mapping from page ids to a copy of the page in buffer pool frames. (in memory)
 - Allocation Policies
 	- Goal: Evicting, Pre-fetching, Writing optimally
 	- Global Policies
 	- Local Policies
-- Buffer Pool Optimisations
-	- Multiple Buffer Pools (per DB, table, index and so on)
-		- also improves latch contention
-		- approaches:
-			- maintain an object id that points to specific buffer pool
-			- use hashing to select the buffer pool
-	- Pre Fetching
-		- Sequential Scans
-		- Index Scans
-	- Scan Sharing / Synchronised Scans
-		- different from result caching
-		- allow multiple queries to attach to a single cursor that scans a table
-			- queries don't need to be the same
-			- can also share partial results
-	- Buffer Pool Bypass (using private buffer pool)
-		- avoids overhead of using the buffer pool (like acquiring latch, getting frames etc.)
-		- memory is local to running query (can't be shared across queries)
-		- works well if operator needs to read large sequence of  contiguous pages on disk
-		- can also be used for temporary data
-	- OS Page Cache (specific to Postgres)
-		- OS maintains its own filesystem cache (aka page or buffer cache)
-		- Most DBMS use direct I/O (using O_DIRECT) to bypass OS cache.
-			- prevents redundant copies
-			- OS has different eviction policies
-			- loss of control over file I/O
-		- Sidenote: Amazon's pg fork (Aurora) doesn't use OS's page cache.
-		- EXPLAIN (BUFFER) (sql statement here)
-		- pg_prewarm
-- Buffer Replacement Policies
-	- which page to evict from buffer pool when freeing up frames?
-	- LRU
-	- Clock (like LRU)
-		- pages organised in circular buffer
-		- each page has a reference bit which is set to 1 when page is accessed
-		- when the clock hand moves to the next page
-			- if ref bit 0 then evict
-			- if ref bit 1 then set to 0
-	- Issue with LRU, Clock
-		- Susceptible to sequential flooding (query does sequential scan which pollutes the buffer pool with pages that might not be read again)
-	- LRU-K
-		- tracks history of last K refs to each page as timestamps & compute the interval b/w subsequent access
-		- history is used to estimate the next time page is going to be accessed & eviction is done basis that
-	- Priority Hints
-		- DBMS can provided hints on whether page is important or not to buffer pool
-	- Dirty Pages
-		- in the buffer pool, if a page
-			- isn't dirty: drop it (fast path but might need this page soon)
-			- is dirty: need to write back to disk (slow path & might not need page in near future)
-			- which to drop? tradeoff b/w fast eviction vs. dirty writing page not needed in future
-			- DBMS can periodically walk through the page table and write dirty pages to disk to optimise this
-	- Other Memory Pools
-		- for sorting+join buffer, query cache, maintenance buffer, log buffer, dictionary cache
-		- might not be backed by disk
+
+### Buffer Pool Optimisations
+- Multiple Buffer Pools (per DB, table, index and so on)
+	- also improves latch contention
+	- approaches:
+		- maintain an object id that points to specific buffer pool
+		- use hashing to select the buffer pool
+- Pre Fetching
+	- Sequential Scans
+	- Index Scans
+- Scan Sharing / Synchronised Scans
+	- different from result caching
+	- allow multiple queries to attach to a single cursor that scans a table
+		- queries don't need to be the same
+		- can also share partial results
+- Buffer Pool Bypass (using private buffer pool)
+	- avoids overhead of using the buffer pool (like acquiring latch, getting frames etc.)
+	- memory is local to running query (can't be shared across queries)
+	- works well if operator needs to read large sequence of  contiguous pages on disk
+	- can also be used for temporary data
+- OS Page Cache (specific to Postgres)
+	- OS maintains its own filesystem cache (aka page or buffer cache)
+	- Most DBMS use direct I/O (using O_DIRECT) to bypass OS cache.
+		- prevents redundant copies
+		- OS has different eviction policies
+		- loss of control over file I/O
+	- Sidenote: Amazon's pg fork (Aurora) doesn't use OS's page cache.
+	- EXPLAIN (BUFFER) (sql statement here)
+	- pg_prewarm
+### Buffer Replacement Policies
+- Which page to evict from buffer pool when freeing up frames?
+- LRU
+- Clock (like LRU)
+	- pages organised in circular buffer
+	- each page has a reference bit which is set to 1 when page is accessed
+	- when the clock hand moves to the next page
+		- if ref bit 0 then evict
+		- if ref bit 1 then set to 0
+- Issue with LRU, Clock
+	- Susceptible to sequential flooding (query does sequential scan which pollutes the buffer pool with pages that might not be read again)
+- LRU-K
+	- tracks history of last K refs to each page as timestamps & compute the interval b/w subsequent access
+	- history is used to estimate the next time page is going to be accessed & eviction is done basis that
+- Priority Hints
+	- DBMS can provided hints on whether page is important or not to buffer pool
+- Dirty Pages
+	- in the buffer pool, if a page
+		- isn't dirty: drop it (fast path but might need this page soon)
+		- is dirty: need to write back to disk (slow path & might not need page in near future)
+		- which to drop? tradeoff b/w fast eviction vs. dirty writing page not needed in future
+		- DBMS can periodically walk through the page table and write dirty pages to disk to optimise this
+- Other Memory Pools
+	- for sorting+join buffer, query cache, maintenance buffer, log buffer, dictionary cache
+	- might not be backed by disk
 
 ## 7 : Hash Tables
 - Course Progress (bottoms-up)
@@ -366,182 +366,182 @@ Fun Fact: SQL was Sequel (Structured English Query Language) initially but IBM h
 - Hash Functions
 	- for any input key, return an integer representation of that key
 	- why not use SHA or other crypto hash functions? we don't have security concerns since these are keys in an internal data structure, the extra overhead & loss of performance isn't worth it
-- Static Hashing Schemes
-	- Linear Probe / Open Address
-		- giant table of slots
-		- resolves collisions by linearly searching for the next free slot in the table
-		- Insertion
-			- jump to next free slot, loop around if at end
-			- note: lookup stop when you either find the key, loop back to start of search, or find out the location and you know it can't be there (how??)
-		- Deletes (handling what happens when you delete a key from a lot)
-			- Movement: slide keys up after rehashing (costly)
-			- Tombstone: set a marker to indicate that the entry in the slot is logically deleted
-				- slot can be re-used for new keys
-				- may need periodic garbage collection
-		- Non Unique Keys (eg. usage: using hashtable for joins)
-			- Separate Linked List : store values in separate storage area for each key
-			- Redundant Keys: store duplicate keys entries together in the hash table
-				- easier to implement so this is what most systems do
-				- check is key exists: find first key
-				- deletion: delete all keys
-		- Sidenote: name of column and record id together can be used to guarantee uniqueness of keys
-	- Robin Hood Hashing
-		- stealing slots from "rich" keys and giving them to "poor keys"
-		- insertion: a key takes slot from another if the first is farther from its optimal position than the latter
-			- each key tracks the no. of positions they're from their optimal position in the table
-		-  the number of "shifts" from ideal position determines how poor the key is
-			- a key inserted at ideal position has a counter of 0
-				- similarly a key that had to shift twice has the counter of 2
-				- more the counter, poorer the key is
-				- if the key being inserted has a larger counter than key already in place then the key already in place is shifted
-				- tradeoff: lots of shuffling can occur on insertion but this can make reads slightly faster | linear hashing is faster and easier for most cases
-	- Cuckoo Hashing
-		- used in a lot of systems
-		- use multiple hash tables with different hash function seeds
-		- insertion: check every table & pick anyone that has a free slot
-			- if no table has a free slot, evict element from one of them and then re-hash it find a new location
-			- you need to keep track that you're not in a cycle
-		- Good OSS implementation: https://github.com/efficient/libcuckoo
-		- What happens if you can't find a new slot using any of the available hash functions? Allocate a new table 2x the size of previous. Re-insert all keys in new hash table.
-		- (A new hash function might work too but implementations don't do this)
-		- Why is it not considered dynamic if it can allocate a new table?
-			- The process is not incremental (eg: think of re-allocating an array in C to insert more elements)
-- Dynamic Hash Tables
-	- static hashing schemes require the DBMS to know the number of elements it wants to store
-		- table needs to be rebuilt on growth/shrinkage in size
-	- resize on demand without complete re-allocation
-	- Chained Hashing
-		- linked list of buckets for each slot in hash table
-		- resolve collisions by placing all elements with the same hash key into the same bucket
-		- new bucket is allocated when a bucket is full
-	- Extendible Hashing
-		- split buckets instead of letting the linked list grow forever
-		- multiple slot locations can point to the same location
-		- reshuffle bucket entries on split and increase the no. of bits to examine
-		- eg: no. of bits increasing : 00, 01, 10, 11 -> 000, 010, 100, 110, 001, 011, 101, 111
-			- example of hashed keys: 011100, 10111, 10110
-	- Linear Hashing (slightly confusing, read about it somewhere else)
-		- hash table maintains a pointer that tracks the next bucket to split
-			- when any bucket overflows, split the bucket at the pointer location (not the bucket that overflowed) (in preparation for future)
-				- the overflowed bucket is extended
-		- use multiple hashes to find the right bucket for a given key
-		- new hash function is used at/below the split pointer
-		- splitting buckets based on the split pointer will eventually get to all overflowed buckets
-		- when the ptr reaches the last slot, delete the first hash function and move back to beginning
-		- eg: 
-			- hash functions: key % n, key % 2n, key % 4n
-			- if you started out with 4 bucket lists, you'd have 8 bucket lists after splitting (slide has 5 because of no space)
-		- Note: Deletion was skipped in lecture. See slides or notes.
-- Sidenote: Hash table isn't what you want to use for a table index.
+### Static Hashing Schemes
+- Linear Probe / Open Address
+	- giant table of slots
+	- resolves collisions by linearly searching for the next free slot in the table
+	- Insertion
+		- jump to next free slot, loop around if at end
+		- note: lookup stop when you either find the key, loop back to start of search, or find out the location and you know it can't be there (how??)
+	- Deletes (handling what happens when you delete a key from a lot)
+		- Movement: slide keys up after rehashing (costly)
+		- Tombstone: set a marker to indicate that the entry in the slot is logically deleted
+			- slot can be re-used for new keys
+			- may need periodic garbage collection
+	- Non Unique Keys (eg. usage: using hashtable for joins)
+		- Separate Linked List : store values in separate storage area for each key
+		- Redundant Keys: store duplicate keys entries together in the hash table
+			- easier to implement so this is what most systems do
+			- check is key exists: find first key
+			- deletion: delete all keys
+	- Sidenote: name of column and record id together can be used to guarantee uniqueness of keys
+- Robin Hood Hashing
+	- stealing slots from "rich" keys and giving them to "poor keys"
+	- insertion: a key takes slot from another if the first is farther from its optimal position than the latter
+		- each key tracks the no. of positions they're from their optimal position in the table
+	-  the number of "shifts" from ideal position determines how poor the key is
+		- a key inserted at ideal position has a counter of 0
+			- similarly a key that had to shift twice has the counter of 2
+			- more the counter, poorer the key is
+			- if the key being inserted has a larger counter than key already in place then the key already in place is shifted
+			- tradeoff: lots of shuffling can occur on insertion but this can make reads slightly faster | linear hashing is faster and easier for most cases
+- Cuckoo Hashing
+	- used in a lot of systems
+	- use multiple hash tables with different hash function seeds
+	- insertion: check every table & pick anyone that has a free slot
+		- if no table has a free slot, evict element from one of them and then re-hash it find a new location
+		- you need to keep track that you're not in a cycle
+	- Good OSS implementation: https://github.com/efficient/libcuckoo
+	- What happens if you can't find a new slot using any of the available hash functions? Allocate a new table 2x the size of previous. Re-insert all keys in new hash table.
+	- (A new hash function might work too but implementations don't do this)
+	- Why is it not considered dynamic if it can allocate a new table?
+		- The process is not incremental (eg: think of re-allocating an array in C to insert more elements)
 
+### Dynamic Hash Tables 
+- Static hashing schemes require the DBMS to know the number of elements it wants to store
+	- Table needs to be rebuilt on growth/shrinkage in size
+- Resize on demand without complete re-allocation
+- Chained Hashing
+	- linked list of buckets for each slot in hash table
+	- resolve collisions by placing all elements with the same hash key into the same bucket
+	- new bucket is allocated when a bucket is full
+- Extendible Hashing
+	- split buckets instead of letting the linked list grow forever
+	- multiple slot locations can point to the same location
+	- reshuffle bucket entries on split and increase the no. of bits to examine
+	- eg: no. of bits increasing : 00, 01, 10, 11 -> 000, 010, 100, 110, 001, 011, 101, 111
+		- example of hashed keys: 011100, 10111, 10110
+- Linear Hashing (slightly confusing, read about it somewhere else)
+	- hash table maintains a pointer that tracks the next bucket to split
+		- when any bucket overflows, split the bucket at the pointer location (not the bucket that overflowed) (in preparation for future)
+			- the overflowed bucket is extended
+	- use multiple hashes to find the right bucket for a given key
+	- new hash function is used at/below the split pointer
+	- splitting buckets based on the split pointer will eventually get to all overflowed buckets
+	- when the ptr reaches the last slot, delete the first hash function and move back to beginning
+	- eg: 
+		- hash functions: key % n, key % 2n, key % 4n
+		- if you started out with 4 bucket lists, you'd have 8 bucket lists after splitting (slide has 5 because of no space)
+	- Note: Deletion was skipped in lecture. See slides or notes.
+- Sidenote: Hash table isn't what you want to use for a table index. Why?
 
 ## 8 : B+ Tree Index
-- table indexes mainly use B+ trees
-- table index: replica of a subset of a table's attributes that are organized and/or sorted for efficient access
-- trade-off for no. of indexes to create per DB: storage & maintenance overhead
-- in OLAP DBs: indexes are primarily used for speeding up joins in smaller tables
+- Table indexes mainly use B+ trees
+- Table index: replica of a subset of a table's attributes that are organized and/or sorted for efficient access
+- Trade-off for no. of indexes to create per DB: storage & maintenance overhead
+- In OLAP DBs: indexes are primarily used for speeding up joins in smaller tables
 - B-tree family: B-Tree, B+ Tree, B* Tree, B<sup>link</sup>-Tree
 - pg uses B+ trees, much like other DBs
 - Note: A slightly modified kind of B+ tree structure is discussed. (Not the original one from the paper)
 - B+ tree is self-balancing tree, keeps data sorted
-	- Operations: Search, Sequential Access, Insertion, Deletion in O(logn)
-	- Optimized for systems that read & write large blocks of data
-	- Node can have > 2 children
-	- `M`-way search tree??
-	- Properties
-		- Perfectly balanced (every lead node is at the same depth in a tree)
-		- Every node other than the root is at least half-full
-			- `M/2 - 1 <= #keys <= M-1`
-		- Every inner node with `k` keys has `k+1` non-null children
-		- Some implementations can be slightly different. Doesn't matter as long as the operations are O(logn) 
-	- B+ tree node comprises of an array of key/value pairs.
-		- Keys are derived from attribute(s) that the index is based on.
-		- The values will differ based on whether the node is classified as "inner node" or "leaf node".
-		- The arrays are usually? kept in sorted order.
-		- Inner node can have a key that's deleted since they act like guide posts. Leat nodes can't have deleted keys.
-	- Leaf Node Values
-		- Approach 1 (Record IDs) : a ptr. to the location of the tuple to which the index entry corresponds
-			- extra lookup
-			- done by: pg, sql server, db2, oracle
-		- Approach 2 (Tuple Data): leaf nodes store actual content of the tuple
-			- extra overhead: secondary indexes must store the record IDs as their values
-			- done by: sqlite, sql server, mysql, oracle
-	- B-tree vs. B+ tree
-		- B-tree stores keys & values in all nodes in tree
-			- space efficient (since each key only appears once)
-			- range scans are expensive compared to B+ tree since leaf nodes are sequential
-	- B+ Tree
-		- See https://www.cs.usfca.edu/~galles/visualization/BPlusTree.html
-		- Max Degree = Max Keys Per Node + 1
-		- Operations: Insert, Delete, Lookup
-		- DBMS can use a B+ tree index if the query provides any of the attributes of the search key
-			- Eg: Index on <a,b,c>
-				- Conjunction: (a = 1 AND b = 2 AND c = 3)
-				- Partial: (a = 1 AND b = 2)
-				- Suffix: (b = 2), (c = 3)
-				- Find (A, B) ; (A, \*), (\*, A)
-			- Eg: Index on <col1, col2, col3>
-				- Column Values: {A, B, C, D}
-				- Search: col2 = B; 
-		- Duplicate Key Handling
-			- Approach 1 : Append Record ID
-				- Add tuple's unique Record ID as part of the key to ensure that all keys are unique
-				- DBMS can use partial keys to find tuples.
-				- pg does this
-			- Approach 2 : Overflow Leaf Nodes
-				- Let leaf nodes to spill into overflow nodes that contain the duplicate keys.
-				- Complex to maintain.
-		- Clustered Indexes
-			- table is stored in order specified by the primary key
-			- some DBs always use a clustered index while others can't use them at all 
-			- pg doesn't maintain the clustered index once done
-			- mysql maintains clustered indexes automatically for primary keys (why can it?)
-		- You can specify BTREE or HASH in pg while creating the index
-	- Recommended Book on BTrees: Modern BTree Techniques (Goetz Graefe)
-	- Design Decisions while Implementing BTrees
-		- Node Size
-			- as per research: slower the storage device, larger the optimal node size for B+ Tree
-				- HDD: ~1MB, SSD: ~10KB, In-Memory: ~512B
-				- we want to maximize the sequential IO we're doing
-			- can also vary per workload
-				- root to leaf traversal : small node sizes
-				- range scans : large node sizes
-		- Merge Threshold
-			- some dbms don't always merge nodes when they're half full & delay it
-				- to reduce the amount of re-organization
-			- it might be better to let smaller nodes exists & periodically rebuild the entire tree
-		- Variable Length Keys
-			- Pointers : store key as pointers to the tuple's attribute
-				- bad in a disk based system since we'd need to fetch each key using the ptr for comparison while traversing
-				- in memory based systems (esp. when there's less memory), this approach prevents duplication
-					- a variant of b-tree called t-tree does this
-			- Variable Length Nodes
-				- requires careful memory management
-			- Padding : pad the key to be max length of the key type
-				- mysql does this
-			- Key Map / Indirection
-				- embed an array of pointers that map to the key + value list within the node
-				- store an fixed length int instead of the key & map it to the key
-				- kinda like dictionary compression
-	- Intra Node Search
-		- Linear
-			- SIMD (Single Instruction/Multiple Data) can be used to speed this up
-		- Binary
-			- data needs to be sorted for this
-		- Interpolation (fastest)
-			- approx. location of desired key based on known distribution of keys
-			- data should be sorted
-			- note: this hasn't been widely implemented outside academia
-	- Optimizations
-		- Buffer Updates : instead of applying the change right way, keep a log and apply the changes after a while (fractal tree index)
-		- Prefix Compression (like incremental compression in Lecture 5)
-		- Deduplication : avoid storing multiple copies of same key in leaf nodes; store key once & maintain a list of tuples with that key (similar approach as hash tables)
-		- Suffix Truncation: we don't need entire keys in inner nodes, just need a minimum prefix to correctly route probes into the index
-		- Pointer Swizzling
-			- store ptrs instead of page id to avoid the address lookup from the page table if a page is pinned in the buffer pool
-			- some extra metadata needs to be tracked so that we know when a page is unpinned & we can't use the ptr anymore
-		- Bulk Insert
-			- fastest way to build a new B+ tree for an existing table is to first sort the keys & then build the index from bottom up
+- Operations: Search, Sequential Access, Insertion, Deletion in O(logn)
+- Optimized for systems that read & write large blocks of data
+- Node can have > 2 children
+- `M`-way search tree??
+- Properties
+	- Perfectly balanced (every lead node is at the same depth in a tree)
+	- Every node other than the root is at least half-full
+		- `M/2 - 1 <= #keys <= M-1`
+	- Every inner node with `k` keys has `k+1` non-null children
+	- Some implementations can be slightly different. Doesn't matter as long as the operations are O(logn) 
+- B+ tree node comprises of an array of key/value pairs.
+	- Keys are derived from attribute(s) that the index is based on.
+	- The values will differ based on whether the node is classified as "inner node" or "leaf node".
+	- The arrays are usually? kept in sorted order.
+	- Inner node can have a key that's deleted since they act like guide posts. Leat nodes can't have deleted keys.
+- Leaf Node Values
+	- Approach 1 (Record IDs) : a ptr. to the location of the tuple to which the index entry corresponds
+		- extra lookup
+		- done by: pg, sql server, db2, oracle
+	- Approach 2 (Tuple Data): leaf nodes store actual content of the tuple
+		- extra overhead: secondary indexes must store the record IDs as their values
+		- done by: sqlite, sql server, mysql, oracle
+- B-tree vs. B+ tree
+	- B-tree stores keys & values in all nodes in tree
+		- space efficient (since each key only appears once)
+		- range scans are expensive compared to B+ tree since leaf nodes are sequential
+- B+ Tree
+	- See https://www.cs.usfca.edu/~galles/visualization/BPlusTree.html
+	- Max Degree = Max Keys Per Node + 1
+	- Operations: Insert, Delete, Lookup
+	- DBMS can use a B+ tree index if the query provides any of the attributes of the search key
+		- Eg: Index on <a,b,c>
+			- Conjunction: (a = 1 AND b = 2 AND c = 3)
+			- Partial: (a = 1 AND b = 2)
+			- Suffix: (b = 2), (c = 3)
+			- Find (A, B) ; (A, \*), (\*, A)
+		- Eg: Index on <col1, col2, col3>
+			- Column Values: {A, B, C, D}
+			- Search: col2 = B; 
+	- Duplicate Key Handling
+		- Approach 1 : Append Record ID
+			- Add tuple's unique Record ID as part of the key to ensure that all keys are unique
+			- DBMS can use partial keys to find tuples.
+			- pg does this
+		- Approach 2 : Overflow Leaf Nodes
+			- Let leaf nodes to spill into overflow nodes that contain the duplicate keys.
+			- Complex to maintain.
+	- Clustered Indexes
+		- table is stored in order specified by the primary key
+		- some DBs always use a clustered index while others can't use them at all 
+		- pg doesn't maintain the clustered index once done
+		- mysql maintains clustered indexes automatically for primary keys (why can it?)
+	- You can specify BTREE or HASH in pg while creating the index
+- Recommended Book on BTrees: Modern BTree Techniques (Goetz Graefe)
+- Design Decisions while Implementing BTrees
+	- Node Size
+		- as per research: slower the storage device, larger the optimal node size for B+ Tree
+			- HDD: ~1MB, SSD: ~10KB, In-Memory: ~512B
+			- we want to maximize the sequential IO we're doing
+		- can also vary per workload
+			- root to leaf traversal : small node sizes
+			- range scans : large node sizes
+	- Merge Threshold
+		- some dbms don't always merge nodes when they're half full & delay it
+			- to reduce the amount of re-organization
+		- it might be better to let smaller nodes exists & periodically rebuild the entire tree
+	- Variable Length Keys
+		- Pointers : store key as pointers to the tuple's attribute
+			- bad in a disk based system since we'd need to fetch each key using the ptr for comparison while traversing
+			- in memory based systems (esp. when there's less memory), this approach prevents duplication
+				- a variant of b-tree called t-tree does this
+		- Variable Length Nodes
+			- requires careful memory management
+		- Padding : pad the key to be max length of the key type
+			- mysql does this
+		- Key Map / Indirection
+			- embed an array of pointers that map to the key + value list within the node
+			- store an fixed length int instead of the key & map it to the key
+			- kinda like dictionary compression
+- Intra Node Search
+	- Linear
+		- SIMD (Single Instruction/Multiple Data) can be used to speed this up
+	- Binary
+		- data needs to be sorted for this
+	- Interpolation (fastest)
+		- approx. location of desired key based on known distribution of keys
+		- data should be sorted
+		- note: this hasn't been widely implemented outside academia
+- Optimizations
+	- Buffer Updates : instead of applying the change right way, keep a log and apply the changes after a while (fractal tree index)
+	- Prefix Compression (like incremental compression in Lecture 5)
+	- Deduplication : avoid storing multiple copies of same key in leaf nodes; store key once & maintain a list of tuples with that key (similar approach as hash tables)
+	- Suffix Truncation: we don't need entire keys in inner nodes, just need a minimum prefix to correctly route probes into the index
+	- Pointer Swizzling
+		- store ptrs instead of page id to avoid the address lookup from the page table if a page is pinned in the buffer pool
+		- some extra metadata needs to be tracked so that we know when a page is unpinned & we can't use the ptr anymore
+	- Bulk Insert
+		- fastest way to build a new B+ tree for an existing table is to first sort the keys & then build the index from bottom up
 
 ## 9 : Index Concurrency Control
 - Single Threaded Engines: VoltDB (by Andy), Redis
@@ -552,7 +552,7 @@ Fun Fact: SQL was Sequel (Structured English Query Language) initially but IBM h
 	- **Physical Correctness** : is the internal representation of the object sound?
 		- pointers aren't invalid, data is correct etc.
 - Focusing on Physical Correctness in this lecture.
-#### Locks vs. Latches
+### Locks vs. Latches
 | _           | Locks                                | Latch                     |
 |-------------|--------------------------------------|---------------------------|
 | Separate    | User Transactions                    | Threads                   |
@@ -593,37 +593,37 @@ Fun Fact: SQL was Sequel (Structured English Query Language) initially but IBM h
 		2. Slot Latches
 			- each slot has its own latch
 
-- B+ Tree Concurrency Control
-	- Latch Crabbing / Coupling
-		- Protocol to allow multiple threads to access / modify B+ Tree at the same time.
-			- Get latch for parent
-			- Get latch for child
-			- Release latch for parent if "safe"
-		- Safe node: won't split or merge when updated i.e.
-			- not full (for insertion)
-			- more than half-full (for deletion)
-		- Releasing latches from top-to-bottom allows other threads to proceed with their request faster compared to doing to bottom-to-top.
-	- Acquiring a write latch on root node everytime is a major bottleneck.
-		- Optimization
-			- assume that most modifications to a B+ Tree won't require a split or merge
-			- take read latches from top to bottom & when you reach the leaf node then determine if your assumption is correct or not
-				- if correct: take write latch on leaf node, perform operation
-				- if not: release all latches, start search from start again but use the pessimistic algorithm (discussed above) this time
-		- Sidenote: What about lock-free data structures?
-			- Don't work that well under high contention.
-			- Mentioned: Trying out an implementation of Microsoft's [B-W tree](https://15721.courses.cs.cmu.edu/spring2017/papers/08-oltpindexes2/bwtree-icde2013.pdf) against a B+ Tree. B+ Tree was faster. Also mentioned that skip-list (which is latch free) is also slower than a good B+ Tree.
-			- B-W Tree has a separate lookup table with tree node ids & that extra lookup reduces performance.
-	-  What if threads want to move from one leaf node to another? (Leaf Node Scan)
-		- There's potential for deadlocks now compared to when we were just moving top to bottom.
-		- For a scan, once we've reached the leaf node level, we can acquire read latches in the same way on siblings (and release them) as we were doing in top->bottom latch crabbing.
-		- Consider 2 parallel readers in opposite directions, if they intersect while scanning, it's not an issue because a node can have multiple read latches & once they move across each adjacent node will only have a single read latch.
-		- Now consider one scan & another delete operation. The reader can't acquire a read latch on the leaf node with the key that's going to be deleted if the deleter acquired a write latch on it first.
-			- We'd wait for very little time and then abort the read.
-			- Note: If the reader acquired the read latch earlier on the "to-be-deleted" node then we won't have an issue. After the read, the deleter will delete the node.
-		- Suggestion from students: Jitter in timeouts, Drop readers since they're less costly
-		- Latches don't support deadlock detection or avoidance.
-		- The leaf node sibling latch acquisition protocol must support a "no-wait" mode.
-		- DBMS's data structures should cope with failed latch acquisitions.
+### B+ Tree Concurrency Control
+- Latch Crabbing / Coupling
+	- Protocol to allow multiple threads to access / modify B+ Tree at the same time.
+		- Get latch for parent
+		- Get latch for child
+		- Release latch for parent if "safe"
+	- Safe node: won't split or merge when updated i.e.
+		- not full (for insertion)
+		- more than half-full (for deletion)
+	- Releasing latches from top-to-bottom allows other threads to proceed with their request faster compared to doing to bottom-to-top.
+- Acquiring a write latch on root node everytime is a major bottleneck.
+	- Optimization
+		- assume that most modifications to a B+ Tree won't require a split or merge
+		- take read latches from top to bottom & when you reach the leaf node then determine if your assumption is correct or not
+			- if correct: take write latch on leaf node, perform operation
+			- if not: release all latches, start search from start again but use the pessimistic algorithm (discussed above) this time
+	- Sidenote: What about lock-free data structures?
+		- Don't work that well under high contention.
+		- Mentioned: Trying out an implementation of Microsoft's [B-W tree](https://15721.courses.cs.cmu.edu/spring2017/papers/08-oltpindexes2/bwtree-icde2013.pdf) against a B+ Tree. B+ Tree was faster. Also mentioned that skip-list (which is latch free) is also slower than a good B+ Tree.
+		- B-W Tree has a separate lookup table with tree node ids & that extra lookup reduces performance.
+-  What if threads want to move from one leaf node to another? (Leaf Node Scan)
+	- There's potential for deadlocks now compared to when we were just moving top to bottom.
+	- For a scan, once we've reached the leaf node level, we can acquire read latches in the same way on siblings (and release them) as we were doing in top->bottom latch crabbing.
+	- Consider 2 parallel readers in opposite directions, if they intersect while scanning, it's not an issue because a node can have multiple read latches & once they move across each adjacent node will only have a single read latch.
+	- Now consider one scan & another delete operation. The reader can't acquire a read latch on the leaf node with the key that's going to be deleted if the deleter acquired a write latch on it first.
+		- We'd wait for very little time and then abort the read.
+		- Note: If the reader acquired the read latch earlier on the "to-be-deleted" node then we won't have an issue. After the read, the deleter will delete the node.
+	- Suggestion from students: Jitter in timeouts, Drop readers since they're less costly
+	- Latches don't support deadlock detection or avoidance.
+	- The leaf node sibling latch acquisition protocol must support a "no-wait" mode.
+	- DBMS's data structures should cope with failed latch acquisitions.
 
 ## 10 : Sorting & Aggregations Algorithms
 - Disk Manager -> Buffer Pool Manager -> Access Methods (scanning indexes, scanning the table itself) -> **Operator Execution** -> Query Planning
@@ -674,33 +674,33 @@ Fun Fact: SQL was Sequel (Structured English Query Language) initially but IBM h
 		- It doesn't effectively utilise additional buffer space (if available).
 		- Double Buffering Optimization : Prefetch the next run in the background & store it in a 2nd buffer while the system is processing the current run.
 			- Reduces wait-time for I/O requests at each step by continuously utilizing the disk.
-	- General External Merge Sort
-		- Pass #0
-			- Use ***B*** buffer pages
-			- Produce ⌈N / B⌉ sorted runs of size ***B***
-		- Pass #1,2,3
-			- Merge ***B-1*** runs
-		- No. of passes = 1 + ⌈ log<sub>B-1</sub>⌈N / B⌉⌉
-		- Total I/O Cost = 2N * (# of passes)
-		- Note: We were ignoring the constant factor B in the 2-way external merge sort
-	- Comparison Optimizations
-		- Code Specialization: instead of providing a comparison function as a pointer to the sorting algorithm, create a hardcoded version of sort that is specific to a key type.
-			- If everything fits in memory then following the ptr to the function is costly.
-			- In some systems, you can build out specialized version of the sorting algorithm where comparison functions are hard-coded in the sorting algorithm itself.
-			- Mentions Just-In-Time compilation
-			- pg does this
-		- Suffix Truncation: Compare a binary prefix of long VARCHAR keys instead of slower string comparison. Fallback to slower version if prefixes are equal.
-	- Using B+ Trees for Sorting
-		- If the table already has an index on the sort attribute(s), we can use it to accelerate sorting by retrieving tuples in desired sort order by traversing the leaf pages of the tree.
-		- Cases
-			- Clustered B+ Tree
-				- Traverse to the left-most leaf page and then retrieve tuples from all leaf pages.
-			- Unclustered B+ Tree
-				- Chase each pointer to the page that contains the data.
-				- Would require random I/O for each data record.
-		- Note: From https://learn.microsoft.com/en-us/sql/relational-databases/indexes/clustered-and-nonclustered-indexes-described?view=sql-server-ver16
-			- Clustered indexes sort and store the data rows in the table or view based on their key values. These key values are the columns included in the index definition. There can be only one clustered index per table, because the data rows themselves can be stored in only one order.
-			- Nonclustered indexes have a structure separate from the data rows. A nonclustered index contains the nonclustered index key values and each key value entry has a pointer to the data row that contains the key value.
+- General External Merge Sort
+	- Pass #0
+		- Use ***B*** buffer pages
+		- Produce ⌈N / B⌉ sorted runs of size ***B***
+	- Pass #1,2,3
+		- Merge ***B-1*** runs
+	- No. of passes = 1 + ⌈ log<sub>B-1</sub>⌈N / B⌉⌉
+	- Total I/O Cost = 2N * (# of passes)
+	- Note: We were ignoring the constant factor B in the 2-way external merge sort
+- Comparison Optimizations
+	- Code Specialization: instead of providing a comparison function as a pointer to the sorting algorithm, create a hardcoded version of sort that is specific to a key type.
+		- If everything fits in memory then following the ptr to the function is costly.
+		- In some systems, you can build out specialized version of the sorting algorithm where comparison functions are hard-coded in the sorting algorithm itself.
+		- Mentions Just-In-Time compilation
+		- pg does this
+	- Suffix Truncation: Compare a binary prefix of long VARCHAR keys instead of slower string comparison. Fallback to slower version if prefixes are equal.
+- Using B+ Trees for Sorting
+	- If the table already has an index on the sort attribute(s), we can use it to accelerate sorting by retrieving tuples in desired sort order by traversing the leaf pages of the tree.
+	- Cases
+		- Clustered B+ Tree
+			- Traverse to the left-most leaf page and then retrieve tuples from all leaf pages.
+		- Unclustered B+ Tree
+			- Chase each pointer to the page that contains the data.
+			- Would require random I/O for each data record.
+	- From [Clustered and nonclustered indexes](https://learn.microsoft.com/en-us/sql/relational-databases/indexes/clustered-and-nonclustered-indexes-described?view=sql-server-ver16)
+		- Clustered indexes sort and store the data rows in the table or view based on their key values. These key values are the columns included in the index definition. There can be only one clustered index per table, because the data rows themselves can be stored in only one order.
+		- Nonclustered indexes have a structure separate from the data rows. A nonclustered index contains the nonclustered index key values and each key value entry has a pointer to the data row that contains the key value.
 
 ### Aggregations
 - Collapsing values for a single attribute from multiple tuples into a single scalar value.
@@ -711,37 +711,37 @@ Fun Fact: SQL was Sequel (Structured English Query Language) initially but IBM h
 - Goal is to avoid having random I/O going to disk & maximizing sequential access.
 - If the SQL statement has a `ORDER BY` clause then it makes more sense to use sorting.
 - If the data doesn't need to be sorted then hashing is usually better since it's computationally cheaper.
+
 - Hashing Aggregate
 	- Populate an ephemeral hash table as the DBMS scans the table.
 	- If everything doesn't fit in memory then we'll need to perform an "External Hashing Aggregate"
-		- Assumption: We only need a single pass (of both phases) for now.
-		- Phase #1 - Partition
-			- Divide tuples into buckets/partitions based on hash key.
-				- A partition is one or more pages that contain the set of keys with same hash value.
-			- Write them out to disk when they get full.
-				- Partitions are spilled to disk via output buffers.
-			- Let's say we have **B** buffers. 
-				- B-1 buffers for the partition
-				- 1 buffer for the input data.
-				- Possible Optimization: If we have a  `DISTINCT` clause, we can avoid duplicate keys when building the initial partitions.
-		- Phase #2 - ReHash
-			- Build in-memory hash table for each partition & compute the aggregation.
-				- For each partition on disk
-					- Assumption: The hash table & each partition fits in memory.
-						- Hash tables would be comparatively smaller than the entire dataset so they should ideally fit in memory. Even if they do spill-over, it can be dealt with easily.
-					- Read it in memory & build an in-memory hash table based of a different hash function.
-					- Go through each bucket of this hash table to bring together matching tuples.
-					- During the Rehash phase, we want to store pairs in the form:
-						- (GroupKey->RunningVal)
-						- Thing of the `AVG` clause using COUNT & SUM
-						- HashTable would have a key & then value as (count, sum) when could be further aggregated to produce the final result.
+	- Assumption: We only need a single pass (of both phases) for now.
+	- Phase #1 - Partition
+		- Divide tuples into buckets/partitions based on hash key.
+			- A partition is one or more pages that contain the set of keys with same hash value.
+		- Write them out to disk when they get full.
+			- Partitions are spilled to disk via output buffers.
+		- Let's say we have **B** buffers. 
+			- B-1 buffers for the partition
+			- 1 buffer for the input data.
+			- Possible Optimization: If we have a  `DISTINCT` clause, we can avoid duplicate keys when building the initial partitions.
+	- Phase #2 - ReHash
+		- Build in-memory hash table for each partition & compute the aggregation.
+			- For each partition on disk
+				- Assumption: The hash table & each partition fits in memory.
+					- Hash tables would be comparatively smaller than the entire dataset so they should ideally fit in memory. Even if they do spill-over, it can be dealt with easily.
+				- Read it in memory & build an in-memory hash table based of a different hash function.
+				- Go through each bucket of this hash table to bring together matching tuples.
+				- During the Rehash phase, we want to store pairs in the form:
+					- (GroupKey->RunningVal)
+					- Thing of the `AVG` clause using COUNT & SUM
+					- HashTable would have a key & then value as (count, sum) when could be further aggregated to produce the final result.
+
 - Discussed Optimizations for Sorting
 	- Chunk I/O into large blocks to amortize costs
 	- Double-buffering to overlap CPU & I/O
 - Mentions: in-memory DBMS that assume everything can fit in memory
 	- pg, MySQL are built from the ground-up to assume that things won't fit in memory
-
-
 ## 11 : Joins Algorithms
 - Since tables in a relational DB are normalised to avoid unnecessary repetition of information, we need to perform joins (using the join operator) to re-construct the "original tuples" without any loss of information.
 - Sidenote: For OLAP systems, a/c research 15-50% of the time for a query is spent in joins.
