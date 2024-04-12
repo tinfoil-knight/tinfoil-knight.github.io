@@ -11,12 +11,15 @@ export default ((opts?: Options) => {
     return (
       <footer class={`${displayClass ?? ""}`}>
         <hr />
-        <ul>
+        <ul style={{ display: "flex" }}>
           {Object.entries(links).map(([text, link]) => (
             <li>
               <a href={link}>{text}</a>
             </li>
           ))}
+          <li style={{ flexGrow: 1, textAlign: "right" }}>
+            Built with <a href="https://quartz.jzhao.xyz/">Quartz</a>
+          </li>
         </ul>
       </footer>
     )
