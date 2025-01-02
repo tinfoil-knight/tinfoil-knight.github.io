@@ -3,7 +3,7 @@ tags:
   - db
   - til
 created: 2023-10-25
-origin: Avinash Sajjanshetty
+from: Avinash Sajjanshetty
 publish: true
 ---
 How you can check if a clean exit or a dirty shutdown happened in a DB?

@@ -6,7 +6,7 @@ tags:
 created: 2024-03-01
 updated: 2024-03-03
 source: https://www.youtube.com/watch?v=bZOvAKGkzpQ
-origin: Mark Raasveldt <mytherin>
+from: Mark Raasveldt <mytherin>
 publish: true
 rating: 4
 ---

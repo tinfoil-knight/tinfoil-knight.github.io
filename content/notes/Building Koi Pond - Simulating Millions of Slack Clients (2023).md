@@ -3,7 +3,7 @@ tags:
   - talks
 created: 2024-06-07
 source: https://www.youtube.com/watch?v=oOCubxI3wmI
-origin: Maude Lemaire
+from: Maude Lemaire
 rating: 3.5
 publish: true
 ---

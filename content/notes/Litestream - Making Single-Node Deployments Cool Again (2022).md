@@ -5,7 +5,7 @@ tags:
   - cmudb-seminar
 created: 2024-02-29
 source: https://www.youtube.com/watch?v=drgriZCRyrQ
-origin: Ben Johnson <benbjohnson>
+from: Ben Johnson <benbjohnson>
 publish: true
 rating: 3
 ---

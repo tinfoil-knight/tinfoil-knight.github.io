@@ -1,9 +1,10 @@
 ---
 tags:
   - talks
+  - nyc-systems
 created: 2024-08-25
 source: https://www.youtube.com/watch?v=SlkEW4C2kd4
-origin: Jonathan Belotti
+from: Jonathan Belotti
 publish: true
 rating: 4
 ---

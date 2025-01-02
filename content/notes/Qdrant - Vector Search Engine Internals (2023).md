@@ -7,7 +7,7 @@ tags:
   - talks
   - cmudb-seminar
 source: https://www.youtube.com/watch?v=bU38Ovdh3NY
-origin: Andrey Vasnetsov
+from: Andrey Vasnetsov
 publish: true
 rating: 4
 ---

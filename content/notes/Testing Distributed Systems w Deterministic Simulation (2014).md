@@ -5,7 +5,7 @@ tags:
 created: 2024-09-01
 updated: 2024-09-02
 source: https://www.youtube.com/watch?v=4fFDFbi3toc
-origin: Will Wilson
+from: Will Wilson
 rating: 3.5
 publish: true
 ---

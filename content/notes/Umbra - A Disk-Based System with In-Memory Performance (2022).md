@@ -5,7 +5,7 @@ tags:
   - cmudb-seminar
 created: 2024-02-26
 source: https://www.youtube.com/watch?v=pS2_AJNIxzU
-origin: Thomas Neumann
+from: Thomas Neumann
 publish: true
 rating: 5
 ---

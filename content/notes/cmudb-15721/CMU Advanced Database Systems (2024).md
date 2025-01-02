@@ -1,7 +1,7 @@
 ---
 tags:
   - db
-origin: Andy Pavlo
+from: Andy Pavlo
 ---
 
 ## 1: Modern OLAP Databases

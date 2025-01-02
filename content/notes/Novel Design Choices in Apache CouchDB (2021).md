@@ -5,7 +5,7 @@ tags:
   - cmudb-seminar
 created: 2024-08-08
 source: https://www.youtube.com/watch?v=FCs7Dz8hgjQ
-origin: Adam Kocoloski
+from: Adam Kocoloski
 publish: true
 rating: 4
 ---

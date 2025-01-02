@@ -4,11 +4,10 @@ tags:
   - talks
 created: 2024-05-23
 source: https://www.youtube.com/watch?v=tcFsgFXV0sM
-origin: Tania Bogatsch
+from: Tania Bogatsch
 publish: true
 rating: 3
 ---
-
 - Tania is a software engineer at DuckDB Labs. She previously interned at CWI.
 - DuckDB in a nutshell: Analytical database, In-process, Written in C++
 

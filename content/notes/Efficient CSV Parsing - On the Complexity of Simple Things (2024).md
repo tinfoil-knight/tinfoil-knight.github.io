@@ -3,7 +3,7 @@ tags:
   - talks
 created: 2024-06-04
 source: https://www.youtube.com/watch?v=YrqSp8m7fmk
-origin: Pedro Holanda
+from: Pedro Holanda
 publish: true
 rating: 2
 ---

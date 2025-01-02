@@ -16,7 +16,7 @@ export default (() => {
       return null
     }
     const frontmatter: { [key: string]: string } = fileData.frontmatter
-    const fieldsToShow = ["source", "origin"].filter((field) => frontmatter[field])
+    const fieldsToShow = ["source", "from"].filter((field) => frontmatter[field])
 
     if (fieldsToShow.length) {
       return (

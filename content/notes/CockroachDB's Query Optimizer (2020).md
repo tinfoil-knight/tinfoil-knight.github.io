@@ -6,7 +6,7 @@ tags:
 created: 2024-07-27
 updated: 2024-07-30
 source: https://www.youtube.com/watch?v=wHo-VtzTHx0
-origin: Rebecca Taft
+from: Rebecca Taft
 publish: true
 rating: 4
 ---

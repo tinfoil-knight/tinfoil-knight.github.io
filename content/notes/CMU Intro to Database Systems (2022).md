@@ -4,7 +4,7 @@ tags:
 created: 2023-08-13
 updated: 2024-02-09
 source: https://15445.courses.cs.cmu.edu/fall2022/
-origin: Andy Pavlo
+from: Andy Pavlo
 publish: true
 ---
 Lectures: https://15445.courses.cs.cmu.edu/fall2022/schedule.html

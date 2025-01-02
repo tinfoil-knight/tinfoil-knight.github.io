@@ -5,7 +5,7 @@ tags:
   - cmudb-seminar
 created: 2024-06-07
 source: https://www.youtube.com/watch?v=9XTg09W5USM
-origin: Arjun Narayan
+from: Arjun Narayan
 publish: true
 rating: 2
 ---

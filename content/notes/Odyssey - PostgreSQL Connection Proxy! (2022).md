@@ -6,7 +6,7 @@ tags:
 created: 2024-03-06
 updated: 2024-03-07
 source: https://www.youtube.com/watch?v=VEYdZL0bU-I
-origin: Andrey Borodin <x4m>
+from: Andrey Borodin <x4m>
 publish: true
 rating: 5
 ---

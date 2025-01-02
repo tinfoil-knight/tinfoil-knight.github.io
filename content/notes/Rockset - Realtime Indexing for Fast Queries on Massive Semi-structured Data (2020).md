@@ -6,7 +6,7 @@ tags:
 created: 2024-06-11
 updated: 2024-06-23
 source: https://www.youtube.com/watch?v=YayQfWr3yzo
-origin: Dhruba Borthakur
+from: Dhruba Borthakur
 rating: 4
 publish: true
 ---

@@ -5,7 +5,7 @@ tags:
 created: 2024-08-09
 updated: 2024-08-10
 source: https://www.vldb.org/pvldb/vol13/p3411-armbrust.pdf
-origin: Michael Armbrust, Ali Ghodsi, Reynold Xin, Matei Zaharia
+from: Michael Armbrust, Ali Ghodsi, Reynold Xin, Matei Zaharia
 rating: 3
 publish: true
 ---

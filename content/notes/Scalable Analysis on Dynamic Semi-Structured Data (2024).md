@@ -3,10 +3,11 @@ tags:
   - talks
   - db
   - search
+  - nyc-systems
 created: 2024-08-15
 updated: 2024-08-16
 source: https://www.youtube.com/watch?v=1wKsjQtjsHc
-origin: Dan Harris <thinkharderdev>
+from: Dan Harris <thinkharderdev>
 rating: 3.5
 publish: true
 ---
@@ -19,7 +20,7 @@ The way to build a modern high scale OLAP system is with columnar data. They wan
 
 How do you map heterogeneous semi-structured data to a columnar format?
 - Difficult balance b/w ingestion throughput, write amplification and query efficiency.
-- Prior art: Record shredding (2010)[^1], [Sinew, 2014](https://www.cs.umd.edu/~abadi/papers/sinew-sigmod14.pdf), [JSON Tiles, 2021](https://db.in.tum.de/~durner/papers/json-tiles-sigmod21.pdf).
+- Prior art: Record shredding (2010)[^1], [Sinew (2014)](https://www.cs.umd.edu/~abadi/papers/sinew-sigmod14.pdf), [JSON Tiles (2021)](https://db.in.tum.de/~durner/papers/json-tiles-sigmod21.pdf).
 
 ## Record Shredding aka Dremel Encoding
 
@@ -44,7 +45,7 @@ This works well if you've a nested relatively static structure with a fixed sche
 
 ## Sinew
 
-The key insight of the Sinew paper is that you can logical structure of the data that doesn't need to match the physical representation.
+The key insight of the Sinew paper is that the logical structure of the data that doesn't need to match the physical representation.
 - Logical schema is the merged schema of all records in the table.
 - Physical schema is partitioned into physical and virtual columns.
 - Physical columns are materialized and stored in their own column (or row in a row-oriented DB).

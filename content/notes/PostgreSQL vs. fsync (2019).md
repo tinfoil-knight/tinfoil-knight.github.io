@@ -4,7 +4,7 @@ tags:
   - talks
 created: 2024-07-24
 source: https://www.youtube.com/watch?v=1VWIGBQLtxo
-origin: Tomas Vondra
+from: Tomas Vondra
 publish: true
 rating: 3
 ---

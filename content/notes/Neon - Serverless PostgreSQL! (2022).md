@@ -5,7 +5,7 @@ tags:
   - cmudb-seminar
 created: 2024-03-25
 source: https://www.youtube.com/watch?v=rES0yzeERns
-origin: Heikki Linnakangas
+from: Heikki Linnakangas
 publish: true
 rating: 5
 ---
