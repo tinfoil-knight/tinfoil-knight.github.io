@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html><head><title>Materialize - A Streaming SQL Database Powered by Timely Dataflow (2020)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Materialize - A Streaming SQL Database Powered by Timely Dataflow (2020)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/materialize---a-streaming-sql-database-powered-by-timely-dataflow-2020"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Materialize - A Streaming SQL Database Powered by Timely Dataflow (2020)</h1><p class="content-meta ">Jun 07, 2024 | 928 words</p><ul class="tags "><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/cmudb-seminar" class="internal tag-link">#cmudb-seminar</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=9XTg09W5USM" class="external" style="color: inherit;">https://www.youtube.com/watch?v=9XTg09W5USM</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Arjun Narayan</span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#what-is-a-streaming-database" data-for="what-is-a-streaming-database">What is a streaming database?</a></li><li class="depth-0"><a href="#the-streaming-ecosystem" data-for="the-streaming-ecosystem">The Streaming Ecosystem</a></li><li class="depth-0"><a href="#materialize--architecture" data-for="materialize--architecture">Materialize : Architecture</a></li><li class="depth-0"><a href="#qa" data-for="qa">Q/A</a></li></ul></div></div></div></div><article class="popover-hint"><p>Arjun is the Co-founder and CEO of Materialize.</p>
+<h2 id="what-is-a-streaming-database">What is a streaming database?<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#what-is-a-streaming-database" class="internal alias"> §</a></h2>
+<ul>
+<li>Optimized for view-maintenance on an ongoing basis over streams of already processed txns.</li>
+<li>Traditionally, most systems were either OLTP or OLAP systems.</li>
+<li>Old Architecture:
+<ul>
+<li>OLTP -> Batch ETL -> OLAP -> SQL -> BI Tools, Reports, Data Mining</li>
+</ul>
+</li>
+<li>Ideal Architecture Today:
+<ul>
+<li>DB ->
+<ul>
+<li><strong>(Streaming Pipeline)</strong> Streaming CDC -> Stream Processing -> Microservices -> Visualization, Alerting, Monitoring
+<ul>
+<li>Some tools for stream processing: Apache Flink, Apache Druid, Kafka Streams</li>
+</ul>
+</li>
+<li><strong>(Batch Pipeline)</strong> Batch ELT -> OLAP -> SQL -> BI Tools, Reports, Data Mining</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>A lot of tooling is needed to get data from a stream reliably to dashboards, alerts and applications. In essence a lot of these tools are just calculating materialized views over the streamed data. With Materialize:
+<ul>
+<li>DB -> Streaming CDC -> Stream Processing -> Materialize -> SQL -> Visualization, Alerting, Monitoring</li>
+</ul>
+</li>
+</ul>
+<h2 id="the-streaming-ecosystem">The Streaming Ecosystem<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#the-streaming-ecosystem" class="internal alias"> §</a></h2>
+<ul>
+<li>What’s different about online view maintenance (OLVM)?
+<ul>
+<li><strong>Queries run for a long time</strong>
+<ul>
+<li>OLTP/OLAP queries are optimized at execution time. You can re-plan for each query.</li>
+<li>Streaming queries need to be optimal forever.</li>
+<li>Once you create a view, query plan is fixed.</li>
+<li>Query planning is much harder since an OLTP system will maintain an evaluation context and can decide to bail and re-run a query but that isn’t an option in dataflow engines. It needs to have a static query plan prepared.</li>
+<li>Error handling is also more difficult since the DB needs to keep running and making progress.</li>
+</ul>
+</li>
+<li><strong>Statistics won’t save you</strong>
+<ul>
+<li>Past performance is not indicative of future results.</li>
+<li>Most query optimization literature for OLAP is oriented around the idea of getting good cardinality estimates of your tables and using that to choose the best query plan.</li>
+<li>In streaming, you’ve to be adaptable to fast and slow moving streams which can change the no. of events by a large amount. Sometimes, you might be using data combined from a slow and fast moving stream which further increases the complexity.</li>
+<li>Q/A: You’d have a dimension and a fact table where the dimension table is mostly static. So you could have some statistics about the fact table using the dimension table. Or are there no static tables in streaming?
+<ul>
+<li>In streaming, people reissue the dimension tables because of updates from batch ETL. This can be really bad for performance if your query plans assumed that the dimension tables are mostly going to be static.</li>
+<li>In OLAP, you could just re-plan everything.</li>
+</ul>
+</li>
+<li>Q/A: Do people actually drop the entire dimension table and then load it back that often?
+<ul>
+<li>Yeah. It’s pretty common.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Writes are already ordered</strong>
+<ul>
+<li>No concurrency control (similar to OLAP) is needed.</li>
+</ul>
+</li>
+<li><strong>Query patterns are known and (mostly) repeated</strong>
+<ul>
+<li>A lot of things can be done ahead of time.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="a-streaming-manifesto">A Streaming Manifesto<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#a-streaming-manifesto" class="internal alias"> §</a></h3>
+<ul>
+<li>SQL : Declarative
+<ul>
+<li>A lot of streaming systems don’t have full SQL support (arbitrary joins, non-window join conditions etc.) .</li>
+</ul>
+</li>
+<li>Do only what’s necessary: Reactive to input changes, little to no busywork
+<ul>
+<li>Existing streaming processors have massive hardware footprint even if they’re ingesting low amounts of data due to complex queries.</li>
+</ul>
+</li>
+<li>Joins: No mandatory temporal windows; Arbitrary join conditions
+<ul>
+<li>Existing streaming systems require streaming joins be windowed along a temporal dimension (i.e. if input stream is changing over time, the joins is only evaluated over some fixed window)</li>
+<li>As per their docs, ”<em>JOINs work over the available history of both streams, which ultimately provides an experience more similar to an RDBMS than other streaming platforms.”</em></li>
+</ul>
+</li>
+</ul>
+<h2 id="materialize--architecture">Materialize : Architecture<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#materialize--architecture" class="internal alias"> §</a></h2>
+<ul>
+<li>Materialize is built on top of timely dataflow and differential dataflow.
+<ul>
+<li><a href="https://github.com/TimelyDataflow/timely-dataflow" class="external">https://github.com/TimelyDataflow/timely-dataflow</a>
+<ul>
+<li>Streaming compute engine. Scale-out, stateful, cyclic dataflow engine.</li>
+<li>Can apply arbitrary operators (written in Rust) on data. These operators are passed timestamps along w/ other input data.</li>
+</ul>
+</li>
+<li><a href="https://github.com/TimelyDataflow/differential-dataflow" class="external">https://github.com/TimelyDataflow/differential-dataflow</a>
+<ul>
+<li>Has an opinionated set of differential operators (like Join, Aggregate, Filter, Map, Range)
+<ul>
+<li>Range: index building operator that takes care of state management</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Materialize on top of these handles client connections, maintains catalogs, streams, views. It does parsing, planning, optimizing of queries and constructing dataflow plans from these queries.</li>
+</ul>
+<p><img src="../attachments/pasted-image-20240607164228.png" width="auto" height="auto"/></p>
+<p>Traditional streaming systems achieve parallelism by sharding on operator.</p>
+<ul>
+<li>Eg. Multiple workers for “Count” operator in a pipeline.</li>
+<li>This can get expensive for complex queries even for low data volume since the data passes through each worker for an operator one by one. Some of the operations (eg. “Filter”) might even be no-op for a lot of data.</li>
+</ul>
+<p>Timely dataflow cooperatively schedules every operator on each worker and shards the entire dataflow graph by key.</p>
+<ul>
+<li>Timestamps drive the movement of data.</li>
+</ul>
+<h3 id="building-materialize--experiences">Building Materialize : Experiences<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#building-materialize--experiences" class="internal alias"> §</a></h3>
+<ul>
+<li>Writing performant dataflow programs is very hard.</li>
+<li>Efficient state management is the key.
+<ul>
+<li>Existing stream processors outsource state management to RocksDB which leads to loss of control over things like when compaction happens.</li>
+</ul>
+</li>
+<li>SQL requires 100% coverage.
+<ul>
+<li>Q/A: How do you cover the SQL standard entirely?
+<ul>
+<li>We don’t. We support Joins, Subqueries etc. Don’t support CTEs and a few other things yet.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="qa">Q/A<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#qa" class="internal alias"> §</a></h2>
+<ul>
+<li>Does this dataflow uses multi-way joins with worst case optimality to do some kind of computations?
+<ul>
+<li>We’re using multi-way joins but not the algorithm with worst case join optimality .</li>
+</ul>
+</li>
+<li>What is the idea of consistency in your system?
+<ul>
+<li>We don’t do any concurrency control on our end because our inputs are ordered for us and have a timestamp associated with them but our system is essentially maintaining snapshot isolation.</li>
+</ul>
+</li>
+<li>Can I combine windows w/ different durations? (Sliding window semantics)
+<ul>
+<li>No.</li>
+</ul>
+</li>
+<li>What aspect of the implementation in Materialized was the most difficult?
+<ul>
+<li>Query planning to get out a static dataflow graph.</li>
+<li>Materialized optimizer is written from scratch.</li>
+</ul>
+</li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

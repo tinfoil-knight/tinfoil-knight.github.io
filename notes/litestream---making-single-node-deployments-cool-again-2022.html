@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html><head><title>Litestream - Making Single-Node Deployments Cool Again (2022)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Litestream - Making Single-Node Deployments Cool Again (2022)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/litestream---making-single-node-deployments-cool-again-2022"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Litestream - Making Single-Node Deployments Cool Again (2022)</h1><p class="content-meta ">Feb 29, 2024 | 1080 words</p><ul class="tags "><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/cmudb-seminar" class="internal tag-link">#cmudb-seminar</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=drgriZCRyrQ" class="external" style="color: inherit;">https://www.youtube.com/watch?v=drgriZCRyrQ</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Ben Johnson &lt;benbjohnson></span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#sqlite-review" data-for="sqlite-review">SQLite Review</a></li><li class="depth-0"><a href="#how-litestream-works" data-for="how-litestream-works">How Litestream Works</a></li><li class="depth-0"><a href="#failure-modes" data-for="failure-modes">Failure Modes</a></li><li class="depth-0"><a href="#litefs" data-for="litefs">LiteFS</a></li><li class="depth-0"><a href="#qa" data-for="qa">Q/A</a></li></ul></div></div></div></div><article class="popover-hint"><ul>
+<li>Ben is the author of <a href="https://github.com/benbjohnson/litestream" class="external alias">Litestream</a> &amp; the key-value store <a href="https://github.com/boltdb/bolt" class="external alias">BoltDB</a>.</li>
+<li>What Litestream Does
+<ul>
+<li>Streaming replication for SQLite</li>
+<li>Backs up to S3, network disks, SFTP etc.</li>
+<li>Adds high durability to a single node deployment</li>
+</ul>
+</li>
+</ul>
+<h2 id="sqlite-review">SQLite Review<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#sqlite-review" class="internal alias"> §</a></h2>
+<ul>
+<li>SQLite Internal Structure
+<ul>
+<li>Physical Layout: Fixed size pages in a file (usually 4KiB but can be changed)</li>
+<li>Logical Layout: B+ Tree</li>
+</ul>
+</li>
+<li>Early SQLite
+<ul>
+<li>Had a transaction mechanism called rollback journal. If you wanted to make a change in the DB transactionally, you’d copy out the older version of the page to a file called the rollback journal &amp; you’d make changes inside the DB. If anything fails, just copy back the file from the rollback journal.</li>
+<li>Bad concurrency. Single writer OR multiple readers.</li>
+</ul>
+</li>
+<li>Modern SQLite
+<ul>
+<li>WAL added in 2010.
+<ul>
+<li>Improved read concurrency, performance.</li>
+<li>Single writer AND multiple readers. Multiple versions of pages exist. Each reader gets its own snapshot at the point-in-time it started.</li>
+<li>Serializable isolation.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="how-litestream-works">How Litestream Works<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#how-litestream-works" class="internal alias"> §</a></h2>
+<ul>
+<li>Only works with SQLite WAL mode.</li>
+<li>SQLite’s WAL journaling mode writes new pages to a “-wal” file.</li>
+<li>If a query starts after a page has been modified by some txn then that page will be read from the WAL &amp; the rest of the pages (which aren’t modified by the point the query started) will be read from the DB.</li>
+<li>SQLite Checkpointing : When WAL grows too large, latest versions of pages are written back to the DB.
+<ul>
+<li>By default the WAL gets upto 4MB before checkpointing.</li>
+</ul>
+</li>
+<li>Litestream checks the WAL continuously (every second) &amp; copied out segments to a shadow WAL. Use some kind of checksum to verify consistency of data. Also detects when the WAL checkpoints &amp; truncates and then creates a new shadow WAL.</li>
+<li>Shadow WAL acts as the staging area to push out later to durable storage periodically (default is 10s but can be configured).</li>
+<li>Q/A: Do you batch when copying to S3 or copying as is?
+<ul>
+<li>We take a chunk of the subset of WAL to copy to S3. We might concatenate some chunks but we’re not really batching.</li>
+</ul>
+</li>
+<li>Litestream also pushes the snapshot of the whole DB separate from the WAL file everyday so that once you’ve a snapshot you only need to replay the WAL files that occurred after that.
+<ul>
+<li>You can do a point-in-time recovery for any period after the last snapshot until the next snapshot is created.</li>
+</ul>
+</li>
+<li>Data window loss is around 1s. (if you configure Litestream to copy to S3 every second)</li>
+<li>Q/A: Can pages be split across the WAL segments?
+<ul>
+<li>No. The segments always contain full txns. so you won’t have a txn. split across segments. All the pages are within those txns.</li>
+</ul>
+</li>
+<li>Q/A: The logical tree contain ptrs or page addresses. When these pages are moved to S3, how is the SQLite DB restored from this backup?
+<ul>
+<li>The page ptrs within the BTree are ptrs to page number &amp; not to a specific version of a page. When you restore from S3, you copy the pages into the same position in the DB.</li>
+</ul>
+</li>
+</ul>
+<h2 id="failure-modes">Failure Modes<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#failure-modes" class="internal alias"> §</a></h2>
+<ul>
+<li>Data Loss Window
+<ul>
+<li>Litestream uses async replication &amp; will lose up to X seconds of data during catastrophic failure where X is the configured sync interval.</li>
+<li>Makes attempt to push to durable storage on clean shutdown.</li>
+</ul>
+</li>
+<li>Restore
+<ul>
+<li>WAL is replicated as-is w/ no compaction. More WAL segments means longer restore times.</li>
+<li>WAL downloaded in parallel from S3.</li>
+<li>LZ4 compressed.</li>
+<li>Increasing snapshot frequency improves restore performance.</li>
+</ul>
+</li>
+<li>Multiple instances can corrupt
+<ul>
+<li>Litestream is single-instance only</li>
+<li>Replicating from multiple sources to a single path will corrupt backups because each instance will delete the other instance’s data.</li>
+<li>In cases like blue-green deployment (where 2 versions of an app are running for sometime), data can get corrupted.</li>
+</ul>
+</li>
+<li>Restarting your instance
+<ul>
+<li>Will incur downtime</li>
+<li>Restarts are less common for older VPS models but more common for ephemeral models like FlyIO, K8s.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Sidenote: Costs (with S3)</p>
+<ul>
+<li>AWS S3 ingress is free.</li>
+<li>PUT requests are 0.005$ / 1000 req.</li>
+<li>Replicating every second costs $13 / month &amp; every 10 seconds costs $1.30/month.</li>
+</ul>
+</blockquote>
+<h2 id="litefs">LiteFS<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#litefs" class="internal alias"> §</a></h2>
+<ul>
+<li>People wanted realtime read replication &amp; high availability. So, they made LiteFS.</li>
+<li>LiteFS is a Distributed File System for SQLite databases.</li>
+<li>FUSE-based.</li>
+<li>Cluster of nodes share the same SQLite data.</li>
+<li>Single-writer elected via Consul lease.</li>
+<li>Instant point-in-time restores.</li>
+<li>Why FUSE?
+<ul>
+<li>SQLite has a virtual file system but requires user intervention (load an extension every session before use).</li>
+<li>FUSE allows fine grained control which lets them do things like prevent writes of read replicas, redirect writes etc.</li>
+<li>Multi-process support.</li>
+</ul>
+</li>
+<li>Why cluster SQLite?
+<ul>
+<li>Improve availability esp. during deploys</li>
+<li>Replicate to edge</li>
+</ul>
+</li>
+<li>Leader Election via Lease (and not Raft)
+<ul>
+<li>Ben wrote the initial raft library for etcd but wanted to keep Litestream simple.</li>
+<li>Raft has strict distributed consensus guarantees which isn’t required for all applications.</li>
+<li>Consul Lease allows for loose membership.</li>
+<li>Rolling DB checksum tracked at every txn.
+<ul>
+<li>Uses XOR CRC64 with the old checksum of the page &amp; add in the new one.</li>
+<li>Fast to compute &amp; provided constant integrity checking.</li>
+<li>Allows for mostly monotonic txn ID.</li>
+<li>If a primary (w/ a txn that hasn’t been pushed to replicas) goes down &amp; another node comes up then you’ve some divergence b/w nodes. The checksum helps realise the divergence &amp; reset state. (Some data is lost but the DB isn’t corrupted)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Instant Point-inTime Restore
+<ul>
+<li>Introduces Lite Transaction (LTX) file format instead of raw WAL.</li>
+<li>LTX files are compactable from multiple streams.
+<ul>
+<li>Durable storage can be rolled up into higher level LTX files.</li>
+</ul>
+</li>
+<li>Can use this to have a staging area for every PR.</li>
+</ul>
+</li>
+<li>Alternatives
+<ul>
+<li>Regular Backups w/ cron (can be done in addition w/ Litestreams)</li>
+<li>Raft-based replication tools: rqlite, dqlite
+<ul>
+<li>Better consistency &amp; durability guarantees but more complex to set up &amp; maintain.</li>
+</ul>
+</li>
+<li>VFS-based Replication: verneuil, LiteReplica,
+<ul>
+<li>Implemented via virtual file system within SQLite</li>
+<li>Must be compiled/linked into the application</li>
+</ul>
+</li>
+<li>Postgres &amp; MySQL</li>
+</ul>
+</li>
+</ul>
+<h2 id="qa">Q/A<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#qa" class="internal alias"> §</a></h2>
+<ul>
+<li>How big can the DB be for these tools to work well?
+<ul>
+<li>Targeting around 1-10GB DBs.</li>
+</ul>
+</li>
+<li>Litestream is blindly copying pages w/o parsing them. Have you thought about some optimizations you could do?
+<ul>
+<li>Litestream does parse the WAL file. There’s a header for the whole WAL &amp; one for each frame which is used to delineate txn.</li>
+<li>We could do Change Data Capture (CDC).</li>
+</ul>
+</li>
+<li>How much load does running Litestream add onto a machine?
+<ul>
+<li>Not much really. Most of the pages are recent &amp; will be in the page cache. Analysis is pretty minimal since the WAL is mostly copied so it doesn’t require much processing time.</li>
+</ul>
+</li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>
