@@ -138,3 +138,4 @@ Q/A
 
 Other things
 - [Fast container image distribution plugin with lazy pulling](https://github.com/containerd/stargz-snapshotter)
+- Blog: https://modal.com/blog/jono-containers-talk

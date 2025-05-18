@@ -49,15 +49,14 @@ Fun Fact: SQL was Sequel (Structured English Query Language) initially but IBM h
 - We don't want to rely on the OS to do anything apart from giving the DBMS memory and not letting the process get killed.
 
 ### mmap
-- mmap can store contents of a file into the address space of a program but it has some issues:
-- Issues:
-	- Transaction Safety : OS can flush dirty pages at any time (you might not want to save changes yet if you're updating multiple pages but the OS will flush the pages and lead to corrupt data)
+- mmap can store contents of a file into the address space of a program but it has some issues.
+	- Transaction Safety : OS can flush dirty pages at any time (you might not want to save changes yet if you're updating multiple pages but the OS will flush the pages and lead to corrupt data).
 	- I/O Stalls :  DBMS doesn't know which pages are in memory so it'll get a page fault every time it tries to access a page not in memory & be stalled by the OS then.
-	- Error Handling : Difficult to validate pages. (DBMS can maintain checksums if it is controlling read, writes unlike mmap)
+	- Error Handling : Difficult to validate pages (DBMS can maintain checksums if it is controlling read, writes unlike mmap).
 	- Performance Issues : OS has it's own data structure for page table which can become a bottleneck.
 - mmap might be okay for really light workloads on small DBs. It's quick and easy to start with.
-- Sidenote: mmap is used by elasticsearch, leveldb ; sqlite also partially uses mmap ; mmap was partially used by mongodb earlier but they stopped using it since they faced problems
-- For more info on why you shouldn't use mmaps for a DBMS: Read https://db.cs.cmu.edu/mmap-cidr2022/
+- Sidenote: mmap is used by elasticsearch, leveldb ; sqlite also partially uses mmap ; mmap was partially used by mongodb earlier but they stopped using it since they faced problems.
+- For more info on why you shouldn't use mmap for a DBMS: Read https://db.cs.cmu.edu/mmap-cidr2022/
 
 ### How the DBMS represents the database in files on disk
 - File Storage
@@ -1546,49 +1545,48 @@ Interleaved Execution Anomalies
 	- Lost Update: One txn overwrites uncommitted data from another uncommitted txn
 - Sidenote: Phantom Reads & Write Skew are some other anomalies.
 
-
 ```
 None of the below scenarios is equivalent to a serial order.
 
-//  Unrepeatable Read
+// Unrepeatable Read
 
-	| T1     | T2     |
-	|--------|--------|
-	| BEGIN  |        |
-10<-| R(A)   |        |
-    |        | BEGIN  |
-	|        | R(A)   |->10
-	|        | W(A)   |<-19
-	|        | COMMIT |
-19<-| R(A)   |        |
-	| COMMIT |        |
-
-
-//  Dirty Read
-
-	| T1    | T2     |
-	|-------|--------|
-	| BEGIN |        |
-10<-| R(A)  |        |
-12->| W(A)  | BEGIN  |
-	|       | R(A)   |->12
-	|       | W(A)   |<-14 (add 2)
-	|       | COMMIT |
-	| ABORT |        |
+| T1         | T2         |
+|------------|------------|
+| BEGIN      |            |
+| 10<-R(A)   |            |
+|            | BEGIN      |
+|            | R(A)->10   |
+|            | W(A)<-19   |
+|            | COMMIT     |
+| 19<-R(A)   |            |
+| COMMIT     |            |
 
 
-//  Lost Update
+// Dirty Read
 
-	| T1     | T2     |
-	|--------|--------|
-	| BEGIN  |        |
-10->| W(A)   |        |
-	|        | BEGIN  |
-	|        | W(A)   |<-19
-	|        | W(B)   |<-YY
-	|        | COMMIT |
-ZZ->| W(B)   |        |
-	| COMMIT |        |
+| T1         | T2              |
+|------------|-----------------|
+| BEGIN      |                 |
+| 10<-R(A)   |                 |
+| 12->W(A)   | BEGIN           |
+|            | R(A)->12        |
+|            | W(A)<-14 (add 2)|
+|            | COMMIT          |
+| ABORT      |                 |
+
+
+// Lost Update
+
+| T1         | T2         |
+|------------|------------|
+| BEGIN      |            |
+| 10->W(A)   |            |
+|            | BEGIN      |
+|            | W(A)<-19   |
+|            | W(B)<-YY   |
+|            | COMMIT     |
+| ZZ->W(B)   |            |
+| COMMIT     |            |
 ```
 
 
@@ -2342,9 +2340,11 @@ Compensation Log Records (CLR)
 The Log Record looks somewhat like this now:
 `<LSN | prevLSN | TxnId | Type | Object | Before | After | UndoNext>`
 Eg:
-`<001 | nil | T1 | BEGIN | - | - | - | - >`
-`<002 | 001 | T1 | UPDATE | A | 30 | 40 | - >`
-`<026 | 011 | T1 | CLR-002 | A | 40 | 30 | 001>`
+```
+<001 | nil | T1 | BEGIN   | - | -  | -  |  -  >
+<002 | 001 | T1 | UPDATE  | A | 30 | 40 |  -  >
+<026 | 011 | T1 | CLR-002 | A | 40 | 30 | 001 >
+```
 
 Sidenote:
 1. CLR makes things more efficient. It isn't necessary for recovery. It prevents us from doing things repeatedly. 

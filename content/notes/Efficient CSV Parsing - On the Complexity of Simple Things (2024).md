@@ -2,6 +2,7 @@
 tags:
   - talks
 created: 2024-06-04
+updated: 2025-02-20
 source: https://www.youtube.com/watch?v=YrqSp8m7fmk
 from: Pedro Holanda
 publish: true
@@ -58,8 +59,7 @@ carriage_return:
 final_state:
 	...
 ```
-- No dependency on the C library
-	- As per the code, they're using the `algorithm` & `fstream` library. Doesn't that count?
+
 - Instead of `ifstream`, you've your own file handle which utilises 32MB buffers and provides control of what's in memory or not for efficiency.
 - ~ 4x improvement TPCH-SF10 benchmark with 60M line-items. Went from ~220s to ~55s.
 - Issues
@@ -146,4 +146,4 @@ The parser uses a state machines similar to this: (States x Transition Trigger)
 - Caching / Partioning
 	- Multiple readers over the same file start from the same point.
 	- IO, Parsing must happens again. This can be avoided.
-	- Academic work: [NoDB: Efficient Query Execution on Raw Data Files](https://stratos.seas.harvard.edu/files/stratos/files/nodb-cacm.pdf)
+	- Academic work: [NoDB: Efficient Query Execution on Raw Data Files](https://15799.courses.cs.cmu.edu/fall2013/static/papers/NoDBsigmod2012.pdf)

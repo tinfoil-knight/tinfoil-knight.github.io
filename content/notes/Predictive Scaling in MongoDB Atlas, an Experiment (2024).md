@@ -1,12 +1,12 @@
 ---
-created: 2024-11-23
-updated: 2024-11-27
-source: https://youtu.be/VLi9MHnBJzQ
-from: Matthieu Humeau, A. Jesse Jiryu Davis
 tags:
   - talks
   - nyc-systems
   - db
+created: 2024-11-23
+updated: 2024-11-27
+source: https://youtu.be/VLi9MHnBJzQ
+from: Matthieu Humeau, A. Jesse Jiryu Davis
 publish: true
 rating: 4
 ---
