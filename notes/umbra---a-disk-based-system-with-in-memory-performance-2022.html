@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html><head><title>Umbra - A Disk-Based System with In-Memory Performance (2022)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Umbra - A Disk-Based System with In-Memory Performance (2022)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/umbra---a-disk-based-system-with-in-memory-performance-2022"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Umbra - A Disk-Based System with In-Memory Performance (2022)</h1><p class="content-meta ">Feb 26, 2024 | 2971 words</p><ul class="tags "><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/cmudb-seminar" class="internal tag-link">#cmudb-seminar</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=pS2_AJNIxzU" class="external" style="color: inherit;">https://www.youtube.com/watch?v=pS2_AJNIxzU</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Thomas Neumann</span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#motivation" data-for="motivation">Motivation</a></li><li class="depth-0"><a href="#what-umbra-does" data-for="what-umbra-does">What Umbra Does</a></li><li class="depth-0"><a href="#buffer-management" data-for="buffer-management">Buffer Management</a></li><li class="depth-0"><a href="#mvcc-on-disk" data-for="mvcc-on-disk">MVCC on disk</a></li><li class="depth-0"><a href="#statistics" data-for="statistics">Statistics</a></li><li class="depth-0"><a href="#compilation--execution" data-for="compilation--execution">Compilation &amp; Execution</a></li><li class="depth-0"><a href="#experiments" data-for="experiments">Experiments</a></li><li class="depth-0"><a href="#conclusion" data-for="conclusion">Conclusion</a></li><li class="depth-0"><a href="#qa" data-for="qa">Q/A</a></li><li class="depth-0"><a href="#appendix" data-for="appendix">Appendix</a></li></ul></div></div></div></div><article class="popover-hint"><blockquote>
+<p><strong>Remarks</strong><br/>
+Umbra has done a lot optimisations to get in-memory performance on a hybrid system. They adaptive query compiler that uses LLVM &amp; generates machine code is the most interesting part.</p>
+</blockquote>
+<h2 id="motivation">Motivation<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#motivation" class="internal alias"> §</a></h2>
+<ul>
+<li>Worked on a purely in-memory system (<a href="https://dbdb.io/db/hyper" class="external alias">HyPer</a>) earlier.</li>
+<li>Pure in-memory systems are fast but expensive.</li>
+<li>Growth in memory sizes stalled compared to what was expected.</li>
+<li>Now, SSD-based systems are quite fast &amp; cheaper than main memory (DRAM). ($500 vs $20000 for 2TB).</li>
+<li>SSD-based systems can still use large in-memory buffers.
+<ul>
+<li>Working set (not the entire dataset) often fits entirely into main memory.</li>
+<li>But, using traditional buffer management limits performance even though everything is in memory.</li>
+</ul>
+</li>
+</ul>
+<h2 id="what-umbra-does">What Umbra Does<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#what-umbra-does" class="internal alias"> §</a></h2>
+<ul>
+<li>Combine large in-memory buffers w/ fast SSDs</li>
+<li>Novel buffer manager allowing in-memory performance</li>
+<li>Umbra is an evolution of HyPer towards an SSD-based system
+<ul>
+<li>Comparable performance if working set fits in main memory</li>
+<li>Transparent scaling beyond main memory when required</li>
+<li>Some parts like the compiling query execution engine is the same as HyPer</li>
+</ul>
+</li>
+<li>Key additions &amp; adaptations
+<ul>
+<li>Scalable buffer management with variable-size pages</li>
+<li>Adaptive compilation &amp; modular execution engine</li>
+<li>Statistics maintenance</li>
+<li>String handling (didn’t talk about this)</li>
+</ul>
+</li>
+</ul>
+<h2 id="buffer-management">Buffer Management<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#buffer-management" class="internal alias"> §</a></h2>
+<ul>
+<li>Traditional approach : Fixed-size pages
+<ul>
+<li>Benefits of using fixed size pages: Recovery, memory management is easy, Less fragmentation</li>
+<li>Requires explicit partitioning of large objects</li>
+<li>Complex code to handle large objects</li>
+<li>Simple buffer manager but complex system</li>
+<li>Reduced performance due to partitioning logic</li>
+</ul>
+</li>
+<li>Umbra’s approach: Variable-size pages
+<ul>
+<li>Large objects are handled transparently</li>
+<li>Can store in-memory representation of large object on single page (for faster lookups)</li>
+<li>No complex partitioning logic required</li>
+<li>Increased complexity of buffer manager</li>
+<li>Main problem: External fragmentation of buffer pool</li>
+</ul>
+</li>
+<li>How they fixed the problem with external fragmentation
+<ul>
+<li>Exploit flexible mapping b/w virtual &amp; physical memory
+<ul>
+<li>Pages are organized in exponentially growing size classes</li>
+<li>Fixed virtual addresses are reserved for each size class</li>
+<li>Mapping to physical memory only for pinned buffer frames</li>
+</ul>
+</li>
+<li>Available virtual memory range is allocated repeatedly w/ different size classes to get a space with multiple granularities.</li>
+<li><img src="../attachments/pasted-image-20240226201058.png" width="auto" height="auto"/></li>
+<li>If a large page is needed &amp; consecutive space isn’t available then free small pages can be de-allocated (which tells the OS to cut the link b/w virtual &amp; physical address space) to get the contiguous physical space for the large page.</li>
+<li>Sidenote: <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/vm-freespace.pdf" class="external">https://pages.cs.wisc.edu/~remzi/OSTEP/vm-freespace.pdf</a> (see Buddy Allocation)</li>
+<li>Q/A : Are there any issues w/ changing the virtual-physical mapping very often like increasing the size of kernel data strictures or blowing out the TLB cache? I’ve heard that using <a href="https://man7.org/linux/man-pages/man2/mremap.2.html" class="external alias">mremap</a>to do this kind of fast re-alloc can cause other memory access to be slower.
+<ul>
+<li>We don’t use mremap because that’s indeed bad. We just tell the OS to unlink which keeps the mapping simple &amp; linear. There’s still a cost though when you change the size which shoots down the TLB of other cores so we don’t like to do this very often. We prefer to keep memory is a certain size &amp; only move it if we really have to. But it’s not terribly expensive. You can do this a few hundred times / second and that’s okay but you don’t want to do this a million of times.</li>
+</ul>
+</li>
+<li>Q/A : How does flush work when backed by variable size pages?
+<ul>
+<li>Writing to disk isn’t any different compared to fixed size pages. The thing to be careful about is recovery. You don’t want to change the size of the page since 2 small pages could be over-written by a large page which is unsafe since you aren’t sure if the header with the LSN number is in the correct place.</li>
+</ul>
+</li>
+<li>Q/A : Do you use huge page for mapping so that when you unmap a 64KiB slot, it can be remapped elsewhere instead of using 2MiB &amp; ending up with a page splitting on a map?
+<ul>
+<li>We don’t use transparent huge pages.</li>
+<li>Extra TLB pressure for finer granularity.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Variable-size pages alone aren’t sufficient for high performance.
+<ul>
+<li>Compared to a purely in-memory systems, traditional buffer managers have other bottlenecks like acquiring a latch for every page that is accessed, pinning &amp; unpinning pages &amp; the root of the BTree being highly contentious.</li>
+<li>Performance Optimizations:
+<ul>
+<li>Pointer swizzling</li>
+<li>Versioned latches</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Pointer Swizzling
+<ul>
+<li>Decentralized mapping from page IDs to memory addresses
+<ul>
+<li>Centralized hash table is a major bottleneck in highly parallel architectures</li>
+<li>Use tagged pointers to encode both PIDs (for disk-resident pages) &amp; memory addresses (for memory-resident pages) so that you can avoid the hashtable lookup for already resolved pages</li>
+</ul>
+</li>
+<li>Pointer swizzling lets you access a page cheaply without a hashtable lookup.</li>
+<li>Inner BTree node is composed of “swip” &amp; “key” where “swip” is a potentially swizzled pointer (page id if page not in memory OR the physical pointer to the page if in memory).</li>
+<li>Now, if you follow a page id from a page, we check if you already resolved this &amp; if yes then we just jump there. If not, then we have to acquire a lock &amp; do IO anyway.</li>
+<li>Cost: When you evict the page, you must invalidate the swip otherwise another reader might think that the page is there when it’s not.</li>
+<li>Hydra currently has only 1 incoming swip. Ideally, you must have a low number of incoming swips because you need to invalidate them when you evict a page.</li>
+</ul>
+</li>
+<li>Versioned Latches
+<ul>
+<li>Traditionally, you’d grab a R-W lock / latch on the root even if you just need to do reads. Determine where you need to go, then latch the child, release the root &amp; so on. Most of the time is spent on acquiring the mutex for the root even if there’s no logical contention.</li>
+<li>A versioned latch is just a single 64-bit integer counter which can be locked in different modes (optimistic, shared or exclusive).
+<ul>
+<li>We remember how many exclusive unlocks we did in the versioned latch. This allows you to check if there was a change.</li>
+</ul>
+</li>
+<li>Modes
+<ul>
+<li>Shared: Read-only access</li>
+<li>Exclusive: Read-write access</li>
+<li>Optimistic: Read-only access, no locks, requires validation &amp; may fail
+<ul>
+<li>Needs to wait if the node already holds an exclusive lock</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Note: If you optimistically latch a page, the page might disappear while you’re reading. In the buffer manager implementation, if a page is evicted, we just read the zero page. Reader must be aware of this.</li>
+</ul>
+</li>
+<li>Relations
+<ul>
+<li>Relations are stored in B+ trees.
+<ul>
+<li>Keys are synthetic (not visible to user) 8-byte tuple IDs.</li>
+<li>PAX layout within leaf pages.</li>
+</ul>
+</li>
+<li>Concurrent access synchronized through optimistic latch coupling
+<ul>
+<li>User versioned latches provided by buffer manager</li>
+<li>Rely on optimistic latches during non-modifying traversal</li>
+<li>Leaf pages shared mode for scans, optimistic mode for point access
+<ul>
+<li>You need to validate after every read in optimistic locking. In particular, the pages holding a string can go away at any time. For point access, you can just copy the string &amp; then check after if it’s still valid but we don’t want to do this during scans to avoid copying strings.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="mvcc-on-disk">MVCC on disk<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#mvcc-on-disk" class="internal alias"> §</a></h2>
+<ul>
+<li>We want to avoid writing to disk due to the high overhead. So a mixed solution is used.</li>
+<li><img src="../attachments/pasted-image-20240228130717.png" width="auto" height="auto"/></li>
+<li>Regular Case: Use an in-memory representation of the txn
+<ul>
+<li>Argument: Majority of txn are small (a few hundred tuples)</li>
+<li>Maintain version chains exclusively in-memory</li>
+<li>Attach to DB pages through local mapping tables</li>
+<li>Retained by buffer manager when pages are evicted (re-attached when page comes back)</li>
+<li>When txns are large (eg. touching all the tuples in the DB) , we don’t want to have in-memory representation because it’s very expensive.</li>
+</ul>
+</li>
+<li>Bulk Operations
+<ul>
+<li>Argument: Bulk operations are infrequent.</li>
+<li>Give exclusive bulk write access to relation.</li>
+<li>Use two bit (created, deleted) per tuple to create “virtual versions”</li>
+<li>Virtual version consume no physical memory</li>
+<li>Proper isolation of arbitrarily large bulk operations</li>
+</ul>
+</li>
+</ul>
+<h2 id="statistics">Statistics<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#statistics" class="internal alias"> §</a></h2>
+<ul>
+<li>Statistics are essential for query optimization to determine things like how many tuples qualify for a predicate, how many distinct values they’ve for a group by etc.</li>
+<li>In HyPer, they used sample for this. When the data changed too much, it was recomputed in-memory. We don’t want to do this on disk due to read amplification.</li>
+<li>Umbra uses reservoir sampling. While the data is inserted, updated or deleted; a sample is maintained all the time so it’s always available &amp; doesn’t need to be recomputed. They use some algorithm to predict the skip length b/w the hits &amp; the reservoir sample. Then figure out which tuple would be relevant for the sample &amp; insert it in the sample.</li>
+<li>How to do this in a multi-threaded way? Skips b/w tuples are pre-computed. Skips are handed to threads on-demand which are responsible for skipping this many tuples until one qualifies.
+<ul>
+<li>Each thread locally counts down until a relevant tuple is encountered.</li>
+<li>Note: Length of skips increases over time. Larger the sample, more likely that tuple is less relevant.</li>
+</ul>
+</li>
+<li>Samples are great for predicated but poor for distinct (/group by) counts.
+<ul>
+<li>Maintain HyperLogLog sketches for all columns.</li>
+</ul>
+</li>
+<li>Sidenote: There are some systems that try to solve for the IO cost by sampling pages instead of tuples but avoid doing this since this creates sampling bias in the data.</li>
+</ul>
+<h2 id="compilation--execution">Compilation &amp; Execution<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#compilation--execution" class="internal alias"> §</a></h2>
+<ul>
+<li>In the I/O case, we might want to pause our query but if our query is just a function we called then it’s difficult to pause. So we compile queries (physical execution plans) into state machines.</li>
+<li>Query pipelines consist of multiple steps i.e. generated functions.</li>
+<li>Viewed as states w/ well defined transitions.</li>
+<li>Query executor orchestrates invocation of steps.</li>
+<li>This is useful for both the I/O case &amp; for scheduling  long running queries (we don’t want someone to wait until the long running query is gone to run a cheap query).</li>
+<li>Eg: <img src="../attachments/pasted-image-20240228134634.png" width="auto" height="auto"/></li>
+<li>Q/A: Is this implemented as a co-routine or as small functions?
+<ul>
+<li>Behaves as co-routine but implemented as generated functions with explicit state.</li>
+</ul>
+</li>
+<li>Q/A: Did you consider the SQL OS approach where they have small functions (at most 6ms)?
+<ul>
+<li>We didn’t because the SQL OS co-routines does memory allocation for its own state. We want to control memory.</li>
+</ul>
+</li>
+<li>Advantages of modular execution plans
+<ul>
+<li>Query execution can easily be suspended (eg. on high IO pressure)</li>
+<li>Enables fine-grained parallelization of pipelines.</li>
+</ul>
+</li>
+<li>Steps are compiled adaptively
+<ul>
+<li>Each function can be compiled separately.</li>
+<li>Code generation employs custom IR similar to LLVM IR.</li>
+<li>Initially translated into machine code using a low-latency backend.</li>
+<li>If beneficial, translated into LLVM IR &amp; just-in-time (JIT) compiled.
+<ul>
+<li>Eg: Very few instructions are needed for something like “allocate a hashtable” so no point in optimizing that. Only done when the step is determined to be expensive.</li>
+</ul>
+</li>
+<li>Note: The query is running &amp; not stopped for this. They compile in background &amp; switch while executing.</li>
+</ul>
+</li>
+<li>Low-latency compilation
+<ul>
+<li>Compile time is a problem is compiling engine. LLVM has super linear compile time for large functions.</li>
+<li>So they started directly emitting machine code.</li>
+<li>Machine code generation wasn’t as difficult as register allocation (which requires detecting loops &amp; doing lifetime computations) but implementing register allocation guarantees almost linear compile time.</li>
+<li>Optimized LLVM is used adaptively &amp; only when beneficial.</li>
+<li>Sidenote:
+<ul>
+<li>LLVM will take 14s to compile a function w/ 2K joins &amp; 4s if asked to do it cheaply. Their custom compiler does it in 33ms.</li>
+<li>LLVM w/ optimizations enabled produces more performant code but takes more time so it’s not worthwhile for most parts of the query.</li>
+</ul>
+</li>
+<li>Q/A: Would a vectorized runtime do any better? We’re trying to optimize for I/O stalls in our query plan. Would a vectorized engine be easier/better to use?
+<ul>
+<li>Vectorized engine is fine for OLAP workloads but compiled engines are significantly better for OLTP workloads since the vectorization overhead becomes noticeable when only a few tuples are used.</li>
+</ul>
+</li>
+<li>Q/A: Do you cache query plans to avoid compiling?
+<ul>
+<li>Compile times are so low that we don’t cache query plans anymore.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="experiments">Experiments<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#experiments" class="internal alias"> §</a></h2>
+<ul>
+<li>System comparison: In memory, warm cache
+<ul>
+<li>On Join Order Benchmark (JOB): 3x faster than HyPer, 4.6x than MonetDB.</li>
+<li>On TPCH: 1.7x faster than Hyper, 1.9x faster than MonetDB.</li>
+<li>Note: Faster than HyPer not because of faster runtime but because of better statistics &amp; query plans.</li>
+</ul>
+</li>
+<li>Cost of buffer manager
+<ul>
+<li>Replaced buffer manager by flat mmap files.</li>
+<li>Similar performance w/ minor performance fluctuations (6% avg., 30% max).</li>
+</ul>
+</li>
+<li>Read perf. w/ cold caches
+<ul>
+<li>Buffer manager &amp; flat mmap files perform equal.</li>
+<li>Full utilization of SSD read bandwidth in both cases.</li>
+<li>Buffer manager much faster than mmap under high concurrency.</li>
+</ul>
+</li>
+<li>Sidenote: mmap is awful for highly parallel reads due to lock contention.</li>
+</ul>
+<h2 id="conclusion">Conclusion<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#conclusion" class="internal alias"> §</a></h2>
+<ul>
+<li>Umbra offers the best of both worlds
+<ul>
+<li>Perf. of an in-memory system if data fits into main memory</li>
+<li>Scalability of a disk-based system beyond main memory</li>
+</ul>
+</li>
+<li>Made possible by
+<ul>
+<li>Efficient &amp; scalable buffer management w/ variable-size pages</li>
+<li>Novel modular execution plan model &amp; adaptive query compilation</li>
+<li>Further adaptations to statistics maintenance &amp; string handling</li>
+</ul>
+</li>
+</ul>
+<h2 id="qa">Q/A<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#qa" class="internal alias"> §</a></h2>
+<ul>
+<li>Do you use a fixed page size for the internal leaf node or a fixed tuple count? Do you target being just under a size that’s power of 2 to reduce fragmentation?
+<ul>
+<li>We try to reach the 64KiB size in the B-Tree leaf pages but we’ll use a larger page for larger data. Inner nodes always have 64KiB pages because the keys are tuple ids.</li>
+</ul>
+</li>
+<li>Do you use 64KiB size for under-full pages too? Do you merge pages on delete?
+<ul>
+<li>It’s very unlikely for pages to be under-full. We try to put as many tuples as possible in the pages.</li>
+<li>We merge on delete.</li>
+</ul>
+</li>
+<li>In the indirection trick (pointer swizzling) do you use using pre-fetching or just cache misses?
+<ul>
+<li>IIRC, first time you go down, you just fill the cache. For multiple lookups, we remember where we have to go next &amp; pre-fetch the page.</li>
+</ul>
+</li>
+<li>Do you have a fixed no. of threads running the queries or do you allocate new threads as queries come?
+<ul>
+<li>We’ve a fixed no. of threads equal to the number of cores. It doesn’t make any sense to have more threads than cores because they can’t run concurrently. We schedule query to thread.</li>
+</ul>
+</li>
+<li>If you’ve a fixed no. of threads, then you’ve some OLAP queries taking a lot of time &amp; then there’ll be some OLTP queries. How do you decide the scheduling of these queries so that OLTP queries have low latency &amp; OLAP queries can still execute fast?
+<ul>
+<li>We use decaying priority i.e. the longer the query runs the lesser its priority.</li>
+</ul>
+</li>
+<li>When you pause a query, do you place some checkpoint or do you just pause the thread?
+<ul>
+<li>The multi-threaded steps are using morsel driven parallelism i.e. the threads process a few thousand tuples &amp; then fall back to the scheduling function &amp; if someone decides that you thread should yield then you stop at the next morsel boundary &amp; switch to another query.</li>
+</ul>
+</li>
+<li>You mentioned that you use only 1 thread per core so do none of these threads block on I/O. Does the CPU not get saturated?
+<ul>
+<li>We aren’t happy w/ this part yet. We use NVMe SSDs which have pretty low latency so we block synchronously on I/O (which is unlikely in itself). But if your device isn’t a very fast SSD then you don’t want to do this. You need another thread which hands out pages to other workers. Workers should never block for long times.</li>
+</ul>
+</li>
+<li>If you’re using the NVMe PCI SSDs then could you redirect the I/O to those threads that are running on the cores that are directly attached to those PCI slots?
+<ul>
+<li>Good idea. Didn’t implement this in Umbra. We did something similar in HyPer where we prefer to read memory from local NUMA nodes. We’d re-schedule threads to read from the local node. Could do something similar in Umbra too.</li>
+</ul>
+</li>
+<li>How does the DB decide to use LLVM to compile the query plan? Is there some statistics to help predict the speed-up from the optimized LLVM?
+<ul>
+<li>We keep track of the progress in each pipeline. We predict how long we’ll need to finish. We’ve a model (basically a polynomial function) that tells how expensive it’s to compile something w/ LLVM &amp; the expected speed-up. If worthwhile then we start compilation &amp; switch but if the remaining running time is not significant then we don’t.</li>
+</ul>
+</li>
+<li>Is this similar to what you were doing w/ HyPer as mentioned in the ICD paper?
+<ul>
+<li>We switched b/w a virtual machine or 2 LLVM nodes in HyPer but we stopped doing this. Our initial backend is different now.</li>
+</ul>
+</li>
+<li>Do you have async I/O abilities enabled w/ something like io_uring or the Windows I/O ring? Does that impact your ability to schedule things into async work?
+<ul>
+<li>We use io_uring for background threads that do I/O &amp; hands pages to worker threads when available.</li>
+</ul>
+</li>
+<li>PAX encoding on leaf pages. How do you navigate the tension b/w dense encodings, low runtimes &amp; CPU overhead on decoding those encodings? Do you use run-length encoding on the PAX pages?
+<ul>
+<li>Text layout is optimized for OLTP workload. Not heavily compressed.</li>
+<li>We’ve a different backend for OLAP where we do run length encoding but not for OLTP.</li>
+</ul>
+</li>
+<li>Since you mentioned OLAP, what do you think about non-CPU execution resources since CPU is tapering off in frequency &amp; core counts. What do you think about GPU or even CPU SIMD instructions?
+<ul>
+<li>We use SIMD instructions for filtering during scans for tables etc.</li>
+<li>We tried using GPU for acceleration but the issue was that when the data is large than GPU memory (which is usually the case), you’ve to transfer data in &amp; out of the GPU which tends to ruins the perf. advantage you gain from GPU. Gains weren’t impressive enough to do in our main systems.</li>
+</ul>
+</li>
+<li>Is Umbra still pg compatible? What level of compatibility does it have (SQL grammar, catalogs, other functionality)?
+<ul>
+<li>Same grammar &amp; wire protocol so a pg driver can be used.</li>
+<li>A few catalog tables are exposed for drivers to work.</li>
+</ul>
+</li>
+</ul>
+<h2 id="appendix">Appendix<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#appendix" class="internal alias"> §</a></h2>
+<ul>
+<li><a href="https://umbra-db.com/" class="external">https://umbra-db.com/</a></li>
+<li>Paper : <a href="https://www.cidrdb.org/cidr2020/papers/p29-neumann-cidr20.pdf" class="external alias">Umbra: A Disk-Based System with In-Memory Performance, Thomas Neumann and Michael J. Freitag</a></li>
+<li><a href="https://dbdb.io/db/umbra" class="external">https://dbdb.io/db/umbra</a></li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

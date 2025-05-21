@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html><head><title>Fast, lazy container loading in Modal (2024)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Fast, lazy container loading in Modal (2024)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/fast,-lazy-container-loading-in-modal-2024"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Fast, lazy container loading in Modal (2024)</h1><p class="content-meta ">Aug 25, 2024 | 1230 words</p><ul class="tags "><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/nyc-systems" class="internal tag-link">#nyc-systems</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=SlkEW4C2kd4" class="external" style="color: inherit;">https://www.youtube.com/watch?v=SlkEW4C2kd4</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Jonathan Belotti</span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#the-container-loading-problem" data-for="the-container-loading-problem">The container loading problem</a></li><li class="depth-0"><a href="#approaches" data-for="approaches">Approaches</a></li><li class="depth-0"><a href="#lazy-loading-performance-problems" data-for="lazy-loading-performance-problems">Lazy loading performance problems</a></li><li class="depth-0"><a href="#system-architecture" data-for="system-architecture">System Architecture</a></li><li class="depth-0"><a href="#performance-grind" data-for="performance-grind">Performance grind</a></li></ul></div></div></div></div><article class="popover-hint"><p>Modal is a serverless cloud GPU service.</p>
+<h2 id="the-container-loading-problem">The container loading problem<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#the-container-loading-problem" class="internal alias"> §</a></h2>
+<ul>
+<li>A usual setup on Modal for some standard ML prediction inference:
+<ul>
+<li>Runtime: Python 3.11 (Fat container, 8 GiB uncompressed)</li>
+<li>Model: Bert (512 MiB .safetensors file)</li>
+</ul>
+</li>
+<li>You need the container file system for the container to start running. A container filesystem is an overlay mount on the host. An overlay FS mount allows reconcile mutations that happen against a read-only lower directory.</li>
+</ul>
+<pre><code>overlay on /mnt/overlay type overlay (
+    rw,
+    relatime,
+    lowerdir=/tmp/tmph45cav46/lower, &lt;- 8GiB uncompressed. read-only
+    upperdir=/tmp/tmph45cav46/upper, &lt;- mutable, initally empty
+    workdir=/tmp/tmph45cav46/work
+)
+</code></pre>
+<h2 id="approaches">Approaches<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#approaches" class="internal alias"> §</a></h2>
+<ul>
+<li>Eager
+<ul>
+<li>Used by Docker, K8s</li>
+<li>Loading approach
+<ul>
+<li>Container image is a fat stack of N tarballs (gzipped).
+<ul>
+<li>Each layer is a separate tarball.</li>
+</ul>
+</li>
+<li>Download N tarballs over the network: concurrent, 2GiB/s. (If host doesn’t already have it )</li>
+<li>Decompress gzipped tarballs: single-threaded, 80MiB/s.</li>
+<li>Unpack into a rootfs directory on host.</li>
+<li>Sidenote: See <code>/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/</code> on a K8s node (with containerd runtime).</li>
+</ul>
+</li>
+<li>While getting the tarballs over the network isn’t expensive, they’re usually compressed and decompressing them takes a lot of time. You also need to write the files against the host file system, setting metadata etc. This needs to be done before the container is even started.
+<ul>
+<li>This delay is fine when you’re running a typical K8s cluster with a few applications since the nodes chosen will usually have the container image cached but its quite slow for a server-less platform.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Lazy
+<ul>
+<li>Used by Modal, AWS Lambda<sup><a href="#user-content-fn-1" id="user-content-fnref-1" data-footnote-ref aria-describedby="footnote-label" class="internal alias">1</a></sup></li>
+<li>Loading approach
+<ul>
+<li>Container image is an index: ~5MiB, load in 1-100ms.</li>
+<li>Index has only pointers to file contents.</li>
+<li>FUSE mount that index: ~2ms.
+<ul>
+<li><code>lowerdir=/tmp/tmph45cav466/fuse</code></li>
+</ul>
+</li>
+<li>FUSE : Filesystem in Userspace
+<ul>
+<li>guest process in user space —filesystem calls like open()—><br/>
+FUSE module in kernel space —FUSE message—><br/>
+host process —file data—> kernel -> guest process</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="lazy-loading-performance-problems">Lazy loading performance problems<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#lazy-loading-performance-problems" class="internal alias"> §</a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>System</th><th>Read Latency</th><th>Read Throughput</th><th>Cost ($USD/GiB/month)</th></tr></thead><tbody><tr><td>Memory</td><td>1-100 ns</td><td>10-40 GiB/s</td><td>$2.0</td></tr><tr><td>SSD</td><td>100 µs</td><td>4 GiB/s</td><td>$0.10</td></tr><tr><td>AZ Cache server</td><td>1 ms</td><td>10 GiB/s</td><td>$0.15^</td></tr><tr><td>Regional CDN</td><td>100 ms</td><td>3-10 GiB/s</td><td>-</td></tr><tr><td>Blob storage (e.g. S3)</td><td>200 ms</td><td>3-10 GiB/s</td><td>$0.015</td></tr><tr><td>^ : significant operation cost</td><td></td><td></td><td></td></tr><tr><td>AZ -> cloud provider availability zone</td><td></td><td></td><td></td></tr></tbody></table></div>
+<p>This is solvable</p>
+<ul>
+<li>Latency lags bandwidth: bandwidth improves much more quickly than latency.</li>
+<li>Caching works
+<ul>
+<li>While Modal is a general container runtime, its customer base is mostly folks using Python for AI/ML applications.</li>
+<li>There’s a lot of overlap in the files in the container used by different libraries (like pytorch, dreambooth etc.).</li>
+<li>A lot of stuff in a fat image is junk that won’t be used but an eager loading system will always load it.</li>
+</ul>
+</li>
+</ul>
+<h2 id="system-architecture">System Architecture<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#system-architecture" class="internal alias"> §</a></h2>
+<p><img src="../notes/cmudb-15721/attachments/pasted-image-20240826004305.png" width="auto" height="auto"/></p>
+<h2 id="performance-grind">Performance grind<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#performance-grind" class="internal alias"> §</a></h2>
+<p>LLM models have sizes in 10s of GiBs. Modal’s peak bandwidth throughput was 800 MiB/s which wasn’t sufficient. It’s now 2.5 GiB/s.</p>
+<p><strong>Host</strong></p>
+<ul>
+<li>Avoid small hosts since cloud providers won’t provide enough bandwidth for IO on SSDs and network.</li>
+<li>You don’t want to be bottlenecked by the network. Network perf >> FUSE perf. Aim for > 4 GiB/s download speeds.
+<ul>
+<li>Avoid single-flow traffic limit &amp; throttling set by cloud provider. Make sure you get the advertised bandwidth.
+<ul>
+<li>You instance might have 20GiB down. but only 5GiB for a single-flow.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Stack SSDs together in RAID 0 config (data split across drives)
+<ul>
+<li>RAID 0 improves IO performance since IO is split across those drives and can be done concurrently. A large file can be stored in multiple segments on different drives and read back much faster.</li>
+<li>We don’t need durability here since the origin of the data is the blob store.</li>
+</ul>
+</li>
+<li>Modal uses AWS g5.12xlarge (5 GiB/s, 3.8TiB NVMe SSD)</li>
+</ul>
+<p><strong>FUSE</strong></p>
+<ul>
+<li>Peak read() throughput was around 800 MiB/s. Lags far behind NVMe and network throughput.</li>
+<li>Now at 2.5 GiB/s.</li>
+<li>Focus on large-file throughput, not op latency.</li>
+<li>Increasing read_ahead
+<ul>
+<li>read_ahead allows kernel to request future pages when it receives request for a particular page</li>
+<li>Originally at 128KiB, now set at 32MiB.</li>
+<li>We can’t keep increasing it forever. The kernel will end up reading a lot of data for a single read-request and in turn increase latency.</li>
+</ul>
+</li>
+<li>Increasing READ request size (FUSE max_pages)
+<ul>
+<li>Each READ request from Kernel to the userspace FUSE server has a size. Larger request sizes, fewer trips into user space.</li>
+<li>Originally at 128KiB, now at 32MiB.</li>
+<li>Without direct IO, couldn’t go above 1MiB. ???
+<ul>
+<li>No page cache if using direct IO.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Tune FUSE’s congestion threshold and background threads
+<ul>
+<li>The FUSE system in the kernel is going to fulfill the IO requests either on an synchronous path or in background. Read requests are buffered. Modal is only using a read-only filesystem so they want to make the background queues as large as possible to avoid throttling the guest processes.</li>
+<li>congestion_threshold -> was 9, now 256.</li>
+<li>max_background: was 12, now 256.</li>
+</ul>
+</li>
+<li>Other suggestions
+<ul>
+<li>Don’t blow up the heap.
+<ul>
+<li>Having a large heap was dropping their throughput and reducing the heap size while they were pulling through the large files was improving their throughput.
+<ul>
+<li>The large heap was leading to more page faults for their workload.</li>
+<li>When you issue a read to Modal and it goes over the network, they want to keep the returned data into disk and the page cache so that any subsequent reads are served from the disk or page cache.</li>
+<li>They were keeping the data in memory in order to write to the disk and blowing up their memory usage.</li>
+</ul>
+</li>
+<li>They now defer writes, keep the heap small, stream data from network to guest process without holding it in memory.</li>
+<li>This increased throughput by 100-200 MiB/s.</li>
+</ul>
+</li>
+<li>Balance disk cache write priority against read priority.</li>
+</ul>
+</li>
+<li>Also see
+<ul>
+<li><a href="https://lwn.net/Articles/372384/" class="external alias">Improving readahead</a></li>
+<li><a href="https://web.archive.org/web/20230408150313/http://www.fsl.cs.stonybrook.edu/docs/fuse/fuse-article-appendices.html" class="external">https://web.archive.org/web/20230408150313/http://www.fsl.cs.stonybrook.edu/docs/fuse/fuse-article-appendices.html</a></li>
+<li><a href="https://www.usenix.org/system/files/conference/fast17/fast17-vangoor.pdf" class="external alias">To FUSE or Not to FUSE: Performance of User-Space File Systems</a></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>512 MiB .safetensors file loads in 200ms from disk cache, ~300ms from network.</p>
+</blockquote>
+<p>Q/A</p>
+<ul>
+<li>How do you defer disk-writing without blowing up the heap or creating a bottleneck on IO write perf of the SSD?
+<ul>
+<li>Keep a reference to data-chunk on the blob store and fetch it later. (Blob stores allow referring to ranges of data) and free the memory occupied by the data chunk.</li>
+</ul>
+</li>
+<li>Do you have to worry about data corruption in the read requests or mis-directed reads?
+<ul>
+<li>We check a lot on the write path. We check length and digests on the read path. We’re able to detect corruption on the disks and fix it.</li>
+</ul>
+</li>
+<li>Did you ever run into problems where a workload caused latency issues?
+<ul>
+<li>Latency is still a bottleneck even for the usual workload. Cold start performance is the most important part.</li>
+<li>We’re trying to avoid trips into the user-space from the kernel. We’re thinking of using things like <a href="https://erofs.docs.kernel.org/en/latest/" class="external alias">EROFS</a> which you load inside the kernel and avoids the trip to user-space.</li>
+<li>We also run a user-space kernel called gVisor which adds additional slowness.</li>
+</ul>
+</li>
+<li>The Python interpreter requests files/modules one by one. How do you deal with that?
+<ul>
+<li>Earlier, this was mitigated by the AZ cache which we used to be much more invested in.</li>
+<li>Now divested from the AZ cache. We focus more on regional and origin store.</li>
+<li>We do a thing called task profiling where we see what the process has done, record that and then aggressively pre-load before the container even starts up. If we’ve never seen that container before, we rely on a certain heuristics (eg. what’s a python process going to want, what’s a ML python process going to want).</li>
+</ul>
+</li>
+<li>Could you use io_uring to improve performance?
+<ul>
+<li>We haven’t explored using it yet but it sounds interesting.</li>
+</ul>
+</li>
+</ul>
+<p>Other things</p>
+<ul>
+<li><a href="https://github.com/containerd/stargz-snapshotter" class="external alias">Fast container image distribution plugin with lazy pulling</a></li>
+<li>Blog: <a href="https://modal.com/blog/jono-containers-talk" class="external">https://modal.com/blog/jono-containers-talk</a></li>
+</ul>
+<section data-footnotes class="footnotes"><h2 class="sr-only" id="footnote-label">Footnotes<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#footnote-label" class="internal alias"> §</a></h2>
+<ol>
+<li id="user-content-fn-1">
+<p><a href="https://arxiv.org/pdf/2305.13162" class="external alias">On-demand Container Loading in AWS Lambda</a> <a href="#user-content-fnref-1" data-footnote-backref aria-label="Back to reference 1" class="data-footnote-backref internal alias">↩</a></p>
+</li>
+</ol>
+</section></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

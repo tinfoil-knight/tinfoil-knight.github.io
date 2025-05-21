@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html><head><title>Rockset - Realtime Indexing for Fast Queries on Massive Semi-structured Data (2020)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Rockset - Realtime Indexing for Fast Queries on Massive Semi-structured Data (2020)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/rockset---realtime-indexing-for-fast-queries-on-massive-semi-structured-data-2020"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Rockset - Realtime Indexing for Fast Queries on Massive Semi-structured Data (2020)</h1><p class="content-meta ">Jun 11, 2024 | 1823 words</p><ul class="tags "><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/cmudb-seminar" class="internal tag-link">#cmudb-seminar</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=YayQfWr3yzo" class="external" style="color: inherit;">https://www.youtube.com/watch?v=YayQfWr3yzo</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Dhruba Borthakur</span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#the-aggregator-leaf-tailer-alt-architecture" data-for="the-aggregator-leaf-tailer-alt-architecture">The Aggregator Leaf Tailer (ALT) Architecture</a></li><li class="depth-0"><a href="#converged-indexing" data-for="converged-indexing">Converged Indexing</a></li><li class="depth-0"><a href="#smart-schema-sql" data-for="smart-schema-sql">Smart Schema SQL</a></li><li class="depth-0"><a href="#cloud-scaling-architecture" data-for="cloud-scaling-architecture">Cloud Scaling Architecture</a></li><li class="depth-0"><a href="#summary--analytics-application-on-massive-datasets" data-for="summary--analytics-application-on-massive-datasets">Summary : Analytics Application on Massive Datasets</a></li><li class="depth-0"><a href="#appendix" data-for="appendix">Appendix</a></li></ul></div></div></div></div><article class="popover-hint"><p>Dhruba is the co-founder and CTO at Rockset. Founding engineer of RocksDB and HDFS. Also worked on HBase, Hive, Andrew File System (AFS).</p>
+<p><strong>Where has data processing been?</strong></p>
+<ul>
+<li>2006-12: Hadoop
+<ul>
+<li>Batch processing optimized for efficiency.</li>
+<li>Hadoop mainly got popular because it was able to handle a large amount of data.</li>
+</ul>
+</li>
+<li>2012-18: Apache Spark, Kafka
+<ul>
+<li>Stream processing optimized for throughput.</li>
+</ul>
+</li>
+<li>2018-now: Rockset
+<ul>
+<li>Analytical applications optimized for: data latency, query latency, QPS
+<ul>
+<li>data latency: how much duration after the data is produced can you query it</li>
+<li>eg of analytical apps: realtime fleet management, game leaderboards</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>What is Rockset?<br/>
+<em>Realtime indexing on massive datasets for building realtime apps on live data without ETL or pipelines.</em></p>
+<h2 id="the-aggregator-leaf-tailer-alt-architecture">The Aggregator Leaf Tailer (ALT) Architecture<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#the-aggregator-leaf-tailer-alt-architecture" class="internal alias"> §</a></h2>
+<p><img src="../attachments/pasted-image-20240611145858.png" width="auto" height="auto"/></p>
+<ul>
+<li>Tailers “tail” data from each data stream and translate it into internal format.</li>
+<li>Data is sent to leaf nodes where its processed and kept ready for queries.</li>
+<li>The 2-level aggregator serves SQL queries coming from applications or the dashboard.</li>
+<li>Different from a traditional <a href="https://dataengineering.wiki/Concepts/Lambda+Architecture" class="external alias">Lambda Architecture</a> &amp; <a href="https://dataengineering.wiki/Concepts/Kappa+Architecture" class="external alias">Kappa Architecture</a>. Follows CQRS pattern (writes are separated from reads). Separating the writes allows them to handle high write throughput without impacting read query latency.</li>
+<li>Got inspired while building the FB Newsfeed app which needs to look at a lot of data, rank it by relevance and show it.</li>
+<li>Architecture is completely disaggregated so each component can be scaled independently.
+<ul>
+<li>High write volume: increase tailers</li>
+<li>Amount of data storage increases: more leaf nodes</li>
+<li>More queries: more aggregators</li>
+</ul>
+</li>
+<li>Sidenote
+<ul>
+<li>Scuba, Nemo at FB also do this. LinkedIn also uses the same architecture.</li>
+<li>Ref: <a href="https://rockset.com/blog/aggregator-leaf-tailer-an-architecture-for-live-analytics-on-event-streams/" class="external alias">Aggregator Leaf Tailer: An Alternative to Lambda Architecture for Real-Time Analytics</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="key-benefits-of-alt">Key Benefits of ALT<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#key-benefits-of-alt" class="internal alias"> §</a></h3>
+<ul>
+<li>Makes queries fast: indexing all data at time of ingest</li>
+<li>Runs complex queries on the fly: Distributed aggregator tier that scales compute and memory resources independently</li>
+<li>Cost-effective: All components can be independently scaled up or down.</li>
+<li>Optimizes read &amp; writes in isolation w/ CQRS (write compute vs. read compute separation, not storage separation)</li>
+</ul>
+<h2 id="converged-indexing">Converged Indexing<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#converged-indexing" class="internal alias"> §</a></h2>
+<ul>
+<li>Ref: <a href="https://rockset.com/blog/converged-indexing-the-secret-sauce-behind-rocksets-fast-queries/" class="external alias">Converged Index™: The Secret Sauce Behind Rockset’s Fast Queries</a></li>
+<li>Rockset is a NoSQL database that accepts JSON, CSV, XML or any other semi-structured data.</li>
+<li><em>Rockset stores every column of every document in a row-based index, column-store index and an inverted index by default.</em></li>
+<li>Q/A: Are the indexes updated one at a time? Could I observe the row-based index being updated before the inverted index and so on?
+<ul>
+<li>Rockset doesn’t support ACID transactions but updates are atomic i.e. changes to all indexes will be observed at once and not separately.</li>
+</ul>
+</li>
+<li>How does converged indexing fit into ALT?
+<ul>
+<li>The tailers extract all the fields inside the provided semi-structured data.</li>
+<li>The leaf houses Rockset’s converged indexes.</li>
+<li>The optimizer can pick the index for the fastest query enhancing the performance of aggregators.</li>
+</ul>
+</li>
+</ul>
+<h3 id="internals">Internals<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#internals" class="internal alias"> §</a></h3>
+<ul>
+<li>Built on top of key-value store RocksDB</li>
+<li>Shreds document into many key-value pairs<br/>
+<img src="../attachments/pasted-image-20240611155836.png" width="auto" height="auto"/></li>
+<li>Types of keys
+<ul>
+<li>R (Row) Keys
+<ul>
+<li>Given the id and field, you can find its values &amp; scan through them quickly and recreate the document you stored.</li>
+</ul>
+</li>
+<li>C (Column Store) Keys
+<ul>
+<li>Data for a particular column is stored together so you can do vectorization, scanning through all value etc.</li>
+<li>The columnar store is also built on top of the key-value store.</li>
+</ul>
+</li>
+<li>S (Inverted Index) Keys</li>
+</ul>
+</li>
+</ul>
+<h4 id="inverted-indexing-for-point-lookups">Inverted Indexing for Point Lookups<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#inverted-indexing-for-point-lookups" class="internal alias"> §</a></h4>
+<p><img src="../attachments/pasted-image-20240611161319.png" width="auto" height="auto"/></p>
+<ul>
+<li>For each value, store documents containing that value.</li>
+<li>Quickly retrieve a list of document IDs that match a predicate.</li>
+<li>Note: Rockset supports nested fields like JSON, Arrays.</li>
+</ul>
+<h4 id="columnar-store-for-aggregations">Columnar Store for Aggregations<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#columnar-store-for-aggregations" class="internal alias"> §</a></h4>
+<p><img src="../attachments/pasted-image-20240611162107.png" width="auto" height="auto"/></p>
+<ul>
+<li>Store each column separately.</li>
+<li>Great compression.</li>
+<li>Only fetch columns the query needs.</li>
+</ul>
+<h4 id="query-optimization-examples">Query Optimization Examples<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#query-optimization-examples" class="internal alias"> §</a></h4>
+<p>Highly Selective Query (will use the inverted index)</p>
+<pre><code>SELECT *
+FROM search_logs
+WHERE keyword = 'hpts'
+AND locale = 'en'
+</code></pre>
+<blockquote>
+<p>Assumption: As per statistics, this query will have very few results</p>
+</blockquote>
+<p>—<br/>
+Large Scan (will use Columnar Store)</p>
+<pre><code>SELECT keyword, count(*)
+FROM search_logs
+GROUP BY keyword
+ORDER BY count(*) DESC
+</code></pre>
+<p>Q/A</p>
+<ul>
+<li>Are you storing all the indexes in the same table-space of RocksDB?
+<ul>
+<li>RocksDB has column families but we get better performance if we keep data in the same table-space (called column family in RocksDB)</li>
+</ul>
+</li>
+<li>Is RocksDB the right tool for this? It seems like you’re sacrificing a lot of efficiency? RocksDB supports page-level compression but nothing else.
+<ul>
+<li>RocksDB has delta encoding. Overhead for real-life datasets is very less.</li>
+</ul>
+</li>
+</ul>
+<h3 id="challenges-with-converged-indexing">Challenges with Converged Indexing<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#challenges-with-converged-indexing" class="internal alias"> §</a></h3>
+<ul>
+<li>One new record = multiple servers update
+<ul>
+<li>In a traditional database w/ term sharding &amp; n indexes, 1 write incurs updates to n different indexes on n servers.</li>
+<li>Requires a distributed txn. (paxos, raft) b/w n servers.</li>
+<li><strong>Addressing the Challenge : Doc Sharding</strong>
+<ul>
+<li>Rockset doesn’t use term sharding but doc sharding
+<ul>
+<li>Term sharding: splitting the terms (keywords) in the inverted index across multiple shards, each shard handles a subset of terms
+<ul>
+<li>Most traditional DBs do term sharding. They’re optimized for throughput and efficiency but not latency.</li>
+</ul>
+</li>
+<li>Doc sharding: all indices for a doc stored on 1 machine
+<ul>
+<li>Elasticsearch, Google Search, FB Search use this</li>
+</ul>
+</li>
+<li>Only paper I could find that mentions both the terms: <a href="https://www.vldb.org/pvldb/vol12/p709-archer.pdf" class="external">https://www.vldb.org/pvldb/vol12/p709-archer.pdf</a></li>
+</ul>
+</li>
+<li>Doc sharding means all new keys will only affect a single shard/lead</li>
+<li>Updates are durably buffered to a distributed log
+<ul>
+<li>Writes are piped through the distributed log and then split basis keys (eg. doc-id)</li>
+</ul>
+</li>
+<li>Leafs only tail the documents in the shards they’re responsible for</li>
+<li>Disadvantage: Query needs to fan out to all machines and get results even though only 1 of the machines has the data
+<ul>
+<li>What prevents them from keeping a metadata store to point to shards?</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>One new doc = multiple random writes
+<ul>
+<li>Traditional systems use BTree storage structure</li>
+<li>Keys are sorted across tables</li>
+<li>A single record update with multiple secondary index would incur writes to multiple different locations</li>
+<li>Addressing the Challenge : RocksDB LSM
+<ul>
+<li>Multiple records updates accumulate in memory and are written into a single SST file.</li>
+<li>Keys are sorted b/w SST files via compaction in a background process.</li>
+<li>Multiple index updates from multiple docs result in one write to storage.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="smart-schema-sql">Smart Schema SQL<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#smart-schema-sql" class="internal alias"> §</a></h2>
+<ul>
+<li>What?
+<ul>
+<li>Automatic generation of a schema based on the exact fields and types present at the time of ingest. Ingestion is schema-less.</li>
+</ul>
+</li>
+<li>Why?
+<ul>
+<li>Avoid data pipelines that can cause data latency.</li>
+<li>Semi-structured data is complex and messy.</li>
+<li>Ingest any semi-structured data (similar to NoSQL)</li>
+</ul>
+</li>
+<li>Under the Hood
+<ul>
+<li>Type information stored with values, not “columns”.</li>
+<li>Strongly types queries on dynamically types fields.</li>
+<li>Designed for nested semi-structured data.</li>
+</ul>
+</li>
+</ul>
+<p>Eg:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="json" data-theme="github-dark github-light"><code data-language="json" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// Documents</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">{</span></span>
+<span data-line><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">  &quot;name&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;John&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">  &quot;age&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">31</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">  &quot;city&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;New York&quot;</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">{</span></span>
+<span data-line><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">  &quot;name&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;Michael&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">  &quot;age&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;notfound&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">  &quot;experiences&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: [</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">    {</span></span>
+<span data-line><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">      &quot;title&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;XYZ&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">      &quot;years&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">4</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">    }</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">  ]</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// collection schema</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">| field                         | occurrences | total | type   |</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">| ----------------------------- | ----------- | ----- | ------ |</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">| [</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;name&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]                      | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">2</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">           | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">2</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">     | string |</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">| [</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;age&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]                       | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">2</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">           | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">2</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">     | string |</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">| [</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;age&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]                       | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">           | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">2</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">     | int    |</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">| [</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;experiences&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]               | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">           | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">     | array  |</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">| [</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;experiences&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;*&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]          | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">           | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">     | object |</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">| [</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;experiences&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;*&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;title&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">] | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">           | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">     | string |</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">| [</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;experiences&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;*&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;years&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">] | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">           | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">     | int    |</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">| [</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;city&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]                      | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">           | </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">2</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">     | string |</span></span></code></pre></figure>
+<p>Q/A: Is this an actual table that’s stored? No. This is materialized on query. There are type counters maintained on every leaf node. When we need to describe table, it queries all leaf nodes and produces the table using the stored counters.</p>
+<p><strong>Schema Binding at Query Time</strong></p>
+<ul>
+<li>Tailers ingest data without pre-defined schemas.</li>
+<li>Aggregator use the schema to make queries faster.</li>
+</ul>
+<h3 id="challenges-with-smart-schemas">Challenges with Smart Schemas<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#challenges-with-smart-schemas" class="internal alias"> §</a></h3>
+<p>Ref: <a href="https://rockset.com/blog/why-real-time-analytics-requires-both-the-flexibility-of-nosql-and-strict/" class="external">https://rockset.com/blog/why-real-time-analytics-requires-both-the-flexibility-of-nosql-and-strict/</a></p>
+<ul>
+<li>Additional CPU usage for processing queries
+<ul>
+<li>Use type hoisting to reduce CPU required to run queries.</li>
+<li><img src="../attachments/pasted-image-20240623185850.png" width="auto" height="auto"/>
+<ul>
+<li>The <code>S</code> type is hoisted at beginning since the values have the same type. If a lot of values have the same type, then Rockset won’t have much overhead.</li>
+<li>Schemaless is storing the type with every value.</li>
+</ul>
+</li>
+<li>Rockset’s query price / performance is on par with strict schema systems.</li>
+</ul>
+</li>
+<li>Requires increased disk space to store types
+<ul>
+<li>Use field interning to reduce the space required to store schema.
+<ul>
+<li>Instead of storing duplicate strings multiple times, the database stores a single copy of each unique string and uses references (or pointers) to that single instance wherever the string appears.</li>
+</ul>
+</li>
+<li><img src="../attachments/pasted-image-20240623185831.png" width="auto" height="auto"/>
+<ul>
+<li>Instead of <code>0: S &quot;City&quot;</code>, it should’ve been <code>0 : S&quot;Rancho Santa Margarita</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="cloud-scaling-architecture">Cloud Scaling Architecture<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#cloud-scaling-architecture" class="internal alias"> §</a></h2>
+<p>Key insight into economics of cloud</p>
+<ul>
+<li>Cost of 1 CPU for 100 mins = Cost of 100 CPU for 1 min
+<ul>
+<li>Without cloud : statically provision for peak demand</li>
+<li>With cloud: dynamically provision for current demand</li>
+</ul>
+</li>
+<li>Goal : resources scale up and down as needed to achieve desired performance</li>
+</ul>
+<p>Cloud Autoscaling</p>
+<ul>
+<li>What?
+<ul>
+<li>Each tailer, leaf or aggregator can be independently scaled up and down as needed.</li>
+</ul>
+</li>
+<li>Why?
+<ul>
+<li>No provisioning</li>
+<li>Pay for usage</li>
+<li>No need to provision for peak capacity</li>
+</ul>
+</li>
+</ul>
+<p>Tailers are easy to scale up since they’re stateless. They’re scaled up using K8s and AWS autoscaling.</p>
+<h3 id="scaling-leaf-nodes">Scaling Leaf Nodes<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#scaling-leaf-nodes" class="internal alias"> §</a></h3>
+<ul>
+<li>Scale down : Use durability of cloud storage.
+<ul>
+<li>RocksDB Cloud is a layer on top of RocksDB. Every time new SST files get produced, they’re pushed to cloud storage (like AWS S3, GCS) by RocksDB Cloud.</li>
+<li>No data loss even if all leaf servers crash.</li>
+</ul>
+</li>
+<li>Scale up : Use zero-copy clones of rocksdb-cloud
+<ul>
+<li>Takes SST files from an existing leaf shard and starts filling it in. It also starts tailing new data that tailers are generating.</li>
+<li>It then becomes a part of the query process and queries through the aggregators start coming to the new leaf process.</li>
+<li>No peer-to-peer replication needed so this has no performance impact on existing leaf servers.</li>
+</ul>
+</li>
+<li>Q/A : Since S3 is eventually consistent, where are you storing S3 keys in your system to do strong consistent reads?
+<ul>
+<li>RocksDB  has something called a “manifest” inside the DB. The replica reads the manifest and finds what S3 files is part of the database. If the replica doesn’t find an S3 file yet, it retries and obtains it.</li>
+</ul>
+</li>
+</ul>
+<h3 id="separate-write-compute-from-query-compute">Separate write compute from query compute<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#separate-write-compute-from-query-compute" class="internal alias"> §</a></h3>
+<p>Ref: <a href="https://rockset.com/blog/remote-compactions-in-rocksdb-cloud/" class="external">https://rockset.com/blog/remote-compactions-in-rocksdb-cloud/</a><br/>
+<img src="../attachments/pasted-image-20240623193335.png" width="auto" height="auto"/></p>
+<h2 id="summary--analytics-application-on-massive-datasets">Summary : Analytics Application on Massive Datasets<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#summary--analytics-application-on-massive-datasets" class="internal alias"> §</a></h2>
+<ul>
+<li>Index rather than partition-and-scan</li>
+<li>Separate write compute from query compute</li>
+<li>Optimized for low data latency, low query latency and high QPS</li>
+</ul>
+<p>Q/A:</p>
+<ul>
+<li>The SST files are written to Cloud but not the WAL. Does that mean that the tailers are stateful or do they rely on upstream durability for log replay?
+<ul>
+<li>Other than tailers that tail a data source, Rockset also has a write API which writes directly.</li>
+<li>Rockset uses a distributed log to make things durable before it hits S3. If you already have data in sources like data-streams (Kafka) or data-lakes then you don’t need this durability.</li>
+<li>If using the write API to Rockset, it uses a distributed log and does three-way replication for the last 1 or 5mins of logs before it actually hits the S3 storage system.</li>
+</ul>
+</li>
+</ul>
+<h2 id="appendix">Appendix<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#appendix" class="internal alias"> §</a></h2>
+<ul>
+<li><a href="https://github.com/rockset/rocksdb-cloud" class="external">https://github.com/rockset/rocksdb-cloud</a></li>
+<li><a href="https://research.facebook.com/publications/scuba-diving-into-data-at-facebook/" class="external alias">Scuba: Diving into Data at Facebook</a></li>
+<li><a href="https://engineering.fb.com/2020/10/09/data-infrastructure/nemo/" class="external alias">Nemo: Data discovery at Facebook</a></li>
+<li>Slides from a similar presentation: <a href="https://files.devnetwork.cloud/DeveloperWeek/presentations/2020/Dhruba-Borthakur.pdf" class="external">https://files.devnetwork.cloud/DeveloperWeek/presentations/2020/Dhruba-Borthakur.pdf</a></li>
+<li>Rockset was acquired by OpenAI.</li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>
