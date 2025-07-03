@@ -15,8 +15,9 @@ rating: 4
 - Qdrant : Vector Similarity Search Engine, OSS, Written in Rust
 
 ## Vector Search : Overview
-- You've an encoder (typically a neural network) which can convert some input data into dense vector representations (also called embeddings). They've an interesting property that pair of vectors in vector space which are close to each other usually corresponds to objects which are also similar in some sense.
-- The type of similarity we want to catch is defined  by the model. The distance function b/w the vectors is also defined by the model but it's a simple dot product in most cases.
+- You've an encoder (typically a neural network) which can convert some input data into dense vector representations (also called embeddings).
+	- Pair of vectors in vector space which are close to each other usually corresponds to objects which are also similar in some sense.
+- The type of similarity we want to catch is defined by the model. The distance function b/w the vectors is also defined by the model but it's a simple dot product in most cases.
 
 ## Qdrant : Architecture
 - Hierarchy: Collection <- Shard <- Segment
@@ -52,7 +53,7 @@ rating: 4
 				- Compress data using Delta encoding, variable byte encoding etc.
 		- Latency vs Throughput
 			- Concurrency  of single request is only efficient to a certain point. The closer we get to low-level index, the less efficient concurrency becomes.
-			- For low latency, we can optimizer CPU utilization by just assigning each CPU core with 1 segment.
+			- For low latency, we can optimize CPU utilization by just assigning each CPU core with 1 segment.
 			- For high throughout,  we can have a single large segment & in this case it'll maximize the throughput of the whole system by just serving each request on a dedicated core using the whole segment in read mode.
 		- Q/A: What's the size of the segment?
 			- Variable. Default size is 0 if there's no data. It just grows with the data.

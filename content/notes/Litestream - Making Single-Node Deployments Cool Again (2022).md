@@ -16,6 +16,7 @@ rating: 3
 	- Adds high durability to a single node deployment
 
 ## SQLite Review
+
 - SQLite Internal Structure
 	- Physical Layout: Fixed size pages in a file (usually 4KiB but can be changed)
 	- Logical Layout: B+ Tree
@@ -29,6 +30,7 @@ rating: 3
 		- Serializable isolation.
 
 ## How Litestream Works
+
 - Only works with SQLite WAL mode.
 - SQLite's WAL journaling mode writes new pages to a "-wal" file.
 - If a query starts after a page has been modified by some txn then that page will be read from the WAL & the rest of the pages (which aren't modified by the point the query started) will be read from the DB.
@@ -47,6 +49,7 @@ rating: 3
 	- The page ptrs within the BTree are ptrs to page number & not to a specific version of a page. When you restore from S3, you copy the pages into the same position in the DB.
 
 ## Failure Modes
+
 - Data Loss Window
 	- Litestream uses async replication & will lose up to X seconds of data during catastrophic failure where X is the configured sync interval.
 	- Makes attempt to push to durable storage on clean shutdown. 
@@ -69,6 +72,7 @@ rating: 3
 > - Replicating every second costs $13 / month & every 10 seconds costs $1.30/month.
 
 ## LiteFS
+
 - People wanted realtime read replication & high availability. So, they made LiteFS.
 - LiteFS is a Distributed File System for SQLite databases.
 - FUSE-based.
@@ -106,6 +110,7 @@ rating: 3
 	- Postgres & MySQL
 
 ## Q/A
+
 - How big can the DB be for these tools to work well?
 	- Targeting around 1-10GB DBs.
 - Litestream is blindly copying pages w/o parsing them. Have you thought about some optimizations you could do?

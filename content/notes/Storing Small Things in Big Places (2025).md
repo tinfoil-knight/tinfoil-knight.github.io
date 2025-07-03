@@ -34,7 +34,7 @@ Replication
 Carl ended up building Graft since he couldn't find anything that met all his requirements.
 
 ## Physical Organization
-- Organizes data into Volumes.
+- Data is organized into Volumes.
 - Volumes are sparse ordered sets of Pages.
 	- SQLite stores data in BTrees which map down to Pages.
 	- Graft Pages are small (4KB).

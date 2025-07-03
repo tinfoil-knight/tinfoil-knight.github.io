@@ -47,7 +47,8 @@ Logical vs. Physical Sharding
 
 > Figma doesn't use micro-services. They've a few large services including a service in Go that powers the real-time feature and a no. of Ruby services including a large Ruby monolith. 
 
-DBProxy
+## DBProxy
+
 - They already run a slightly modified version of pgBouncer as their database proxy. DBProxy is a Go service that sits b/w application and pgBouncer layers.
 - "Brains" of horizontal sharding. Application doesn't need to know how the backend is actually sharded beyond including a shard key in queries. 
 - Also enables load-shedding, improved observability, replica hedging etc. 
@@ -90,7 +91,8 @@ Physical Sharding Operation
 
 ![[Pasted image 20241017200103.png]]
 
-Lessons Learned
+## Lessons Learned
+
 - You can get a long way on one database... Until you can't
 	- Figma was on a single pg instance from 2012 to 2020 w/o connection pooling or replicas.
 	- Very few companies hit the scale where vanilla pg stops working.
