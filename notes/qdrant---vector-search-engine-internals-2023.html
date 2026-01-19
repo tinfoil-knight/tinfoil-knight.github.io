@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html><head><title>Qdrant - Vector Search Engine Internals (2023)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Qdrant - Vector Search Engine Internals (2023)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/qdrant---vector-search-engine-internals-2023"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Qdrant - Vector Search Engine Internals (2023)</h1><p class="content-meta ">Mar 04, 2024 | 2101 words</p><ul class="tags "><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/search" class="internal tag-link">#search</a></li><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/cmudb-seminar" class="internal tag-link">#cmudb-seminar</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=bU38Ovdh3NY" class="external" style="color: inherit;">https://www.youtube.com/watch?v=bU38Ovdh3NY</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Andrey Vasnetsov</span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#vector-search--overview" data-for="vector-search--overview">Vector Search : Overview</a></li><li class="depth-0"><a href="#qdrant--architecture" data-for="qdrant--architecture">Qdrant : Architecture</a></li><li class="depth-0"><a href="#vector-index" data-for="vector-index">Vector Index</a></li><li class="depth-0"><a href="#qa" data-for="qa">Q/A</a></li><li class="depth-0"><a href="#appendix" data-for="appendix">Appendix</a></li></ul></div></div></div></div><article class="popover-hint"><ul>
+<li>Andrey is co-founder, CTO at Qdrant. Working w/ search engines since 2014.</li>
+<li>Qdrant : Vector Similarity Search Engine, OSS, Written in Rust</li>
+</ul>
+<h2 id="vector-search--overview">Vector Search : Overview<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vector-search--overview" class="internal alias"> §</a></h2>
+<ul>
+<li>You’ve an encoder (typically a neural network) which can convert some input data into dense vector representations (also called embeddings).
+<ul>
+<li>Pair of vectors in vector space which are close to each other usually corresponds to objects which are also similar in some sense.</li>
+</ul>
+</li>
+<li>The type of similarity we want to catch is defined by the model. The distance function b/w the vectors is also defined by the model but it’s a simple dot product in most cases.</li>
+</ul>
+<h2 id="qdrant--architecture">Qdrant : Architecture<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#qdrant--architecture" class="internal alias"> §</a></h2>
+<ul>
+<li>Hierarchy: Collection &lt;- Shard &lt;- Segment
+<ul>
+<li>Collection
+<ul>
+<li>Isolates types of data. Contains shards.</li>
+<li>Similar to Table in relational DBs.</li>
+<li>Raft is used to keep track of metadata (eg. location of collection, configuration etc.)</li>
+</ul>
+</li>
+<li>Shard
+<ul>
+<li>Isolates subsets of data. Contains segments.</li>
+<li>It’s guaranteed that shard contains only non-overlapping subset of records.</li>
+<li>Can be moved b/w nodes &amp; replicated for higher availability.</li>
+</ul>
+</li>
+<li>Segment
+<ul>
+<li>Isolates index &amp; data storage.</li>
+<li>Each segment is capable of performing the same operations as a Collection but on a small subset of data.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ACID vs BASE
+<ul>
+<li>BASE stands for <strong>B</strong>asically <strong>A</strong>vailable <strong>S</strong>oft-state <strong>E</strong>ventually-consistent</li>
+<li>A system like Postgres is a typical example of ACID database with strict transactional guarantees &amp; cares a lot about consistency of data but it’s scalability is very limited (upto the size of a single machine). On the other hand, a system like Elasticsearch is an example of a BASE system since it has weaker consistency guarantees but is very scalable.</li>
+<li>Sidenote: <a href="https://aws.amazon.com/compare/the-difference-between-acid-and-base-database/" class="external">https://aws.amazon.com/compare/the-difference-between-acid-and-base-database/</a></li>
+</ul>
+</li>
+<li>For Qdrant, scalability &amp; performance is more important.
+<ul>
+<li>Should be treated as a search engine &amp; not as a database.</li>
+<li>Shouldn’t be used as a primary storage. (10:30)</li>
+<li>A new version of model (common operation in vector DBs) will need to wipe the whole DB if the encoder is changed.</li>
+</ul>
+</li>
+<li>Shard Internals
+<ul>
+<li><code>WAL -> Segments Holder &lt;- Optimizer</code></li>
+<li>Shards don’t usually have a second level of separation (segments) in other DBs.</li>
+<li>Reasons for not putting all the data in a single segment
+<ul>
+<li>Immutability
+<ul>
+<li>If the structure is only built once &amp; never extended then:
+<ul>
+<li>Data structure becomes more compact &amp; we don’t need to jump b/w different locations in memory so we’ve less cache misses.</li>
+<li>All data statistics is known in advanced so we can perform various optimizations like pre-computing histograms, data distributions etc.</li>
+<li>Allocate the exact amount of memory needed so no memory fragmentation.</li>
+<li>Loading computable data structures is faster since no disaggregation needs to be done since you just copy a row chunk from disk in memory. You could even do mmaping which is even faster.</li>
+<li>Compress data using Delta encoding, variable byte encoding etc.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Latency vs Throughput
+<ul>
+<li>Concurrency  of single request is only efficient to a certain point. The closer we get to low-level index, the less efficient concurrency becomes.</li>
+<li>For low latency, we can optimize CPU utilization by just assigning each CPU core with 1 segment.</li>
+<li>For high throughout,  we can have a single large segment &amp; in this case it’ll maximize the throughput of the whole system by just serving each request on a dedicated core using the whole segment in read mode.</li>
+</ul>
+</li>
+<li>Q/A: What’s the size of the segment?
+<ul>
+<li>Variable. Default size is 0 if there’s no data. It just grows with the data.</li>
+<li>We prefer to configure the number of segments instead of the size.</li>
+<li>You can go as big as you want if you’ve the resources.</li>
+</ul>
+</li>
+<li>Q/A : Is there any advantage of having segments of different sizes within the same shard?
+<ul>
+<li>No because we prefer to have even distribution. In practice though, it may happen because segments are joined during the insertion of data &amp; you always need to have atleast 1 segment that’s not immutable.</li>
+</ul>
+</li>
+<li>Q/A : Is the segment size configurable at runtime? No. Only number of segments.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Segments Management
+<ul>
+<li>Some segments in a shard are immutable while others are just mutable &amp; used to insert new data.</li>
+<li>We need to maintain illusion for the user that the collection is mutable &amp; that the user can insert, delete, update any data at any time.</li>
+<li>How to update data in immutable data structure?
+<ul>
+<li>Use copy-on-write. Whenever user inserts or updates data in the immutable segment,  the data is copied into a mutable segment &amp; marked as deleted in the old segment.</li>
+</ul>
+</li>
+<li>How to obtain the immutable data structure?
+<ul>
+<li>We need to perform long running optimizations in the segment so index building is quite long &amp; that’s why we need to keep the segment available for read &amp; updates from the user.</li>
+<li>We use a proxy segment which is a special type of segment that wraps the segment being currently optimized. Also holds the list of modifications it needs to apply to resolve conflict which is happening when you copy data from old segment into new.</li>
+<li>When optimization is done, the proxy segment is converted back into regular segments (optimized segment + small copy-on-write segment).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Segments Internals
+<ul>
+<li><img src="../attachments/pasted-image-20240304192627.png" width="auto" height="auto"/></li>
+<li>Didn’t describe any details. Mentioned that the concrete implementation depends on configuration. They’ve 3 different implementations of vector storage currently.</li>
+</ul>
+</li>
+</ul>
+<h2 id="vector-index">Vector Index<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vector-index" class="internal alias"> §</a></h2>
+<ul>
+<li>Approximate Nearest Neighbours (ANN)</li>
+<li>All vectors are candidates for the response</li>
+<li>Different flavours
+<ul>
+<li>Annoy : tree-based</li>
+<li>IVFPQ : clustering-based</li>
+<li>HNSW : graph-based (used in Qdrant)</li>
+</ul>
+</li>
+</ul>
+<h3 id="hnsw-hierarchical-navigable-small-world">HNSW (Hierarchical Navigable Small World)<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#hnsw-hierarchical-navigable-small-world" class="internal alias"> §</a></h3>
+<ul>
+<li>Internally appears as a proximity graph (each vector is represented as a node in the graph &amp; those nodes are connected with a number of closest neighbours)</li>
+<li>Greedy search on the proximity graph (choose closest node -> repeat with new selected node until the distance b/w the node &amp; target can’t be improved)
+<ul>
+<li>No guarantee of search resulting in the closest target</li>
+</ul>
+</li>
+<li>Precision can be controlled (more precision, less speed)</li>
+<li>Challenges
+<ul>
+<li>Index building is CPU intensive &amp; might affect search if it doesn’t have dedicated resources</li>
+<li>Index has a random data access pattern. Techniques like pre-fetching, block-reading aren’t efficient.</li>
+<li>Read pattern is sequential (we go from one graph to another)</li>
+</ul>
+</li>
+<li>Solving the challenges of HNSW index
+<ul>
+<li>Quantization + Oversampling
+<ul>
+<li>Generate compressed in-memory representation of vectors &amp; use it to generate a selection of vectors
+<ul>
+<li>Sidenote: Recently added binary quantization. Single dimension represented by single bit. 32x compression. Allows comparing vectors in just 2 CPU instructions (bitwise sort, pop-count). Works well with large vectors.
+<ul>
+<li>OpenAI provides vectors with ~1.5K dimensions.</li>
+<li>Docs recommend using this feature for vectors w/ 1K+ dimensions.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>The generated selection is replaced by the original vectors. Scoring process can be parallelized unlike traversal as we already know offsets of IDs of candidates. We can also use slower storage devices.</li>
+</ul>
+</li>
+<li>Q/A: What do you do with the quantized vectors against the original vectors?
+<ul>
+<li>HNSW on quantized vector -> Get selection -> Re-scoring using original representation (Fetch the vectors from disk in parallel -> Compute the score)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="filterable-hnsw">Filterable HNSW<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#filterable-hnsw" class="internal alias"> §</a></h3>
+<ul>
+<li>Combining vector search with other filters (in-place, not pre or post)
+<ul>
+<li>Pre or Post filtering is inefficient compared to in-place filtering (filters checked using graph traversal).</li>
+</ul>
+</li>
+<li>Problem arises when the filtering condition is so strict that the graph becomes disconnected &amp; we can no longer find the path b/w the entry-point of the graph &amp; the section which contains the desired result.</li>
+<li>Percolation Theory
+<ul>
+<li>How many nodes should be removed from the graph to make it disconnected?</li>
+<li>Critical Threshold, p<sub>c</sub> = 1 / &lt;k>
+<ul>
+<li>p<sub>c</sub> : leaved nodes fraction</li>
+<li>&lt;k> : average node degree</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>In practice, precision collapses entirely after removing 90% of nodes.</li>
+<li>Payload-based refinement
+<ul>
+<li>We know that the filters aren’t random &amp; are based on some metadata associated with vectors.</li>
+<li>Build additional links in accordance w/ expected filtering conditions so that when a filter condition is applied, the graph stays connected regardless of the strictness of search.</li>
+<li>This approach doesn’t increase the search complexity. We can still perform search using original links where it’s needed &amp; utilize the extra links where it’s being filtered out. It’s also compatible with multiple (filter) fields at once.
+<ul>
+<li>Sub-graphs are merged into the main graph. We can also de-duplicate links so only a fraction of memory will be required for this &amp; search speed won’t be effected.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Note: Important thing about this additional payload &amp; associated payload indexes is that data type of payload does matter but in most cases it’s possible to come up w/ a strategy to cover filter conditions w/ a subgraph.
+<ul>
+<li>For eg: For a numerical field where we don’t have exact keyword which define a strict subset of points but in this case we can build a sub-graph for overlapping intervals. We know which interval covers how many points &amp; we know the minimum threshold of how many points should be in a graph so we build overlapping intervals &amp; we build sub-graphs for those additional intervals.</li>
+</ul>
+</li>
+</ul>
+<h2 id="qa">Q/A<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#qa" class="internal alias"> §</a></h2>
+<ul>
+<li>Is the search guaranteed to be exact or is it also approximate?
+<ul>
+<li>Search is approximate. But filter conditions will be satisfied.</li>
+</ul>
+</li>
+<li>Are you vectorizing those additional metadata fields?
+<ul>
+<li>No. We keep the payload alongside the vector &amp; check the condition during search.</li>
+</ul>
+</li>
+<li>Does quantization affect filtering?
+<ul>
+<li>No. It only affects the precision of the vector search &amp; not filtering.</li>
+</ul>
+</li>
+<li>Does Qdrant do any cardinality estimations to determine the query plan?
+<ul>
+<li>Yes.</li>
+</ul>
+</li>
+<li>If I had something like “customerId” &amp; know that they are always going to be separated out, would you recommend using different collections or is there a filter for that?
+<ul>
+<li>Qdrant can build HSNW graph only based on payload so we can skip building the whole main graph for all points &amp; only build sub-graphs for specific user ids. We can search for the user or still scan the whole collection &amp; we don’t have to spend as much resources for building vector index for all points together.</li>
+<li>No overhead of creating multiple collections.</li>
+</ul>
+</li>
+<li>What’s the complexity of creating this HNSW index as the no. of records &amp; dimensionality of each vector grows?
+<ul>
+<li>Dimensionality affects how fast you can compare a pair of vectors. Linear complexity.</li>
+<li>Complexity of graph search &amp; building it is approximately logarithmic?. It’s quite expensive to build large indexes.</li>
+<li>The process of indexing involves search too since you need to first search for its neighbours &amp; then perform changes in the graph.</li>
+</ul>
+</li>
+<li>Can these links cross across segments or shards?
+<ul>
+<li>No. Links are isolated to 1 segment.</li>
+<li>Each segment is queried individually during search. Similar approach is used in full text search engines.</li>
+</ul>
+</li>
+<li>Are the segments random or based on some sort of spacial partition?
+<ul>
+<li>Segments are completely random. We don’t do any kind of clustering inside when inserting points because clustering depends on type of vectors &amp; model which we don’t know in advance. Could be a good approach for a specific project where you know what embedding model you’re going to use but not applicable in the general case.</li>
+</ul>
+</li>
+<li>How are the expected filtering conditions determined? Are they pre-determined is some sort of prepared query fashion?
+<ul>
+<li>User can specify what fields need to be indexed.</li>
+</ul>
+</li>
+<li>How do you decide how many new links to add &amp; how much does this blow up the graph? If you’ve any predicate that has any attribute that’s even relatively high (say 100 values), you’d end up adding a lot of new edges to make it work?
+<ul>
+<li>We allow users to configure this value (no. of additional links) in the configuration of collections. By default we use the same amount as the original graph has.
+<ul>
+<li>This is usually not a big problem since they’re being de-duplicated. If a link exists in the original graph, a link won’t be added explicitly on top of it after the merge process.</li>
+<li>HNSW has a special heuristic which allows it to reduce redundant nodes on its own. (Is this Qdrant implementation or just in general?)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>How does your approach with HNSW + quantization compare w/ Microsoft’s disk ANN?
+<ul>
+<li>Disk ANN doesn’t use quantization. Data structure is similar w/o any hierarchy. Difference is in how you build it. HNSW assumes that when you insert a new point, you create a new link for this point in the existing graph.</li>
+<li>Disk ANN on the other hand builds a fully connected graph &amp; then prunes it.</li>
+<li>Disk ANN doesn’t have any in-memory storage.</li>
+</ul>
+</li>
+<li>Do you’ve experience w/ checking similarities for time-series data?
+<ul>
+<li>Qdrant assumes that embeddings are made from an external model. If you’ve a model which can translate time series data into vector then you can use it.</li>
+<li>You can have a model representation the series of actions as a vector. Similar to how word2vec works.</li>
+</ul>
+</li>
+<li>What’s the biggest unsolved problem you face in your system?
+<ul>
+<li>Making it cheap to store 1B vectors.</li>
+</ul>
+</li>
+</ul>
+<h2 id="appendix">Appendix<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#appendix" class="internal alias"> §</a></h2>
+<ul>
+<li><a href="https://qdrant.tech/" class="external">https://qdrant.tech/</a></li>
+<li><a href="https://github.com/qdrant/qdrant" class="external">https://github.com/qdrant/qdrant</a></li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

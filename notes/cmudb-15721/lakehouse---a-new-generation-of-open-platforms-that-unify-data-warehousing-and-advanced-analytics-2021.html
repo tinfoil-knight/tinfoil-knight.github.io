@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html><head><title>Lakehouse - A New Generation of Open Platforms that Unify Data Warehousing and Advanced Analytics (2021)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Lakehouse - A New Generation of Open Platforms that Unify Data Warehousing and Advanced Analytics (2021)"/><link rel="icon" href="../../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/cmudb-15721/lakehouse---a-new-generation-of-open-platforms-that-unify-data-warehousing-and-advanced-analytics-2021"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="../..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../../notes/">notes</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../../notes/cmudb-15721/">cmudb 15721</a></div></nav><h1 class="article-title ">Lakehouse - A New Generation of Open Platforms that Unify Data Warehousing and Advanced Analytics (2021)</h1><p class="content-meta ">Aug 09, 2024 | 523 words</p><ul class="tags "><li><a href="../../tags/db" class="internal tag-link">#db</a></li><li><a href="../../tags/paper" class="internal tag-link">#paper</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.vldb.org/pvldb/vol13/p3411-armbrust.pdf" class="external" style="color: inherit;">https://www.vldb.org/pvldb/vol13/p3411-armbrust.pdf</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Michael Armbrust, Ali Ghodsi, Reynold Xin, Matei Zaharia</span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#what-is-the-research" data-for="what-is-the-research">What is the research?</a></li><li class="depth-0"><a href="#architecture" data-for="architecture">Architecture</a></li><li class="depth-0"><a href="#evaluation" data-for="evaluation">Evaluation</a></li><li class="depth-0"><a href="#discussion" data-for="discussion">Discussion</a></li></ul></div></div></div></div><article class="popover-hint"><h2 id="what-is-the-research">What is the research?<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#what-is-the-research" class="internal alias"> §</a></h2>
+<p>The paper introduces the Lakehouse architecture for data storage and analytics on open file formats. Their implementation provides comparable performance with better consistency by directly using the source data unlike the two-tier data lake + warehouse architecture which requires additional ETL and storage.</p>
+<h2 id="architecture">Architecture<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#architecture" class="internal alias"> §</a></h2>
+<p><img src="../../attachments/pasted-image-20240810175110.png" width="auto" height="auto"/></p>
+<blockquote>
+<p>It might not be evident in the figure but there’s usually a staging area where data is processed before loading it into a data warehouse.</p>
+</blockquote>
+<p>Systems using the lakehouse architecture access and store data in an object store (owned by the customer) and run a transactional metadata layer on top to keep track of objects and which table they belong to.</p>
+<p>The metadata layer enables safer access to the underlying data and allows multi-object updates (required since a single table is split across multiple files).</p>
+<blockquote>
+<p>They don’t mention it in the paper but there’d be some kind of a catalog on top of the object metadata layer to track all the tables and their schema.</p>
+</blockquote>
+<p>The data is stored using open file formats like Parquet or ORC.</p>
+<p>Their implementation uses <a href="https://github.com/delta-io/delta" class="external alias">Delta Lake</a> for metadata storage and the Delta Engine for execution.<br/>
+Delta Lake stores the metadata as Parquet files in the data lake (object store) itself.</p>
+<p>For better performance, they maintain additional data on top of the cloud data lake. Their execution engine caches files (on SSDs, RAM) and maintains auxiliary data (like indexes and stats).<br/>
+Apart from this, they also reorder records to cluster.</p>
+<blockquote>
+<p>They use space-filling curves to reorder data which based on multiple parameters instead of just one. Space-filling curves provide a way to encode those multi parameters into a single value while preserving the closeness of those records for better ordering.<br/>
+I’d suggest checking out Hilbert’s curve if you’re interested.</p>
+</blockquote>
+<h2 id="evaluation">Evaluation<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#evaluation" class="internal alias"> §</a></h2>
+<p><img src="../../attachments/pasted-image-20240810015805.png" width="auto" height="auto"/></p>
+<p>They’ve used the TPC-DS benchmark with 30TB of data (stored as Parquet files). Even in their own evaluation, the Delta Engine doesn’t do too well compared to one of the undisclosed vendors on test duration and cost for on-demand instances.</p>
+<p>But, getting similar performance to data warehouses (that require additional storage, data pipelines and have a proprietary format) is definitely a win.</p>
+<h2 id="discussion">Discussion<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#discussion" class="internal alias"> §</a></h2>
+<p>While the paper mentions supporting multiple formats, as per current Delta Lake docs<sup><a href="#user-content-fn-1" id="user-content-fnref-1" data-footnote-ref aria-describedby="footnote-label" class="internal alias">1</a></sup>, it only supports storage in Parquet files.<br/>
+You can import CSV, JSON and other formats but Delta Lake would need to convert them to Parquet files first. While Parquet is more efficient for storage and easier to optimize for execution, I’d like to see support for more unstructured formats.</p>
+<p>They also mention decompressing the Parquet data in cache for faster execution. Using the <a href="https://arrow.apache.org/" class="external alias">Arrow</a> in-memory format could make reads faster for “hot data”.</p>
+<p>I also came across <a href="https://arxiv.org/pdf/2308.05368" class="external alias">Building a serverless Data Lakehouse from spare parts</a> in which the authors implement the lakehouse architecture entirely with open source tools.</p>
+<p>File and table formats seem standard now. With recent efforts in commoditizing the catalog<sup><a href="#user-content-fn-2" id="user-content-fnref-2" data-footnote-ref aria-describedby="footnote-label" class="internal alias">2</a></sup> and execution<sup><a href="#user-content-fn-3" id="user-content-fnref-3" data-footnote-ref aria-describedby="footnote-label" class="internal alias">3</a></sup> layer, the lock-in will eventually move from the infra to the overall platform. Hopefully, this leads to vendors focusing on better UX for business and data science teams.</p>
+<section data-footnotes class="footnotes"><h2 class="sr-only" id="footnote-label">Footnotes<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#footnote-label" class="internal alias"> §</a></h2>
+<ol>
+<li id="user-content-fn-1">
+<p><a href="https://web.archive.org/web/20240810113526/https://docs.delta.io/latest/delta-faq.html#where-does-delta-lake-store-the-data" class="external">https://web.archive.org/web/20240810113526/https://docs.delta.io/latest/delta-faq.html#where-does-delta-lake-store-the-data</a> <a href="#user-content-fnref-1" data-footnote-backref aria-label="Back to reference 1" class="data-footnote-backref internal alias">↩</a></p>
+</li>
+<li id="user-content-fn-2">
+<p><a href="https://materializedview.io/p/make-lakehouse-catalogs-boring-again" class="external">https://materializedview.io/p/make-lakehouse-catalogs-boring-again</a> <a href="#user-content-fnref-2" data-footnote-backref aria-label="Back to reference 2" class="data-footnote-backref internal alias">↩</a></p>
+</li>
+<li id="user-content-fn-3">
+<p><a href="https://datafusion.apache.org/" class="external">https://datafusion.apache.org/</a> <a href="#user-content-fnref-3" data-footnote-backref aria-label="Back to reference 3" class="data-footnote-backref internal alias">↩</a></p>
+</li>
+</ol>
+</section></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../../postscript.js" type="module"></script></html>

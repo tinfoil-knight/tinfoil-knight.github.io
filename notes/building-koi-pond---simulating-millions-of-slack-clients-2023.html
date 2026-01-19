@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html><head><title>Building Koi Pond - Simulating Millions of Slack Clients (2023)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Building Koi Pond - Simulating Millions of Slack Clients (2023)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/building-koi-pond---simulating-millions-of-slack-clients-2023"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Building Koi Pond - Simulating Millions of Slack Clients (2023)</h1><p class="content-meta ">Jun 07, 2024 | 673 words</p><ul class="tags "><li><a href="../tags/talks" class="internal tag-link">#talks</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=oOCubxI3wmI" class="external" style="color: inherit;">https://www.youtube.com/watch?v=oOCubxI3wmI</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Maude Lemaire</span></div></div></div></div><article class="popover-hint"><p>Maude Lemaire is a Sr. Staff Software Engineer @ Slack and technical lead for the backend performance infrastructure team.</p>
+<p>Slack didn’t have any load testing tooling. They had a big customer that was putting strain on their infra.</p>
+<p>The initial tool (API Blast) just made API requests to the server. It had a few parameters for specifying concurrency, rate limits etc. but that’s it.</p>
+<ul>
+<li>Why did they not use off the shelf tool which already provide these functionalities?</li>
+</ul>
+<p>API Blast didn’t test the web-socket stack. The only thing that was tested is ingest. Message propagation wasn’t tested since there were no incoming clients.</p>
+<p><img src="../attachments/pasted-image-20240608170843.png" width="auto" height="auto"/></p>
+<ul>
+<li>Edge API is for serving data cached in various Points-of-Presence around the world &amp; required instantaneously. (Like the quick switcher, search bar that comes up on  ⌘ + K)</li>
+<li>Real time services maintain all active web-socket connections with all users around the world. It organizes those connections by channels.</li>
+</ul>
+<p>This worked for a while but a newer customer wanted a channel to house all 300K users where 100K users are likely to be active at the same time.</p>
+<p>Slack is susceptible to load-related performance problems in 3 key ways:</p>
+<ul>
+<li>Massive fan-out (users sending messages in big channels )</li>
+<li>Event floods</li>
+<li>Thundering herd
+<ul>
+<li>Eg: If someone posts a message that goes to 100K active users and even 10 users send 1 reaction, those reactions need to be propagated to 100K clients which leads to a 1 million web-socket events.</li>
+</ul>
+</li>
+</ul>
+<p>In mid-2019, they built a tool called Puppet Show.</p>
+<ul>
+<li>Simulated real desktop users by spinning up 1000s of headless chrome browsers logged into Slack (distinct users, distinct token) across a K8s cluster.</li>
+<li>They had a script simulate different actions like switching to a channel &amp; posting a message, switching to another &amp; adding a reaction, trolling Slackbot etc.</li>
+<li>A central component (Puppeteer) oversaw all the puppets. The puppets would check in regularly to update the puppeteer about their state. Puppets would receive a script from Puppeteer and start executing it.
+<ul>
+<li>Sidenote: Don’t confuse Puppeteer with the Node.js library used to control Chromium.</li>
+</ul>
+</li>
+<li>Pros
+<ul>
+<li>High fidelity. Nothing better than logging into the slack client and executing actions.</li>
+<li>Flexible scripting using Javascript</li>
+</ul>
+</li>
+<li>Cons
+<ul>
+<li>Costs a lot. For each puppet instance, the cost was 37 cents per day. Running 100K instances would cost 37K USD everyday.</li>
+<li>Spinning up 100K instances took several days and pods would crash frequently.</li>
+</ul>
+</li>
+<li>Once it was verified that Slack can handle the load, they stopped using this tool.</li>
+</ul>
+<p>They signed up a customer (in 2020, around the pandemic) that wanted support for 500K (IBM probably) users in the same Slack instance.</p>
+<p>The headless chrome browsers were replaced w/ lightweight client simulators written in Go.</p>
+<ul>
+<li>A koi is a Slack client simulation (single Go routine)</li>
+<li>A school is a collection of koi (single Go program that runs in a single pod on K8s)</li>
+<li>The keeper manages the schools and keeps track of the overall load test state and parameters.</li>
+</ul>
+<p>A JSON configuration file needs to be provided when you boot up a load test that tells a “koi” what to do once booted.<br/>
+Each action is mapped to a probability of being performed. Then there’s a set of implementation w/ each action that the koi should perform with each of those actions.</p>
+<pre><code>{
+    &quot;behaviors&quot;: {
+        &quot;chat.postMessage&quot;: {
+            &quot;frequency&quot;: 0.043
+        }
+    },
+    &quot;sequences&quot;: {
+        &quot;chat.postMessage&quot;: {
+            &quot;doc&quot;: &quot;Sends a message to a random channel.&quot;,
+            &quot;steps&quot;: [
+                ...
+            ]
+        }
+    }
+}
+</code></pre>
+<p>Every tick (configurable but 1s by default), a koi runs through its entire configuration and performs the actions based on their odds.</p>
+<p>This was good enough to simulate massive fan-out and event floods but not thundering herds since they couldn’t simulate coordinated behavior. That’s why they have “formations” that allows specifying the percentage of users participating over a period of time.</p>
+<pre><code>{
+    &quot;formations&quot;: [
+        {
+            &quot;name&quot;: &quot;Populate announcement channel with reactions&quot;,
+            &quot;begin_within_secs&quot;: 30,
+            &quot;percent&quot;: 1.0,
+            &quot;sequence&quot;: {
+                &quot;steps&quot;: [
+                    ...
+                ]
+            }
+        }
+    ]
+}
+</code></pre>
+<p>A koi cost 0.1 cents to run per day.</p>
+<h2 id="appendix">Appendix<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#appendix" class="internal alias"> §</a></h2>
+<ul>
+<li>Slides: <a href="https://speakerdeck.com/qcmaude/building-koi-pond-simulating-millions-of-slack-clients" class="external">https://speakerdeck.com/qcmaude/building-koi-pond-simulating-millions-of-slack-clients</a></li>
+<li><a href="https://slack.engineering/%EF%B8%8F-surfs-up-preparing-for-huge-waves-of-traffic-via-load-testing/" class="external">https://slack.engineering/%EF%B8%8F-surfs-up-preparing-for-huge-waves-of-traffic-via-load-testing/</a></li>
+<li><a href="https://slack.engineering/load-testing-with-koi-pond/" class="external">https://slack.engineering/load-testing-with-koi-pond/</a></li>
+<li><a href="https://slack.engineering/continuous-load-testing/" class="external">https://slack.engineering/continuous-load-testing/</a></li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

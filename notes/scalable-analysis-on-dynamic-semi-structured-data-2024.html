@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html><head><title>Scalable Analysis on Dynamic Semi-Structured Data (2024)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Scalable Analysis on Dynamic Semi-Structured Data (2024)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/scalable-analysis-on-dynamic-semi-structured-data-2024"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Scalable Analysis on Dynamic Semi-Structured Data (2024)</h1><p class="content-meta ">Aug 15, 2024 | 1446 words</p><ul class="tags "><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/search" class="internal tag-link">#search</a></li><li><a href="../tags/nyc-systems" class="internal tag-link">#nyc-systems</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=1wKsjQtjsHc" class="external" style="color: inherit;">https://www.youtube.com/watch?v=1wKsjQtjsHc</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Dan Harris &lt;thinkharderdev></span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#record-shredding-aka-dremel-encoding" data-for="record-shredding-aka-dremel-encoding">Record Shredding aka Dremel Encoding</a></li><li class="depth-0"><a href="#sinew" data-for="sinew">Sinew</a></li><li class="depth-0"><a href="#json-tiles" data-for="json-tiles">JSON Tiles</a></li><li class="depth-0"><a href="#synthesis--cx-data" data-for="synthesis--cx-data">Synthesis : CX-Data</a></li></ul></div></div></div></div><article class="popover-hint"><p>Dan Harris is a Principal Software Engineer at <a href="https://coralogix.com/" class="external alias">Coralogix</a> (an observability platform) where he works on the remote query system.</p>
+<p>They store customer data is stored in a data lake and analytics are provided on top of that.</p>
+<p>Observability data is semi-structured (eg. JSON) and varies over time a lot (since new attributes keep getting added or removed to logs in a codebase).</p>
+<p>The way to build a modern high scale OLAP system is with columnar data &amp; store it using formats like Parquet. But columnar data doesn’t mesh very well with complex nested data structures.</p>
+<p>How do you map heterogeneous semi-structured data to a columnar format?</p>
+<ul>
+<li>Difficult balance b/w ingestion throughput, write amplification and query efficiency.</li>
+<li>Prior art: Record shredding (2010)<sup><a href="#user-content-fn-1" id="user-content-fnref-1" data-footnote-ref aria-describedby="footnote-label" class="internal alias">1</a></sup>, <a href="https://www.cs.umd.edu/~abadi/papers/sinew-sigmod14.pdf" class="external alias">Sinew (2014)</a>, <a href="https://db.in.tum.de/~durner/papers/json-tiles-sigmod21.pdf" class="external alias">JSON Tiles (2021)</a>.</li>
+</ul>
+<h2 id="record-shredding-aka-dremel-encoding">Record Shredding aka Dremel Encoding<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#record-shredding-aka-dremel-encoding" class="internal alias"> §</a></h2>
+<ul>
+<li>Flatten record and store the leaf value at the same path in columns.</li>
+<li>Use additional metadata to reconstruct the nested structure on read:
+<ul>
+<li>Repetition levels: For repeated value (eg. an array of arrays), identifies at which level the value is repeated.</li>
+<li>Definition levels: If you’ve a null value in a column then it tells you which level is the column actually null at (since if you’ve a null value at higher level in the tree then all sub-values are implicitly null).</li>
+</ul>
+</li>
+</ul>
+<p><img src="../attachments/pasted-image-20240815214457.png" width="auto" height="auto"/></p>
+<p>This works well if you’ve a nested relatively static structure with a fixed schema. But they had some issues:</p>
+<ul>
+<li>In very wide tables, construction of nested values during scan can be very expensive
+<ul>
+<li>To produce the full record, you need to read all columns.</li>
+<li>Slows down reading but also data compaction during ingestion.</li>
+</ul>
+</li>
+<li>Requires tracking globally merged schema.
+<ul>
+<li>Very difficult when ingesting many GB/s or very heterogeneous data.</li>
+</ul>
+</li>
+<li>Records get coerced into a globally merged schema.
+<ul>
+<li>Adds a lot of random noise from spares values which get “imputed” into all records when read. (even an originally small document would end up with a lot of extra fields with null values when read)</li>
+</ul>
+</li>
+<li>Dealing with type conflicts requires another layer of complexity.
+<ul>
+<li>The Arrow format supports union types so you can resolve type conflicts by lifting types into union but it adds a lot of complexity.</li>
+</ul>
+</li>
+</ul>
+<h2 id="sinew">Sinew<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#sinew" class="internal alias"> §</a></h2>
+<p>The key insight of the Sinew paper is that the logical structure of the data that doesn’t need to match the physical representation.</p>
+<ul>
+<li>Logical schema is the merged schema of all records in the table.</li>
+<li>Physical schema is partitioned into physical and virtual columns.</li>
+<li>Physical columns are materialized and stored in their own column (or row in a row-oriented DB).</li>
+<li>Virtual columns are stored together in an efficient binary format.</li>
+</ul>
+<p>The schema analyzer decides what columns to materialize into physical columns as data evolves.</p>
+<p>During query time, you can track which columns are physical or virtual. Anything that’s not a physical column and materialized can be materialized on the fly</p>
+<p>The schema analyzer proposed in the paper was in the context of a single node DB. Very difficult to implement it for hundreds of nodes. So, they decided to not go ahead with this.</p>
+<h2 id="json-tiles">JSON Tiles<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#json-tiles" class="internal alias"> §</a></h2>
+<p>Extends the original ideas behind Sinew. It provided a new method for clustering records to maximize efficiency of materialized columns.</p>
+<ul>
+<li>During data ingestion, group records into fixed size chunks (“tiles”).</li>
+<li>Use FP-Growth algorithm to identify “frequent item-sets” (eg. common fields in records).</li>
+<li>Exchange records b/w tiles to group more similar records together in the same tile.</li>
+<li>Non-materialized columns are stored in a binary json format.</li>
+</ul>
+<p>This can be just done locally on a node and you don’t need to do this in a distributed manner.</p>
+<p>FP-Growth isn’t efficient and becomes expensive to run at scale.</p>
+<h2 id="synthesis--cx-data">Synthesis : CX-Data<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#synthesis--cx-data" class="internal alias"> §</a></h2>
+<p>They created their own format: CX-Data.</p>
+<ul>
+<li>Uses Parquet as physical file format.</li>
+<li>Build on insights from the Sinew and JSON Tiles paper.
+<ul>
+<li>Does partial materialization of leaf values into separate Parquet columns.</li>
+<li>Store the original raw record in an efficient binary format.</li>
+<li>Dynamically materialize virtual columns during query execution if required.</li>
+<li>Avoid materializing complex nested structured, only scalar values and arrays of scalars.</li>
+</ul>
+</li>
+<li>Avoid costly coordination during ingestion &amp; query execution.
+<ul>
+<li>Decisions about materialization are local to an ingestion task.
+<ul>
+<li>They decide what to materialize by taking the top N least sparse columns in the chunk of data.</li>
+</ul>
+</li>
+<li>All schema information during query planning is inferred from the query itself with no external catalog.</li>
+</ul>
+</li>
+</ul>
+<p><img src="../attachments/pasted-image-20240816005955.png" width="auto" height="auto"/></p>
+<p>Since parsing JSON strings on the fly while scanning data for reads is really slow, the raw record needs to be stored in an efficient format. There were a lot of existing binary JSON formats like: Postgres JSONB, BSON (MongoDB), SQLite JSONB, Amazon ION, MessagePack etc.</p>
+<p>But, they made their own binary JSON format based on Postgres JSONB.</p>
+<p>Postgres JSONB</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="d" data-theme="github-dark github-light"><code data-language="d" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">JsonbValue</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">+---------------------------------------------------------------+</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">|</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> [</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">JEntry</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]  [</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">JEntry</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]  [</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">JEntry</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]  </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">|</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">  [</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">Value</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]  [ ] [   ] ... [  ]  </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">|</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">+---------------------------------------------------------------+</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">JEntry </span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">32</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> bits</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">)</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">+---------------------------------------------------------------+</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">|</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 0</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> |</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 1</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 1</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 0</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> |</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 1</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 0</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 1</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 0</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 0</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> ...                                     </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">|</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">+---------------------------------------------------------------+</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">  |</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    |</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">          |</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                                           </span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">  |</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    |</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">          +--</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> length</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">/</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">offset</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> of</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> value </span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">scalar</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">) </span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">OR</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> children</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> count </span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">container</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">)</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">  |</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    |</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                </span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">  |</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    +-------------</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> type </span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">object</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">,</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> array</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">,</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> string</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> etc</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">.)                                 </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">|</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">  </span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">  +-----------------</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> length</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">/</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">offset</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                          </span></span>
+<span data-line> </span></code></pre></figure>
+<p>A JsonbValue has fixed length JEntries followed by variable length values.<br/>
+For simple scalar values, either the length or offset is stored in the remaining 28 bits.</p>
+<ul>
+<li>At like every 32nd JEntries, they store an offset and the rest store the length so you’ve to never traverse more than 32 JEntries to find the offset into the value buffer for a JEntry.<br/>
+Containers like array or an object store the no. of children i.e. items in the array OR key-value pairs in the object.</li>
+</ul>
+<h3 id="jsona--json-arrow--binary-json-format-for-the-columnar-world">JsonA / JSON Arrow : Binary JSON format for the columnar world<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#jsona--json-arrow--binary-json-format-for-the-columnar-world" class="internal alias"> §</a></h3>
+<p>Issues with existing formats</p>
+<ul>
+<li>Designed for row/document stores.</li>
+<li>Doesn’t cleanly separate structure from data.</li>
+<li>You store everything together so you can’t reduce IO. You’ve to read the whole column as a column chunk and you can then sort and traverse though there &amp; it’s fast to traverse through and find the value but in a data lake architecture you want to eliminate IO as much as possible.</li>
+</ul>
+<p>Small tweaks to adapt the Postgres JSONB format to column stores</p>
+<ul>
+<li>Take the JEntries and variable length values and separate them into different columns.</li>
+<li>Split the variable length columns into 2 separate buffers. One for keys and another for values.
+<ul>
+<li>The keys are repeated a lot so you can use dictionary encoding here. Also, if you want to find a particular path in an object, you just need to read the keys without reading the value buffer (where the bulk of the data lives).</li>
+<li>You can also prune I/O by converting a query like <code>path = 1</code> to <code>path != NULL AND path = 1</code> for predicate filtering.</li>
+</ul>
+</li>
+</ul>
+<p>Separating the structure from value data:</p>
+<ul>
+<li>Made traversing structure (key lookup) cache-friendly</li>
+<li>Minimized IO when queries can be resolved only based on structure</li>
+</ul>
+<p>Other benefits of JsonA</p>
+<ul>
+<li>Faster to parse from JSON string
+<ul>
+<li>Build the structure directly from parse w/o intermediate representation</li>
+<li>In their benchmarks, ~40% faster to parse to JsonA than to serde_json::Value<sup><a href="#user-content-fn-2" id="user-content-fnref-2" data-footnote-ref aria-describedby="footnote-label" class="internal alias">2</a></sup></li>
+<li>There’s no intermediate state (like a parse tree) in parsing JsonA that you’ve to build unlike JSON. You build the structure as you process the input tokens.</li>
+</ul>
+</li>
+<li>Fast value extraction
+<ul>
+<li>Can extract multiple values from single traversal</li>
+</ul>
+</li>
+<li>IsNull, IsNotNull, IsTrue, IsFalse checks can be done purely with nodes and keys
+<ul>
+<li>For predicate pushdown, IO can be eliminated for values</li>
+</ul>
+</li>
+<li>String values are stored already unescaped
+<ul>
+<li>Eliminates parsing overhead for full-text search</li>
+</ul>
+</li>
+</ul>
+<p>Q/A</p>
+<ul>
+<li>If the decision for what column to materialize is done on a per-chunk basis, does that mean during query execution each chunk has very different set of columns?
+<ul>
+<li>It makes things like planning partitioning (for distributed query execution) difficult since you don’t know where data is materialized and where it’s not materialized. One partition may take significantly longer than other since a column might be virtual for those chunks.</li>
+</ul>
+</li>
+<li>Do you have any background process that looks through all the chunks and reorganizes them?
+<ul>
+<li>No. It’s not currently feasible due to the amount of data. Working on smarter ways to do materialization.</li>
+</ul>
+</li>
+<li>What’s the target size for ingesting Parquet files?
+<ul>
+<li>~ 50-300 MBs.</li>
+<li>This can get compacted into larger files.</li>
+</ul>
+</li>
+<li>In practice, how varied are schemas are w/ customer workloads?
+<ul>
+<li>Extremely varied.</li>
+<li>We dump data into big silos. All logs (even from different systems) go into a single table.</li>
+<li>Every once in a while, you’ve someone who tries to make UUID a key in the object. We’ve ways of preventing that from blowing anything up but it’s a constant problem.</li>
+</ul>
+</li>
+</ul>
+<section data-footnotes class="footnotes"><h2 class="sr-only" id="footnote-label">Footnotes<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#footnote-label" class="internal alias"> §</a></h2>
+<ol>
+<li id="user-content-fn-1">
+<p>Introduced in <a href="https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/36632.pdf" class="external alias">Dremel: Interactive Analysis of Web-Scale Datasets</a>. Also see <a href="https://www.goldsborough.me/distributed-systems/2019/05/18/21-09-00-a_look_at_dremel/" class="external alias">A Look at Dremel</a>. Parquet (<a href="https://blog.x.com/engineering/en_us/a/2013/dremel-made-simple-with-parquet" class="external">https://blog.x.com/engineering/en_us/a/2013/dremel-made-simple-with-parquet</a>) also uses Dremel encoding. <a href="#user-content-fnref-1" data-footnote-backref aria-label="Back to reference 1" class="data-footnote-backref internal alias">↩</a></p>
+</li>
+<li id="user-content-fn-2">
+<p><a href="https://github.com/serde-rs/json" class="external">https://github.com/serde-rs/json</a> <a href="#user-content-fnref-2" data-footnote-backref aria-label="Back to reference 2" class="data-footnote-backref internal alias">↩</a></p>
+</li>
+</ol>
+</section></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

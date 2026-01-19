@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html><head><title>How Discord Indexes Billions of Messages (2017)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="How Discord Indexes Billions of Messages (2017)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="til/how-discord-indexes-billions-of-messages-2017"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../til/">til</a></div></nav><h1 class="article-title ">How Discord Indexes Billions of Messages (2017)</h1><p class="content-meta ">Feb 17, 2025 | 759 words</p><ul class="tags "><li><a href="../tags/search" class="internal tag-link">#search</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://discord.com/blog/how-discord-indexes-billions-of-messages" class="external" style="color: inherit;">https://discord.com/blog/how-discord-indexes-billions-of-messages</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Jake Heinz</span></div></div></div></div><article class="popover-hint"><ul>
+<li>technical requirements: fast, self-healing, linearly scalable, lazily indexed
+<ul>
+<li>lazily indexed - don’t index until someone attempts to search messages at least once</li>
+</ul>
+</li>
+<li>decided to use elasticsearch (evaluated solr vs elasticsearch)</li>
+<li>wanted to avoid large es clusters since they’re difficult to maintain and team didn’t have much experience</li>
+<li>idea: delegate sharding to &amp; routing to application layer which would allow them to index messages into a pool of smaller es clusters
+<ul>
+<li>cluster outage would only affect limited messages</li>
+<li>can throw away unrecoverable clusters easily (and lazily re-index when needed)</li>
+</ul>
+</li>
+<li>es prefers bulk indexing
+<ul>
+<li>queue messages and process in bulk</li>
+<li>delay is reasonable since users mostly search for historical messages and not recent ones</li>
+</ul>
+</li>
+<li>tooling
+<ul>
+<li>message queue (used <a href="https://docs.celeryq.dev/en/latest/" class="external alias">Celery</a>)</li>
+<li>index workers (routing and bulk inserts from queue)</li>
+<li>historical index workers</li>
+<li>shard mapping (discord_guild -> es cluster + index)
+<ul>
+<li>persistent (on Cassandra)</li>
+<li>cache (used <code>mget</code> in Redis)</li>
+</ul>
+</li>
+<li>shard allocator (one-time assignment of “shard”)
+<ul>
+<li>store shards ranked by score that represents their load (used sorted sets in Redis)</li>
+<li>score is incremented w/ each new allocation</li>
+<li>each indexed message in es had a probability to increment the score of its shard</li>
+</ul>
+</li>
+<li>discovery (used etcd)
+<ul>
+<li>of clusters and hosts within them</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>raw message data not stored in ES
+<ul>
+<li>only fields actually stored (<code>store: &quot;yes&quot; in es</code>) are message id, server id &amp; channel id</li>
+<li>message metadata is stored in inverted index</li>
+<li>timestamp isn’t included in index since ids contain a timestamp (snowflake ids)</li>
+</ul>
+</li>
+<li>for search results, message is fetched from Cassandra along w/ message context (2 messages before &amp; after)</li>
+<li>when testing
+<ul>
+<li>observed unexpected disk &amp; cpu usage</li>
+<li>es’s index refresh interval is 1s by default (to support near real-time search) so every second es was flushing in-memory buffer to a lucene segment &amp; opening the segment to make it searchable across a thousand indexes</li>
+<li>just increasing the refresh interval to 1hr didn’t work since a discord server could go hours w/o needing to execute a single query
+<ul>
+<li>control refreshing from application layer
+<ul>
+<li>after bulk insert, marking guild ids &amp; es shard containing them as dirty
+<ul>
+<li>expire after 1 hour (refresh would’ve happened by then)</li>
+</ul>
+</li>
+<li>on search, check if the es shard AND guild id are dirty &amp; refresh the shard’s es index if so</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Appendix</p>
+<ul>
+<li>“guild” is just the internal name for a server</li>
+<li>“shard” in es vs. “shard” in this post
+<ul>
+<li>es index is split into shards for distributing data</li>
+<li>in this post, a shard just maps to a guild</li>
+<li>an es shard can contain data for multiple guild ids</li>
+</ul>
+</li>
+<li>Index Template</li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="json" data-theme="github-dark github-light"><code data-language="json" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">{</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">    'template'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'m-*'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">    'settings'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">        'number_of_shards'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">        'number_of_replicas'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">        'index.refresh_interval'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">3600</span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">s'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">    },</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">    'mappings'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">        'message'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">            '_source'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'includes'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: [</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'id'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'channel_id'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'guild_id'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                ]</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">            },</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">            'properties'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // This is the message_id, we index by this to allow</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // for greater than/less than queries, so we can search</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // before, on, and after.</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'id'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'long'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // Lets us search with the &quot;in:#channel-name&quot; modifier.</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'channel_id'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'long'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // Lets us scope a search to a given server.</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'guild_id'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'long'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // Lets us search &quot;from:Someone#0001&quot;</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'author_id'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'long'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // Is the author a user, bot or webhook? Not yet exposed in client.</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'author_type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'byte'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // Regular chat message, system message...</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'short'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // Who was mentioned, &quot;mentions:Person#1234&quot;</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'mentions'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'long'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // Was &quot;@everyone&quot; mentioned</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // (only true if the author had permission to @everyone at the time).</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // This accounts for the case where &quot;@everyone&quot; could be in a</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // message, but it had no effect, </span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // because the user doesn't have permissions to ping everyone. </span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'mention_everyone'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'boolean'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // Array of [message content, embed title, embed author,</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // embed description, ...] for full-text search.</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'content'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'text'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'fields'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                        'lang_analyzed'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                            'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'text'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                            'analyzer'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'english'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                        }</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                    }</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // An array of shorts, specifying what type of media the message has.</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // &quot;has:link|image|video|embed|file&quot;.</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'has'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'short'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // An array of normalized hostnames in the message,</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // traverse up to the domain. Not yet exposed in client.</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // &quot;http://foo.bar.com&quot; gets turned into [&quot;foo.bar.com&quot;, &quot;bar.com&quot;]</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'link_hostnames'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'keyword'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // Embed providers as returned by oembed, i.e. &quot;Youtube&quot;.</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // Not yet exposed in client.</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'embed_providers'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'keyword'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // Embed type as returned by oembed. Not yet exposed in client.</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'embed_types'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'keyword'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // File extensions of attachments, i.e. &quot;fileType:mp3&quot;</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'attachment_extensions'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'keyword'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                },</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">                // The filenames of the attachments. Not yet exposed in client.</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                'attachment_filenames'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: {</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'type'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'text'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">                    'analyzer'</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#FDAEB7;--shiki-light:#B31D28;--shiki-dark-font-style:italic;--shiki-light-font-style:italic;">'simple'</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">                }</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">            }</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">        }</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">    }</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span></code></pre></figure></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

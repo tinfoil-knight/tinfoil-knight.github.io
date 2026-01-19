@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html><head><title>Predictive Scaling in MongoDB Atlas, an Experiment (2024)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Predictive Scaling in MongoDB Atlas, an Experiment (2024)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/predictive-scaling-in-mongodb-atlas,-an-experiment-2024"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Predictive Scaling in MongoDB Atlas, an Experiment (2024)</h1><p class="content-meta ">Nov 23, 2024 | 1514 words</p><ul class="tags "><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/nyc-systems" class="internal tag-link">#nyc-systems</a></li><li><a href="../tags/db" class="internal tag-link">#db</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://youtu.be/VLi9MHnBJzQ" class="external" style="color: inherit;">https://youtu.be/VLi9MHnBJzQ</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Matthieu Humeau, A. Jesse Jiryu Davis</span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#vertical-scaling-in-atlas" data-for="vertical-scaling-in-atlas">Vertical Scaling in Atlas</a></li><li class="depth-0"><a href="#auto-scaling-today" data-for="auto-scaling-today">Auto-scaling Today</a></li><li class="depth-0"><a href="#predictive-scaling-experiment" data-for="predictive-scaling-experiment">Predictive Scaling Experiment</a></li><li class="depth-0"><a href="#conclusion" data-for="conclusion">Conclusion</a></li><li class="depth-0"><a href="#appendix" data-for="appendix">Appendix</a></li></ul></div></div></div></div><article class="popover-hint"><p>Both Humeau (Staff Data Scientist) and Davis (Sr. Staff Research Engineer) work at MongoDB and were experimenting with MongoDB to see if predictive scaling would work for MongoDB Atlas (their cloud hosted service).</p>
+<p>MongoDB</p>
+<ul>
+<li>NoSQL Document Database</li>
+<li>MongoDB Query Language</li>
+<li>Strong consistency, high availability, ACID transactions</li>
+</ul>
+<p>MongoDB is usually deployed as a 3-node replica set.<br/>
+The primary handles both reads and writes while the secondaries allow query scaling but their main purpose is being a hot standby.</p>
+<p>MongoDB can also be deployed as a sharded cluster so each replica set ends up owning a portion of the data. A routing service (mongos) routes the queries to these replica sets from the client.</p>
+<p>MongoDB Atlas can be multi-region, multi-cloud.</p>
+<p>Problem Statement: Can we save money by predicting customers’ workload fluctuation and choosing the smallest server that’ll serve them for each quarter hour or so?</p>
+<p>Customers can select cluster tiers on MongoDB Atlas with different storage, RAM and vCPUs which map internally to various instances on the cloud provider.</p>
+<h2 id="vertical-scaling-in-atlas">Vertical Scaling in Atlas<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vertical-scaling-in-atlas" class="internal alias"> §</a></h2>
+<p>Once a customer requests to upgrade/downgrade their instance, Atlas takes over and automatically goes through these steps:</p>
+<ul>
+<li>Take a secondary offline.</li>
+<li>Detach its network storage.</li>
+<li>Restart it w/ a different server size.</li>
+<li>Reattach storage.</li>
+<li>Wait for it to catch up to the primary.</li>
+<li>Scale the other secondary likewise.</li>
+<li>Step down the primary and scale it.
+<ul>
+<li>There’s a co-ordinated handoff where Atlas chooses a secondary and starts it up so that there’s even less downtime than normal.</li>
+</ul>
+</li>
+</ul>
+<p>This process takes about 15 mins (for a 3-node set).</p>
+<h2 id="auto-scaling-today">Auto-scaling Today<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#auto-scaling-today" class="internal alias"> §</a></h2>
+<p>Primitive currently. Atlas scales infrequently and reactively basis some rules like:</p>
+<ul>
+<li>Scale up by 1 tier after 1 hour of over- load.</li>
+<li>Scale down by 1 tier after 24 hours of under-load.
+<ul>
+<li>Even if the load dis-appears entirely, the cluster won’t scale down multiple levels at once.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Issues</strong></p>
+<ul>
+<li>Clusters can be over/under-loaded for long periods.</li>
+<li>Clusters are already overloaded when they start scaling up.</li>
+</ul>
+<p><strong>Ideal Future</strong></p>
+<ul>
+<li>Forecast each cluster’s resource needs.</li>
+<li>Scale a cluster up before it’s overloaded.</li>
+<li>Scale it down as soon as it’s underloaded.</li>
+<li>Scale directly to the right size, skipping intermediate tiers.</li>
+</ul>
+<h2 id="predictive-scaling-experiment">Predictive Scaling Experiment<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#predictive-scaling-experiment" class="internal alias"> §</a></h2>
+<ul>
+<li>The experiment was possible because MongoDB had kept record of server’s performance metrics (workload, CPU, memory) in 1-minute intervals in a data warehouse for a few years then for 160K clusters.</li>
+<li>They chose 10K clusters (of customers who had opted in to auto-scaling) and analyzed their history from previous year.</li>
+<li>Split the history into a training period and a testing period.</li>
+<li>Trained models to forecast the clusters’ demand and CPU utilization.</li>
+<li>Built a prototype and tested how a predictive scaler would’ve performed during testing period, compared to the reactive scaler that was running at that time.</li>
+</ul>
+<p>Components of the Autoscaler</p>
+<ul>
+<li>Forecaster : forecasts each cluster’s future workload.
+<ul>
+<li>updated continuously (every minute or every few mins)</li>
+</ul>
+</li>
+<li>Estimator: estimates CPU% for any workload, any instance size.
+<ul>
+<li>given some inputs (like instance size, QPS), outputs CPU required</li>
+<li>difficult because they can’t see the customer’s data or queries</li>
+<li>long-lived and doesn’t depend on an individual cluster’s day to day fluctuations</li>
+<li>only trained (again) when there’s a new and more efficient version of mongodb available or there’s a new cloud instance type</li>
+</ul>
+</li>
+<li>Planner: chooses cheapest instance that satisfies forecasted demand.</li>
+</ul>
+<p><img src="../attachments/pasted-image-20241127031345.png" width="auto" height="auto"/></p>
+<h3 id="planner">Planner<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#planner" class="internal alias"> §</a></h3>
+<p><img src="../attachments/pasted-image-20241127031504.png" width="auto" height="auto"/><br/>
+If the planner realizes that you’re going to be overloaded on the cheap server (M40) then it’ll start the migration and upgrade the instance to the pricier M50 before you’ll be overloaded.<br/>
+Similarly, if you’re not forecast to be overloaded, it’ll downgrade the instance back again.</p>
+<h3 id="forecaster-long-term">Forecaster (Long-term)<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#forecaster-long-term" class="internal alias"> §</a></h3>
+<p>Initially, they thought to just forecast the CPU usage.</p>
+<ul>
+<li>But if you forecast the CPU usage and then use that to make scaling decisions that’ll affect the usage then it creates a circular dependency.</li>
+<li>Eg: If the system forecasts a spike tomorrow and scales accordingly to absorb it then it’s not going to be able to forecast it.</li>
+</ul>
+<p>So, they needed to forecast metrics that won’t be affected by their scaling decisions. They chose customer-driven customers like:</p>
+<ul>
+<li>QPS</li>
+<li>Connections in the cluster</li>
+<li>Query complexity (repr. by the no. of items scanned by the query engine)</li>
+<li>DB size</li>
+</ul>
+<p>These metrics can be considered to be (almost be) independent from the instance size and the state of the cluster.</p>
+<p><img src="../attachments/pasted-image-20241127032640.png" width="auto" height="auto"/></p>
+<p>They found that more than half of the customers had daily patterns in their usage and about a quarter of them had weekly patterns too.</p>
+<p><img src="../attachments/pasted-image-20241127032749.png" width="auto" height="auto"/></p>
+<p>Forecasting Model</p>
+<ul>
+<li>Used the MSTL (Multi-Season Trend decomposition using LOESS) model for forecasting.</li>
+<li>MSTL takes the whole time series and tries to extract individual components in that time series.</li>
+<li>Used ARIMA forecast for residuals (which are mostly randomly distributed)</li>
+</ul>
+<p><img src="../attachments/pasted-image-20241127033016.png" width="auto" height="auto"/></p>
+<p>The seasonal component is forecasted with the trend and the residuals to get a forecast for the required metrics.</p>
+<p>The forecaster is called long-term because it needs several weeks of data to be trained. It’s cheap to run so it can be run often.</p>
+<p><strong>Accuracy</strong></p>
+<p>Median MAPE (Mean Absolute Percentage Error)</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th></th><th>Seasonal Clusters</th><th>Non-seasonal Clusters</th></tr></thead><tbody><tr><td>Connections</td><td>3%</td><td>50%</td></tr><tr><td>Query Rate</td><td>19%</td><td>71%</td></tr><tr><td>Scanned Objects Rate</td><td>27%</td><td>186%</td></tr></tbody></table></div>
+<p>Not usable for non-seasonal clusters.<br/>
+Instead of maintaining a system that knows which cluster is seasonal or not, when the model runs, it also produces a score for confidence and if that’s too low, it’s not used for predictive scaling.</p>
+<h3 id="forecaster-short-term">Forecaster (Short-term)<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#forecaster-short-term" class="internal alias"> §</a></h3>
+<p>What about unexpected (i.e. non-seasonal) changes in demand? Or if a cluster doesn’t have a seasonal component? Or the seasonality changes?<br/>
+Can it do better than the reactive scaler?</p>
+<p>The short-term forecaster uses only the last hour or two of data to try to infer what’s going to happen in near future.</p>
+<p>Does simple trend interpolation (if load is increasing, it’s going to keep increasing and so on.)</p>
+<ul>
+<li>Not supposed to be very accurate but to save a few minutes and scale early thus avoiding scaling an overloaded cluster.</li>
+</ul>
+<p><img src="../attachments/pasted-image-20241127035156.png" width="auto" height="auto"/></p>
+<p>Local trend approach beats the naive approach 68% of the time (29% reduction in error)</p>
+<h3 id="estimator">Estimator<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#estimator" class="internal alias"> §</a></h3>
+<p>The forecasted customer-driven metrics are turned into CPU estimates.</p>
+<p>Takes</p>
+<ul>
+<li>Demand
+<ul>
+<li>Top metrics: Scanned objects, insert rate, query rate, connections</li>
+</ul>
+</li>
+<li>Instance Size
+<ul>
+<li>vCPUS, RAM</li>
+</ul>
+</li>
+</ul>
+<p>And outputs the CPU% (can be RAM or IOPS too)</p>
+<p>In ML terms, they’re solving a regression problem to predict CPU utilization.</p>
+<ul>
+<li>The model used to Gradient Boosted Trees.</li>
+<li>Trained successively by always training on the errors of the previous ones.</li>
+<li>Trained on 25mn samples (of demand, instance size and the target value which is CPU utilization)</li>
+</ul>
+<blockquote>
+<p>For 45% of customer clusters, error is under 7%.</p>
+</blockquote>
+<p><img src="../attachments/pasted-image-20241127040541.png" width="auto" height="auto"/></p>
+<h2 id="conclusion">Conclusion<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#conclusion" class="internal alias"> §</a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th></th><th>Predictive auto-scaler</th><th>Reactive auto-scaler</th></tr></thead><tbody><tr><td>Avg. distance from 75% util. target</td><td>18.6%</td><td>32.1%</td></tr><tr><td>Avg. under-utilization</td><td>18.3%</td><td>28.3%</td></tr><tr><td>Avg. over-utilization</td><td>0.4%</td><td>3.8%</td></tr></tbody></table></div>
+<blockquote>
+<p>Avg. Estimated Cost Savings: $0.09 / cluster / hour</p>
+</blockquote>
+<p><strong>Future Work</strong></p>
+<ul>
+<li>Addressing the Estimator’s shortcomings (to expand the portion of customers that they’re not able to serve now). Exploring things like:
+<ul>
+<li>additional data about hardware spec to the model (eg. cloud provider, generation of instance etc.)</li>
+<li>modeling memory with CPU</li>
+<li>adding more granular data about query patterns</li>
+</ul>
+</li>
+<li>Running live experiments on real hardware to validate accuracy results</li>
+<li>Goal: Integrate w/ current reactive scaler. Not released yet.</li>
+</ul>
+<p>Q/A</p>
+<ul>
+<li>When you talk about modeling memory, what’s the unit there? Is it cache-hit rates? How can you be memory bound in a database?
+<ul>
+<li>We’ve 15 or 20 different memory metrics. Haven’t explored much. It includes cache size, RAM being consumed etc.</li>
+</ul>
+</li>
+<li>Does Mongo prevent queries from running if there’s not enough memory?
+<ul>
+<li>It doesn’t. But the diff. b/w accessing data from disk and RAM is enormous so mongodb cache as much as possible.</li>
+<li>Certain workloads are cache-killers while others are cache-friendly. If the DB is spending all its time waiting for the disk then the CPU will seem idle &amp; you’ll think that it’s not a bad workload whereas it’s an awful workload so we’re trying to model the whole system as one thing for the ML system.</li>
+</ul>
+</li>
+<li>Do you ever run into issues where instances are just not available from the cloud provider?
+<ul>
+<li>Haven’t heard about that happening. We use common instances and there’s always enough supply.</li>
+</ul>
+</li>
+<li>How quickly are you making the decision to scale up or scale down? The workload might keep fluctuating up and down.
+<ul>
+<li>Scaling takes about 15 minutes. The planner tries to find the cheapest instance that’ll satisfy the demand for as long as would be required before it’d have to scale again.</li>
+<li>We make up plans that don’t require us to scale more often than every 15 mins.</li>
+</ul>
+</li>
+<li>Compared to the reactive scaler (which only scales 1 instance at a time), how much does the predictive scaler benefit from prediction vs. from scaling by multiple tiers?
+<ul>
+<li>Didn’t look into this in detail. From looking into the data, it’s rare that we need to scale more than 1 tier at a time. The gains are from scaling at the right time rather than having to do with scaling multiple tiers.</li>
+</ul>
+</li>
+<li>How do you determine confidence in the model?
+<ul>
+<li>We check how well-fitted it is to the near history. We train it on the long history but look at fitted score on recent history.</li>
+</ul>
+</li>
+</ul>
+<h2 id="appendix">Appendix<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#appendix" class="internal alias"> §</a></h2>
+<ul>
+<li>Inspired by Rebecca Taft’s PhD thesis
+<ul>
+<li>Review: <a href="https://emptysqua.re/blog/e-store-and-p-store/" class="external">https://emptysqua.re/blog/e-store-and-p-store/</a></li>
+<li><a href="https://rytaft.github.io/estore.pdf" class="external">https://rytaft.github.io/estore.pdf</a></li>
+<li><a href="https://rytaft.github.io/pstore.pdf" class="external">https://rytaft.github.io/pstore.pdf</a></li>
+</ul>
+</li>
+<li>Also see, <a href="https://dl.acm.org/doi/10.1145/3620678.3624790" class="external alias">Is Machine Learning Necessary for Cloud Resource Usage Forecasting?</a></li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

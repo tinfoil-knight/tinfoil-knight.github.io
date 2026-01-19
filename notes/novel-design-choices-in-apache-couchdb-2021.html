@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html><head><title>Novel Design Choices in Apache CouchDB (2021)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Novel Design Choices in Apache CouchDB (2021)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/novel-design-choices-in-apache-couchdb-2021"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Novel Design Choices in Apache CouchDB (2021)</h1><p class="content-meta ">Aug 08, 2024 | 1450 words</p><ul class="tags "><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/cmudb-seminar" class="internal tag-link">#cmudb-seminar</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=FCs7Dz8hgjQ" class="external" style="color: inherit;">https://www.youtube.com/watch?v=FCs7Dz8hgjQ</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Adam Kocoloski</span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#copy-on-write-storage" data-for="copy-on-write-storage">Copy-on-Write Storage</a></li><li class="depth-0"><a href="#change-feeds" data-for="change-feeds">Change Feeds</a></li><li class="depth-0"><a href="#view-engine" data-for="view-engine">View Engine</a></li><li class="depth-0"><a href="#replication" data-for="replication">Replication</a></li><li class="depth-0"><a href="#clustering" data-for="clustering">Clustering</a></li><li class="depth-0"><a href="#appendix" data-for="appendix">Appendix</a></li></ul></div></div></div></div><article class="popover-hint"><p>Adam is an IBM Fellow working on cloud file systems. Co-founder of Cloudant (based on Apache CouchDB) which was acquired by IBM.</p>
+<p>CouchDB</p>
+<ul>
+<li>Document Store: JSON documents with primary keys</li>
+<li>Built in change feeds</li>
+<li>Event-drive</li>
+<li>Active-active replication</li>
+<li>Async Materialized View Maintenance</li>
+<li>Written in Erlang</li>
+<li>Secondary indexes are maintained async</li>
+</ul>
+<h2 id="copy-on-write-storage">Copy-on-Write Storage<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#copy-on-write-storage" class="internal alias"> §</a></h2>
+<ul>
+<li>Uses a BTree-like data structure internally.</li>
+<li>Append only on disk
+<ul>
+<li>write document, updated leaf node, path up to the root.</li>
+<li>then do an fsync followed by writing the header and another fsync for durable storage.</li>
+</ul>
+</li>
+<li>Snapshot isolation is straight-forward
+<ul>
+<li>Reader grabs the last header that they can observe in that file and use whatever the header points to for all subsequent operations.</li>
+<li>Any concurrent writes will happen after that point in file and won’t be observed by the reader with that header.</li>
+</ul>
+</li>
+<li>Crash recovery is simpler
+<ul>
+<li>Just seek backward to find last committed header. Truncate everything after the last committed header.</li>
+<li>Every prefix of a DB file is itself a valid DB.</li>
+</ul>
+</li>
+<li>Files becomes bloated over time and require regular compaction.
+<ul>
+<li>Get all entries accessible by latest DB header, write to a new file and then drop the old one.</li>
+</ul>
+</li>
+</ul>
+<p>Q/A</p>
+<ul>
+<li>Is there a BTree per table or is it per database?
+<ul>
+<li>CouchDB doesn’t have tables. Just databases w/ documents in them. No native joins b/w databases.</li>
+</ul>
+</li>
+<li>Are secondary indexes just B+ trees updating async?
+<ul>
+<li>Yeah. There are 2 indexes that are maintained atomically on write. Everything else is async.</li>
+<li>The other atomically maintained index is for all documents that ever existed ordered by most recent update.</li>
+</ul>
+</li>
+</ul>
+<h2 id="change-feeds">Change Feeds<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#change-feeds" class="internal alias"> §</a></h2>
+<ul>
+<li>The atomically maintained most recent update index is used for:
+<ul>
+<li>Compaction</li>
+<li>Materialized Views</li>
+<li>Replication</li>
+</ul>
+</li>
+<li>Exposed via a JSON endpoint
+<ul>
+<li>Doesn’t require persistent connectivity. Just need to remember the last sequence number used.</li>
+</ul>
+</li>
+<li>Q/A
+<ul>
+<li>Is this index compacted?
+<ul>
+<li>Yes. But tombstone entries for deletion aren’t removed.</li>
+<li>All other extra metadata is removed. (For eg: if a document is updated/deleted later on, you wouldn’t get the older update if you didn’t request the document before compaction happened)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="view-engine">View Engine<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#view-engine" class="internal alias"> §</a></h2>
+<ul>
+<li>Only way to index documents by user defined attributes in CouchDB 1.x.</li>
+<li>User supplied JS function executes in a sandboxed context.</li>
+<li>Maintenance is async using change feed.
+<ul>
+<li>If you query a view, CouchDB will refresh it automatically.</li>
+</ul>
+</li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="javascript" data-theme="github-dark github-light"><code data-language="javascript" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// Eg: map function</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">function</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;">doc</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">) {</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">	if</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (doc.type </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">==</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;"> &quot;post&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">){</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">		emit</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">([doc._id, doc.created_at])</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">	} </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">else</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> if</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (doc.type </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">==</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;"> &quot;comment&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">){</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">		emit</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">([doc.parent_id, doc.created_at])</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">	}</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// DB</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">{</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	_id</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;p1&quot;</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	type</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;post&quot;</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	created_at</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;2009/01/30 08:04:11&quot;</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	content</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;Hello World ...&quot;</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">{</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	_id</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;c1&quot;</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	parent_id</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;p1&quot;</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	type</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;comment&quot;</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	created_at</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;2009/01/30 12:30:15&quot;</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	content</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;Amazing blog&quot;</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">{</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	_id</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;c2&quot;</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	parent_id</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;p1&quot;</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	type</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;comment&quot;</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	created_at</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;2009/01/30 12:50:00&quot;</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">	content</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">: </span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;Insightful post&quot;</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span></code></pre></figure>
+<ul>
+<li>How it works?
+<ul>
+<li>Create a special class of document called a design document which has one or more JS functions insides that creates views.</li>
+<li>JS functions get executed against all documents in the DB. The functions can choose to emit 0 or 1 key-value pair for each document that they process.</li>
+</ul>
+</li>
+<li>Can be used to create indexes, mimic joins, perform aggregations etc.</li>
+<li>View is stored using a BTree.
+<ul>
+<li>Aggregations are stored in the inner nodes of the tree.</li>
+<li>In the main indexes of the DB, only basic statistics is stored. Not user controlled.</li>
+<li>In the view engine, user can specify custom statistics that need to be maintained. Some functions like sum, count, min, max, approx distinct count are built-in. JS functions can be used to define custom stats. (reduce function)</li>
+</ul>
+</li>
+<li>Views are maintained incrementally.</li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="javascript" data-theme="github-dark github-light"><code data-language="javascript" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// Eg:</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// map function</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">emit</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">([dt.year, dt.month, dt.date], doc.total_sale)</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// reduce function</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">reduce</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">:_sum</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// query</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">_view</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">/</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">by_date</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">?</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">startkey</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">[</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">2010</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&amp;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">endkey</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">[</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">2010</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">2</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">]</span></span></code></pre></figure>
+<p>Q/A</p>
+<ul>
+<li>Does the BTree-like data structure have variable node sizes?
+<ul>
+<li>Yeah. The chunking function on the nodes won’t have the same no. of children everytime.</li>
+<li>If the aggregation gets too large,  you end up with a tall BTree as a result.</li>
+</ul>
+</li>
+</ul>
+<h2 id="replication">Replication<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#replication" class="internal alias"> §</a></h2>
+<ul>
+<li>You can setup active-passive replication using change feeds.</li>
+<li>But CouchDB also supports active-active replication.</li>
+<li>People take a replication of a database and then take the second instance into a disconnected environment. Eg. airline infotainment systems
+<ul>
+<li>The disconnected system might also take updates in its disconnected state.</li>
+</ul>
+</li>
+<li>Servers can disconnect for long periods of time. Writes can land in multiple locations. No edit should get lost.</li>
+</ul>
+<h3 id="revision-tracking-hash-history-forests">Revision Tracking: Hash History Forests<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#revision-tracking-hash-history-forests" class="internal alias"> §</a></h3>
+<ul>
+<li>Each document maintains its own revision history.</li>
+<li>Revision ids are deterministically generated from contents of the document (including previous revision id)</li>
+<li>No notion of actor like you’d get in a <a href="https://en.wikipedia.org/wiki/Vector_clock" class="external alias">vector clock</a> or a <a href="https://dl.acm.org/doi/10.1145/2332432.2332497" class="external alias">dotted version vector</a></li>
+<li>No actual merge operation. Only one branch of history is kept alive. Update is submitted to one edit branch and other branches are marked as deleted.</li>
+<li>Only the last N entries are kept but no branch is ever discarded.
+<ul>
+<li>N = 1000 by default</li>
+<li>Since servers can disconnect for long periods of time, you can get a spurious conflict and when you do replication, there’s no way to link together larger edit histories and the disconnected document will appear to be a sibling of the original one. ???</li>
+<li>Q/A: Is the cleanup of history done on a dedicated background thread or is it cooperative?
+<ul>
+<li>Cleanup of the bodies of documents is a background thread (happens during compaction).</li>
+<li>Cleanup of metadata (revision history information) happens on connect.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>All “leaf” revision contents are preserved for user-driven resolution.
+<ul>
+<li>Final entry of each edit branch is always preserved.</li>
+</ul>
+</li>
+</ul>
+<h2 id="clustering">Clustering<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#clustering" class="internal alias"> §</a></h2>
+<ul>
+<li>Was initially implemented in 2.x</li>
+<li>Databases are split into shards.</li>
+<li>Shards are replicated across nodes.</li>
+<li>Documents are mapped to shards using consistent hashing on document id.</li>
+<li>Each replica independently chooses whether to commit and update.
+<ul>
+<li>How?</li>
+</ul>
+</li>
+<li>Secondary indexes built local to each shard. Coordinator needs to check in with every shard to gather the final result.
+<ul>
+<li>Since there’s no quorum on secondary indexes, a replica with stale data might respond.</li>
+</ul>
+</li>
+<li>Q/A: What’s the worst behavior you’ve observed?
+<ul>
+<li>We keep patching the systems to avoid incorrect behaviors. Replicas that have been down for a period of time knows that its not up to date and opts out of responding to requests.</li>
+</ul>
+</li>
+<li>Issues w/ this old Clustering Design (from 2.0 - 3.1.1)
+<ul>
+<li>Query scaling
+<ul>
+<li>Low throughput for global query processing even with a lot of computing resources</li>
+</ul>
+</li>
+<li>Lagging / non-monotonic index reads (for secondary indexes)</li>
+<li>Replayed change feeds
+<ul>
+<li>The sequence index is not necessarily identical amongst all the replicas of an individual shard. Updates can get applied out of order.</li>
+<li>Updates won’t be missed but users can see an update more than once.</li>
+</ul>
+</li>
+<li>Unavoidable edit conflicts
+<ul>
+<li>For concurrent writers modifying the same piece of data</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Attempts at fixing
+<ul>
+<li>Tried to work on a Raft-style consensus mechanism among individual replicas of individual shards.</li>
+<li>Wanted to preserve existing API, have a reliable solution, support scaling up and down.</li>
+<li>Explored integration with FoundationDB.</li>
+</ul>
+</li>
+<li>With FoundationDB : Consistency at Scale
+<ul>
+<li>FDB provides strict serializability in the underlying K-V store.</li>
+<li>Edit conflicts for apps targeting a single CouchDB instance were eliminated (considering a single cloud region).</li>
+<li>Helped refocus CouchDB’s active-active replication on cross-region, hybrid and multi-cloud use cases.</li>
+<li>Distributed txns. in FDB enable secondary indexes (for views, search, query) to scale alongside primary data without sacrificing consistency.</li>
+<li>Change feed is provides a totally ordered, sortable list of edited documents. Rewinds (update can re-appear in the feed) are eliminated.
+<ul>
+<li>FDB allows adding the version stamp into your key at commit time which allows having an ordered list of updates.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>FDB integration was later abandoned due to sponsorship issues from IBM. See <a href="https://lists.apache.org/thread/9gby4nr209qc4dzf2hh6xqb0cn1439b" class="external">https://lists.apache.org/thread/9gby4nr209qc4dzf2hh6xqb0cn1439b</a>.</p>
+</blockquote>
+<p>Q/A</p>
+<ul>
+<li>In terms of market, why do you think MongoDB and CouchDB succeeded while other NoSQL DBs like Rethink failed? Why do you think Mongo has the larger “mindshare”?
+<ul>
+<li>We tried offering DB-as-a-service very early on and didn’t focus on any other distribution mechanism which helped since people wanted to offload DB admin work.</li>
+<li>Mongo had a really large DX team (much larger than core DB) and had a lot of client libraries for every new framework. CouchDB neglected this since they though that HTTP and JSON was enough.</li>
+</ul>
+</li>
+<li>If you had to write CouchDB from start again, would you go with Erlang?
+<ul>
+<li>Erlang’s process isolation and runtime debugging abilities were helpful as a startup shipping untested DB versions every week.</li>
+<li>Hiring was an issue. The community is doing interesting things now (like Elixir) and there are other production users (like WhatsApp).</li>
+<li>I would probably use it again but write more lower level stuff in Rust.</li>
+</ul>
+</li>
+<li>What’s the  biggest engineering challenge you’re facing at CouchDB now?
+<ul>
+<li>Too lax about limits on things like max txn. duration, size of individual fields etc.</li>
+<li>Now, there are users who exceed these limits but their data is already in production so hardening those limits is difficult.</li>
+</ul>
+</li>
+</ul>
+<h2 id="appendix">Appendix<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#appendix" class="internal alias"> §</a></h2>
+<ul>
+<li><a href="https://docs.couchdb.org/en/stable/ddocs/views/intro.html" class="external alias">Introduction to Views — Apache CouchDB</a></li>
+<li>Source: <a href="https://github.com/apache/couchdb" class="external">https://github.com/apache/couchdb</a></li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

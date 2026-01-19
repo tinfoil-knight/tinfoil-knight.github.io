@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html><head><title>CockroachDB's Query Optimizer (2020)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="CockroachDB's Query Optimizer (2020)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/cockroachdb's-query-optimizer-2020"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">CockroachDB's Query Optimizer (2020)</h1><p class="content-meta ">Jul 27, 2024 | 1914 words</p><ul class="tags "><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/cmudb-seminar" class="internal tag-link">#cmudb-seminar</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=wHo-VtzTHx0" class="external" style="color: inherit;">https://www.youtube.com/watch?v=wHo-VtzTHx0</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Rebecca Taft</span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#query-optimization-in-cockroachdb" data-for="query-optimization-in-cockroachdb">Query Optimization in CockroachDB</a></li><li class="depth-0"><a href="#generating-alternative-plans" data-for="generating-alternative-plans">Generating alternative plans</a></li><li class="depth-0"><a href="#choosing-a-plan" data-for="choosing-a-plan">Choosing a Plan</a></li><li class="depth-0"><a href="#locality-aware-sql-optimization" data-for="locality-aware-sql-optimization">Locality-Aware SQL Optimization</a></li><li class="depth-0"><a href="#theory-vs-practice" data-for="theory-vs-practice">Theory vs. Practice</a></li><li class="depth-0"><a href="#qa" data-for="qa">Q/A</a></li><li class="depth-0"><a href="#appendix" data-for="appendix">Appendix</a></li></ul></div></div></div></div><article class="popover-hint"><p>CockroachDB: Postgres-compatible Geo-Distributed SQL database</p>
+<p>Architecture</p>
+<ul>
+<li>Shared-nothing</li>
+<li>Consists of distributed SQL layer on top of a distributed KV layer</li>
+</ul>
+<p>This talk focuses on the SQL layer.</p>
+<h2 id="query-optimization-in-cockroachdb">Query Optimization in CockroachDB<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#query-optimization-in-cockroachdb" class="internal alias"> §</a></h2>
+<ul>
+<li>Why not use Postgres (or some other OSS) optimizer?
+<ul>
+<li>CockroachDB codebase is written in Go. pg’s optimizer is in C. Didn’t want the overhead of calling C from Go.</li>
+<li>Execution plans are very different in CockroachDB. A plan that performs very well on a single node may perform poorly when distributed across nodes at a large distance.</li>
+<li>Optimizer is key to DB performance and using other optimizer won’t let them maintain control.</li>
+</ul>
+</li>
+<li>CDB’s First Optimizer
+<ul>
+<li>Not really an optimizer. Used heuristics (rules) to choose execution plan.
+<ul>
+<li>Eg: “if an index is available, always use it”</li>
+</ul>
+</li>
+<li>Overtime rules started looking like this:
+<ul>
+<li>“always use the index, except when the table is very small or we expect to scan >75% of the rows, or the index is located on a remote machine”</li>
+</ul>
+</li>
+<li>This became difficult to manage.</li>
+<li>This kind of optimizer works for OLTP but customers were using CDB for OLAP queries too.</li>
+</ul>
+</li>
+<li>Cost-based optimizer
+<ul>
+<li>Instead of applying rigid rules, considers multiple alternatives</li>
+<li>Assign a cost to each alternative and choose lowest cost option</li>
+<li>Cascade-style optimization w/ unified search</li>
+<li>How to generate alternatives?
+<ul>
+<li>Start w/ default plan from SQL query</li>
+<li>Perform a series of transformations (what ?)</li>
+<li>Store alternatives in a compact data structure called <strong>memo</strong>
+<ul>
+<li><a href="https://www.querifylabs.com/blog/memoization-in-cost-based-optimizers" class="external">https://www.querifylabs.com/blog/memoization-in-cost-based-optimizers</a></li>
+<li><a href="https://sqlserverperformace.blogspot.com/2020/03/inside-sql-server-query-optimizer-part.html" class="external">https://sqlserverperformace.blogspot.com/2020/03/inside-sql-server-query-optimizer-part.html</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Q/A</p>
+<ul>
+<li>Do you do anything like what Postgres does where they’ve the initial cost that is a cheap approximation and then there’s a final cost if you decide to complete the rest of it OR is it a single cost model that produces a single value?
+<ul>
+<li>Just a single value right now.</li>
+</ul>
+</li>
+<li>Can you do cost model estimations on logical nodes or does it always has to be a physical node?
+<ul>
+<li>We’ve merged the idea of logical and physical nodes. For eg: we don’t have the concept of a logical join. A logical join is just a hash join for us.</li>
+</ul>
+</li>
+</ul>
+<h2 id="generating-alternative-plans">Generating alternative plans<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#generating-alternative-plans" class="internal alias"> §</a></h2>
+<ul>
+<li>Phase of plan generation
+<ul>
+<li><em>Parse -> Optbuild -> Normalize -> Explore -> DistSQL planning</em></li>
+</ul>
+</li>
+<li>Sample Query</li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="sql" data-theme="github-dark github-light"><code data-language="sql" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">CREATE</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> TABLE</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> ab</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (a </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">INT</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> PRIMARY KEY</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, b </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">INT</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">INDEX</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(b));</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">CREATE</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> TABLE</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> cd</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (c </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">INT</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> PRIMARY KEY</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, d </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">INT</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">);</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">SELECT</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> *</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> FROM</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> ab </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">JOIN</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> cd </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">ON</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> b</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">c </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">WHERE</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> b</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">></span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">;</span></span></code></pre></figure>
+<h3 id="parsing">Parsing<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#parsing" class="internal alias"> §</a></h3>
+<ul>
+<li>Parse the SQL query. Uses a yak file similar to pg.<br/>
+<img src="../attachments/pasted-image-20240727182314.png" width="auto" height="auto"/></li>
+</ul>
+<h3 id="optbuild">Optbuild<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#optbuild" class="internal alias"> §</a></h3>
+<ul>
+<li>Takes AST from parser &amp; produces the preliminary query plan.</li>
+</ul>
+<pre><code>ConstructSelect(
+    ConstructInnerJoin(
+        ConstructScan(),
+        ConstructScan(),
+        ConstructFiltersItem(
+            ConstructEq(
+                ConstructVariable(),
+                ConstructVariable(),
+            ),
+        ),
+    ),
+    ConstructFiltersItem(
+        ConstructGt(
+            ConstructVariable(),
+            ConstructConst(),
+        ),
+    ),
+)
+</code></pre>
+<ul>
+<li>Also does semantic analysis. For eg:
+<ul>
+<li>Do tables in the query actually exists and does the current user have the permission to read them?</li>
+<li>Do columns exist in those specific table and are they unique?</li>
+<li>What columns are selected by <code>*</code>?</li>
+<li>Do types match for equality comparison?</li>
+</ul>
+</li>
+<li>Q/A:
+<ul>
+<li>At what point do you try to bind a prepared statement value to a type?
+<ul>
+<li>Happens during the optbuild phase.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="normalization">Normalization<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#normalization" class="internal alias"> §</a></h3>
+<ul>
+<li>Happens in parallel w/ the optbuild phase. The nested function calls are factory methods generated from a no. of defined normalization rules.</li>
+<li>Each of the factory functions have a bunch of normalization rules that’ll execute and modify the output and create the full normalization plan.<br/>
+<img src="../attachments/pasted-image-20240727183013.png" width="auto" height="auto"/></li>
+<li>In the image, we’ve used the fact that <code>b=c</code> to infer that if <code>b>1</code> then <code>c>1</code> and pushed the filter down below the join.</li>
+<li>Normalization rules
+<ul>
+<li>Create a logically equivalent relation expression.</li>
+<li>Normalization (or “rewrite”) rules are almost always good to apply.</li>
+<li>Eg:
+<ul>
+<li>Eliminate unnecessary operation: <code>NOT (NOT) x -> x</code></li>
+<li>Canonicalize expressions: <code>5 = x -> x = 5</code></li>
+<li>Constant folding: <code>length('abc') -> 3</code></li>
+<li>Predicate push-down</li>
+<li>De-correlation of subqueries</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="dsl--optgen">DSL : Optgen<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#dsl--optgen" class="internal alias"> §</a></h4>
+<ul>
+<li>DSL for representing normalization and exploration rules.</li>
+<li>Gets compiled to factory function in Go which are called in Optbuild.</li>
+<li>Examples</li>
+</ul>
+<ol>
+<li></li>
+</ol>
+<pre><code># EliminateNot discards a doubled Not operator // Comment explaining the rule
+
+[EliminateNot, Normalize] // Header with rulename, tag
+(Not (Not $input:*)) // Match rule
+=>
+$input // Replace expression
+</code></pre>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="go" data-theme="github-dark github-light"><code data-language="go" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// ConstructNot constructs an expression for the Not operator.</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">func</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (_f </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">*</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">Factory) </span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">ConstructNot</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(input opt.ScalarExpr) opt.ScalarExpr {</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">	// [EliminateNot]</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">	{</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">		_not, _ </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">:=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> input.(</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">*</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">memo.NotExpr)</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">		if</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _not </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">!=</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> nil</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> {</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">			input </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">:=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _not.Input</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">			if</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _f.matchedRule </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">==</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> nil</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> ||</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _f.</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">matchedRule</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(opt.EliminateNot) {</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">				_expr </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">:=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> input</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">				return</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _expr</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">			}</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">		}</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">	}</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">	// ... other rules ...</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">	e </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">:=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _f.mem.</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">MemoizeNot</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(input)</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">	return</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _f.</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">onConstructScalar</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(e)</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span></code></pre></figure>
+<ol start="2">
+<li></li>
+</ol>
+<pre><code># MergeSelects combines two nested Select operators into a single Select that
+# ANDs the filter conditions of the two Selects.
+
+[MergeSelects, Normalize]
+(Select (Select $input:* $innerFilters:*) $filters:*)
+=>
+(Select $input (ConcatFilters $innerFilters $filters))
+</code></pre>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="go" data-theme="github-dark github-light"><code data-language="go" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// [MergeSelects]</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">{</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">	_select, _ </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">:=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> input.(</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">*</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">memo.SelectExpr)</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">	if</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _select </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">!=</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> nil</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> {</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">		input </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">:=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _select.Input</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">		innerFilters </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">:=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _select.Filters</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">		if</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _f.matchedRule </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">==</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> nil</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> ||</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _f.</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">matchedRule</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(opt.MergeSelects) {</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">			_expr </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">:=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _f.</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">ConstructSelect</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">				input,</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">				// DSL allows calling arbitrary Go functions (like ConcatFilters)</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">				// defined by them</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">				_f.funcs.</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">ConcatFilters</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(innerFilters, filters),</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">			)</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">			return</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> _expr</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">		}</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">	}</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span></code></pre></figure>
+<p>Q/A</p>
+<ul>
+<li>How Go specific is the DSL?
+<ul>
+<li>We don’t use any Go specific PL features. Can be rewritten for other languages.</li>
+</ul>
+</li>
+</ul>
+<h3 id="exploration">Exploration<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#exploration" class="internal alias"> §</a></h3>
+<ul>
+<li>Exploration rules may or may not produce a better plan so both alternatives are kept around unlike normalization where replacement is done.</li>
+<li>Same syntax as Normalize rules in the DSL with a different tag (Explore)</li>
+<li>Eg:
+<ul>
+<li>Join reordering: A join (B join C) -> (A join B) join C</li>
+<li>Join algorithm (eg. hash join, merge join, lookup join)</li>
+<li>Index selection</li>
+</ul>
+</li>
+</ul>
+<p>Memo after normalization</p>
+<ul>
+<li>Memo stores query plan trees. It consists of a series of groups.</li>
+<li>They also store scalar expressions in the Memo groups but only relational expressions are shown in the image below.</li>
+<li>Groups can refer to other groups. Eg. Group 1 does an inner join b/w Group 2 and 3.</li>
+</ul>
+<p><img src="../attachments/pasted-image-20240728181144.png" width="auto" height="auto"/></p>
+<p>For exploration, you iterate through the groups and see if any exploration rules match.</p>
+<p>GenerateIndexScans created an alternate scan in which we’re scanning the secondary index as opposed to the primary index.<br/>
+<img src="../attachments/pasted-image-20240728181353.png" width="auto" height="auto"/></p>
+<p><img src="../attachments/pasted-image-20240728181717.png" width="auto" height="auto"/></p>
+<p>Example from <a href="https://www.querifylabs.com/blog/memoization-in-cost-based-optimizers" class="external">https://www.querifylabs.com/blog/memoization-in-cost-based-optimizers</a><br/>
+<img src="../attachments/pasted-image-20240728182123.png" width="auto" height="auto"/></p>
+<p>The best plan gets passed to the next phase after cost determination.</p>
+<h3 id="distsql-planning">DistSQL Planning<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#distsql-planning" class="internal alias"> §</a></h3>
+<p>Takes the plan from the optimizer and extends them to whatever the cluster topology is.</p>
+<p><img src="../attachments/pasted-image-20240728182851.png" width="auto" height="auto"/></p>
+<blockquote>
+<p>Currently doesn’t take advantage of how the tables are laid out on the disk, optimizations that may involve broadcasting some data from a smaller table to another for joins etc. but planned in near future.</p>
+</blockquote>
+<h2 id="choosing-a-plan">Choosing a Plan<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#choosing-a-plan" class="internal alias"> §</a></h2>
+<ul>
+<li>Factors that affect cost:
+<ul>
+<li>Hardware configuration</li>
+<li>Data distribution</li>
+<li>Type of operators
+<ul>
+<li>Performed benchmarking to understand the relative cost of different operators under the assumption that they won’t change much w/ different queries.</li>
+<li>This relative cost is hard-coded in the cost model.</li>
+</ul>
+</li>
+<li>No. of rows processed by each operator</li>
+</ul>
+</li>
+</ul>
+<p><strong>No. of rows processed by each operator</strong></p>
+<ul>
+<li>Collect statistics: Row count, Distinct count, Null count, Histogram</li>
+<li>Multi-column stats are also collected in addition to single column stats
+<ul>
+<li>Use indexes to determine what columns to collect multi-column stats on
+<ul>
+<li>Eg: for index on (a, b, c), collect multi-column stats on (a,b) and (a,b,c)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Stats Collection (<code>CREATE STATISTICS</code>): Full Table Scan -> Perform Sampling (size: 10K rows) ; Insert each row into HyperLogLog sketch to calculate distinct count for each column -> Aggregate Samples</li>
+<li><code>CREATE STATISTICS</code> is automatically run when:
+<ul>
+<li>A table is created</li>
+<li>A new column or index is added</li>
+<li>~20% of data in table has changed</li>
+</ul>
+</li>
+<li>How to determine when 20% of data has changed?
+<ul>
+<li>After a mutation on some node, statistic collection will be triggered based on chance</li>
+<li><code>P(refresh) = no. of rows updated / (no. of rows in table * 0.20)</code></li>
+</ul>
+</li>
+<li>Always refresh if no stats yet OR a it’s been a while since last refresh</li>
+<li>Each create stats run takes minutes. Full table scan can impact performance. Many table scans at once can bring down the cluster.</li>
+<li>To minimize performance impact
+<ul>
+<li>Run <code>CREATE STATISTICS</code> as a job
+<ul>
+<li>Guarantees only 1 stats job running at a time</li>
+<li>Resilient to node failures</li>
+</ul>
+</li>
+<li>Use throttling to limit CPU utilization by stats job</li>
+</ul>
+</li>
+</ul>
+<h2 id="locality-aware-sql-optimization">Locality-Aware SQL Optimization<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#locality-aware-sql-optimization" class="internal alias"> §</a></h2>
+<ul>
+<li>Customers can optionally duplicate read-mostly data in each locality
+<ul>
+<li>Use replication constraints to pin the copies to different geographic regions (eg. US-East, US-West, EU)
+<ul>
+<li>i.e. duplicate index keys in the table similar to the primary key</li>
+</ul>
+</li>
+<li>Optimizer includes locality in cost model &amp; automatically selects index from same locality: <code>primary</code>, <code>idx_eu</code> or <code>idx_usw</code></li>
+</ul>
+</li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="sql" data-theme="github-dark github-light"><code data-language="sql" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">CREATE</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> TABLE</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> postal_code</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">	id </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">INT</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> PRIMARY KEY</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">,</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">	code STRING,</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">	INDEX</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> idx_eu (id) STORING (code),</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">	INDEX</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> idx_usw (id) STORING (code),</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">)</span></span></code></pre></figure>
+<ul>
+<li>Plan queries to use data from the same locality</li>
+<li>What’s next? (see attached slides for more info on this)
+<ul>
+<li>Replace duplicated indexes w/ “global tables”
+<ul>
+<li><a href="https://www.cockroachlabs.com/blog/global-tables-in-cockroachdb/" class="external">https://www.cockroachlabs.com/blog/global-tables-in-cockroachdb/</a></li>
+</ul>
+</li>
+<li>Support geo-partitioned unique indexes</li>
+<li>Move DistSQL planning into optimizer</li>
+<li>Incorporate latency into cost model</li>
+</ul>
+</li>
+</ul>
+<h2 id="theory-vs-practice">Theory vs. Practice<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#theory-vs-practice" class="internal alias"> §</a></h2>
+<p><strong>Optimizing for OLTP</strong></p>
+<ul>
+<li>When they went from the simple heuristic planner to the cost based optimizer, they had to focus a lot of minimizing overhead for simple OLTP queries (eg. primary key lookup) because even though the heuristic planner had problems, it was really fast
+<ul>
+<li>Took advantage of logical properties essential for optimization
+<ul>
+<li>Cardinality (different from stats)</li>
+<li>Functional dependencies</li>
+<li>Non-null columns etc.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Normalization rules are really important. As of this talk they’ve 242 normalization rules &amp; 29 exploration rules</li>
+<li>Foreign key checks &amp; cascades optimized as “post queries”
+<ul>
+<li>Foreign key checks (eg: value inserted in a child table that references some other parent table and needs to check whether the value exists in parent table or not) use joins which can be optimized.</li>
+<li>Done after the statement is executed (but hasn’t returned value yet).</li>
+</ul>
+</li>
+</ul>
+<p><strong>Join Ordering</strong></p>
+<ul>
+<li>v1 was shipped w/o join ordering.</li>
+<li>Initially implemented w/ 2 rules: CommuteJoin, AssociateJoin
+<ul>
+<li>Was really inefficient.</li>
+<li>Reordered at most 4 tables by default.</li>
+</ul>
+</li>
+<li>An intern implemented DP<sub>SUBE</sub> from “Guido Moerkotte, Pit Fender, and Marius Eich. 2013. On the correct and complete enumeration of the core search space.” and made it more efficient.
+<ul>
+<li>Now it orders up to 8 tables by default.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Query Cache</strong></p>
+<ul>
+<li>LRU cache keyed on SQL string</li>
+<li>Stores optimized memo</li>
+<li>For prepared statements w. placeholders
+<ul>
+<li>Normalized memo is stored</li>
+<li>Placeholders are replaced during execution followed by additional normalization and exploration</li>
+</ul>
+</li>
+</ul>
+<p>Other features</p>
+<ul>
+<li>Optimizer Hints
+<ul>
+<li>CockroachDB allows forcing specific index and join types as hints</li>
+</ul>
+</li>
+<li>Debugging tools <code>EXPLAIN ANALYZE (DEBUG) ...</code>
+<ul>
+<li>Generates a bundles with stats, schema, environment variables,  the query plan at various verbosities</li>
+</ul>
+</li>
+</ul>
+<h2 id="qa">Q/A<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#qa" class="internal alias"> §</a></h2>
+<ul>
+<li>How do you test the optimizer? How do you test if the cost model is working correctly?
+<ul>
+<li>We don’t prove that the chosen plan is the best plan. We mostly focus on testing the correctness of the plan.</li>
+<li>We run benchmarking regularly so that existing queries don’t regress.</li>
+</ul>
+</li>
+<li>Are input parameters enough to debug everything you need?
+<ul>
+<li>It’s enough for now. Once we start adding more to the cost model to make it more aware of the cluster topology and data distribution then we’d need more info.</li>
+</ul>
+</li>
+<li>Do you run any kind of SQL fuzzer?
+<ul>
+<li>Yes. SQLSmith. Mostly for checking if there’s any internal error.</li>
+<li>Manuel Rigger was testing logical correctness using SQLLancer and opened a bunch of issues.
+<ul>
+<li><a href="https://www.manuelrigger.at/dbms-bugs/" class="external">https://www.manuelrigger.at/dbms-bugs/</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>In general, what’s the complexity of queries you’re seeing? Cockroach isn’t like Snowflake so complex queries might be limited since they’re pushed to those systems. Are things limited to TPC-H, TPC-DS?
+<ul>
+<li>Complex queries are uncommon.</li>
+</ul>
+</li>
+<li>Is there any restriction on rewrite rules on the kind of complexity they’re allowed to handle? You mentioned that they can call arbitrary (programmed by them) Go functions.
+<ul>
+<li>We don’t allow User-Defined functions. All functions are reviewed by some team member.</li>
+</ul>
+</li>
+</ul>
+<h2 id="appendix">Appendix<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#appendix" class="internal alias"> §</a></h2>
+<ul>
+<li>Slides: <a href="https://courses.cs.washington.edu/courses/csep590d/22sp/lectures/UW%20Talk%202022%20CockroachDB's%20Optimizer.pdf" class="external alias">https://courses.cs.washington.edu/courses/csep590d/22sp/lectures/UW%20Talk%202022%20CockroachDB’s%20Optimizer.pdf</a> (from another event)</li>
+<li><a href="https://github.com/cockroachdb/cockroach" class="external">https://github.com/cockroachdb/cockroach</a></li>
+<li><a href="https://dl.acm.org/doi/pdf/10.1145/3318464.3386134" class="external alias">SIGMOD’20 - CockroachDB: The Resilient Geo-Distributed SQL Database</a></li>
+<li><a href="https://www.cockroachlabs.com/blog/building-cost-based-sql-optimizer/" class="external alias">How we built a cost-based SQL optimizer</a></li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

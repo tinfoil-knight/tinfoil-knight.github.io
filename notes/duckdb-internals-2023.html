@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html><head><title>DuckDB Internals (2023)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="DuckDB Internals (2023)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/duckdb-internals-2023"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">DuckDB Internals (2023)</h1><p class="content-meta ">Mar 01, 2024 | 1864 words</p><ul class="tags "><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/cmudb-seminar" class="internal tag-link">#cmudb-seminar</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=bZOvAKGkzpQ" class="external" style="color: inherit;">https://www.youtube.com/watch?v=bZOvAKGkzpQ</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Mark Raasveldt &lt;mytherin></span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#system-overview" data-for="system-overview">System Overview</a></li><li class="depth-0"><a href="#vectors" data-for="vectors">Vectors</a></li><li class="depth-0"><a href="#query-execution" data-for="query-execution">Query Execution</a></li><li class="depth-0"><a href="#table-storage" data-for="table-storage">Table Storage</a></li><li class="depth-0"><a href="#lightning-round--misc-topics" data-for="lightning-round--misc-topics">Lightning Round : Misc Topics</a></li><li class="depth-0"><a href="#qa" data-for="qa">Q/A</a></li><li class="depth-0"><a href="#appendix" data-for="appendix">Appendix</a></li></ul></div></div></div></div><article class="popover-hint"><blockquote>
+<p><strong>Remarks</strong><br/>
+The Unified Vector Format was really neat. It’s nice to see the adaptive string format from Umbra being used by DuckDB too.</p>
+</blockquote>
+<ul>
+<li>In-process OLAP DBMS (SQLite for Analytics)</li>
+<li>Supports querying directly over many formats (like Parquet, CSV, JSON, Arrow, Pandas, SQLite, Postgres)</li>
+<li>Mark is the Co-Founder &amp; CTO along w/ being a major contributor at DuckDB. PhD from CWI.</li>
+</ul>
+<h2 id="system-overview">System Overview<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#system-overview" class="internal alias"> §</a></h2>
+<p><img src="../attachments/pasted-image-20240301183506.png" width="auto" height="auto"/></p>
+<ul>
+<li>Written in C++, Uses the pg parser</li>
+<li>Vectorized push-based model (vector at a time for an operator instead of the usual row at a time model)</li>
+</ul>
+<h2 id="vectors">Vectors<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vectors" class="internal alias"> §</a></h2>
+<ul>
+<li>DuckDB has a custom vector format similar to <a href="https://arrow.apache.org/docs/format/Columnar.html" class="external alias">Arrow</a>
+<ul>
+<li>Focused more on execution. The Arrow format is optimized for other use-cases like streaming over a socket, serialization, on-disk storage etc.</li>
+<li>Co-designed w/ Velox (both DuckDB &amp; Velox have the same vector format)</li>
+</ul>
+</li>
+<li>For scalar types, vectors are logically arrays.</li>
+<li>Their VectorType physically stores compressed data which can be pushed into the engine &amp; operated on directly without decompressing.</li>
+<li>Some examples: <img src="../attachments/pasted-image-20240301185258.png" width="auto" height="auto"/></li>
+<li>Operations involving different kind of vectors together would need to be handled case by case which would require a lot of code. DuckDB doesn’t use specialized execution for these cases &amp; uses generic operators.
+<ul>
+<li>Flatten: Convert vector into Flat vector (i.e. decompress)
+<ul>
+<li>Downside: need to move/copy data around</li>
+<li>? Do they actually use this</li>
+</ul>
+</li>
+<li>ToUnified - Convert vector to unified format
+<ul>
+<li>Unified Format for Applicable Types<img src="../attachments/pasted-image-20240301190154.png" width="auto" height="auto"/></li>
+<li>Doesn’t require copying/moving data</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Q/A
+<ul>
+<li>You get a dictionary vector when reading a DuckDB file but does the same happen when reading Parquet files with their dictionary format?
+<ul>
+<li>We emit our dictionary vectors for Parquet too. Some values like NULL parameters in query are also converted to Constant vector if applicable.</li>
+</ul>
+</li>
+<li>Do you have any idea of how much performance gain on removing the indirection layer when comparing a dictionary w/ 1 element &amp; a constant vector?
+<ul>
+<li>We don’t specialize a lot on dictionary vectors compared to constant vectors since the benefit isn’t always obvious for generic dictionaries compared to a constant vector.</li>
+</ul>
+</li>
+<li>Do you read data before you choose which representation to store your vectors in?
+<ul>
+<li>Our storage is compatible with vectors but it isn’t exactly that. We do things like bitpacking before storing data. Some of our storage formats are compatible w/ vectors but not all of them translate to different vector types.</li>
+</ul>
+</li>
+<li>(Clarification) Say a user inserts values like 1, 2, 0 which would be apt for the dictionary format. How would you determine whether to use Flat or Dictionary Vector?
+<ul>
+<li>There’s a compression phase when we write to disk. When reading back from the storage format, we can say that our storage format is dictionary encoded so a Dictionary vector might be the optimal representation for this.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Strings
+<ul>
+<li>Same format as <a href="https://www.cidrdb.org/cidr2020/papers/p29-neumann-cidr20.pdf" class="external alias">Umbra</a> is used.</li>
+<li>Size: 16 bytes (B)</li>
+<li>Short Strings  (&lt;= 12 bytes)
+<ul>
+<li><code>length(4B) | string data (4B+8B)</code></li>
+<li>Inlined (instead of storing a ptr to the string)</li>
+</ul>
+</li>
+<li>Long String
+<ul>
+<li><code>length(4B) | prefix (4B) | offset or ptr(8B)</code></li>
+</ul>
+</li>
+<li>Regardless of string length, the first 8 byte contains the size &amp; prefix for the string. This allows faster comparisons.</li>
+</ul>
+</li>
+<li>Nested Types (eg. structs, list)
+<ul>
+<li>Storing as blobs or string is slow</li>
+<li>Stored recursively using vectors (similar to Arrow)
+<ul>
+<li>Fast &amp; highly efficient processing</li>
+<li>Allows reuse of operators for nested types</li>
+</ul>
+</li>
+<li>The types are composable i.e. structs can have lists, lists can have structs &amp; so on.</li>
+<li>Structs store their child vectors &amp; a validity mask.<img src="../attachments/pasted-image-20240301194153.png" width="auto" height="auto"/>
+<ul>
+<li>Lists are stored as combination of offset/lengths &amp; a child vector. The child vector can have a different length.<img src="../attachments/pasted-image-20240301200038.png" width="auto" height="auto"/></li>
+</ul>
+</li>
+<li>Q/A: What happens when data types differ b/w struct fields for different entries?
+<ul>
+<li>We don’t support different datatypes for the same field when using structs. The schema for a struct is fixed. There’s a Map type (key-pair values) which is stored as a list of structs which can be used instead.</li>
+</ul>
+</li>
+<li>Q/A: Can the struct contain itself as a child type?
+<ul>
+<li>No. Not supported.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="query-execution">Query Execution<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#query-execution" class="internal alias"> §</a></h2>
+<ul>
+<li>Pull-Based Model (Vector Volcano) (initial, not used now)
+<ul>
+<li>Every operator implements GetChunk.</li>
+<li>Query starts by calling GetChunk on the root.</li>
+<li>Nodes recursively call GetChunk on the children.</li>
+<li>Geared towards single threaded execution</li>
+</ul>
+</li>
+<li>Parallelism Model
+<ul>
+<li><a href="https://youtu.be/bZOvAKGkzpQ?si=cgTGLEY35DqLwrSC&amp;t=1937" class="external">https://youtu.be/bZOvAKGkzpQ?si=cgTGLEY35DqLwrSC&amp;t=1937</a></li>
+<li>Adding multi-threading to a Volcano-based system
+<ul>
+<li>Exchange Operator
+<ul>
+<li>Individual operators don’t need to be parallelism aware</li>
+<li>The optimizers splits the query plan into multiple partitions which are executed independently
+<ul>
+<li>Eg: HashTable being built over different ranges for a table &amp; then joined by the exchange operator</li>
+</ul>
+</li>
+<li>Note for Self: See <a href="https://15445.courses.cs.cmu.edu/fall2022/slides/13-queryexecution2.pdf" class="external">https://15445.courses.cs.cmu.edu/fall2022/slides/13-queryexecution2.pdf</a> for more details</li>
+<li>Issues
+<ul>
+<li>Plan explosion (lots of plan due to splitting &amp; re-joining, DBMSs often do quadratic or even exponential order operations with plans)</li>
+<li>Load imbalance issues (all partitions may not have the same load &amp; lead to uneven distribution across threads)</li>
+<li>Added materialization cost (communication b/w operators require materializing rows since the operators are parallelism unaware)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Morsel driven parallelism
+<ul>
+<li>Individual operators are parallelism-aware
+<ul>
+<li>Eg: Hash Join knows how to obtain input in parallel. Same for Scan operator.</li>
+</ul>
+</li>
+<li>Parallelism isn’t integrated into the query plan</li>
+<li>Morsel drive parallelism was hard to integrate into a pull-based model where everything is entangled together. So, folks at DuckDB switched to a push-based model.</li>
+<li>Paper: <a href="https://db.in.tum.de/~leis/papers/morsels.pdf" class="external alias">Morsel-Driven Parallelism: A NUMA-Aware Query Evaluation Framework for the Many-Core Age</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Push-based Model
+<ul>
+<li>Separate interfaces for sink, source &amp; operator.</li>
+<li><strong>Source &amp; sink are parallelism aware.</strong></li>
+<li>Source
+<ul>
+<li><code>void GetData(DataChunk &amp;chunk, GlobalSourceState &amp;gstate, LocalSourceState &amp;lstate)</code></li>
+</ul>
+</li>
+<li>Operator
+<ul>
+<li><code>OperatorResulttype Execute(DataChunk &amp;input, DataChunk &amp;chunk, OperatorState &amp;state)</code></li>
+</ul>
+</li>
+<li>Sink
+<ul>
+<li><code>void Sink(GlobalSinkState &amp;gstate, LocalSinkState &amp;lstate, DataChunk &amp;input)</code></li>
+<li><code>void Combine(GlobalSinkState &amp;gstate, LocalSinkState &amp;lstate)</code></li>
+<li><code>void Finalize(GlobalSinkState &amp;gstate)</code></li>
+</ul>
+</li>
+<li><img src="../attachments/pasted-image-20240303031625.png" width="auto" height="auto"/>
+<ul>
+<li>The Hash Join on the right side doesn’t need to be parallelism aware since it’s just going to probe the HashTable built by the HashJoin on left.</li>
+</ul>
+</li>
+<li>In pull-based flow, control flow lives inside the operator which allows for great flexibility (eg. can call child, decide to get more data or not etc.) but that level of flexibility wasn’t needed in DuckDB. Call stack holds all state since everything is built on recursive calls.</li>
+<li>In push-based flow, control flow happens in a central location. State is stored explicitly in a central location. This also enables optimizations like
+<ul>
+<li>Vector Cache: add small caches b/w operators</li>
+<li>Scan Sharing: push results of 1 scan into multiple sinks (can be done in a pull-based system but easier to implement in a push-based one)</li>
+<li>Q/A: What happens if the different sinks consuming from the Scan operate at different rates?
+<ul>
+<li>Currently Sinks are blocking in the sense that they are executed one after the other. If we were doing async IO then we’d need to apply back-pressure somehow.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Execution of a pipeline can be paused since state is stored centrally.
+<ul>
+<li>Eg: If you’re pushing data into a sink &amp; that sink has fixed sized buffer, if the buffer is full, you can interrupt the pipeline.</li>
+<li>Similarly, you need to be able to pause your pipeline if you were doing async IO so that the pipeline waits for the IO to be done.</li>
+<li>Hard to do this in a pull-based model.</li>
+<li>Q/A: Could you have synchronization bottlenecks if you’ve parallel queries? What about the global state? Can that become a bottleneck?
+<ul>
+<li>Depends on the operators you’re using. Could definitely happen if you’ve things that do socket connections etc. Usually the only socket connections we’ve are on our sources because we don’t have a client consuming this over a socket.</li>
+<li>The global state is where the communication b/w threads happen &amp; it can definitely become a bottleneck.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="table-storage">Table Storage<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#table-storage" class="internal alias"> §</a></h2>
+<ul>
+<li>Single-file block-based storage format</li>
+<li>WAL is stored separately</li>
+<li>File Strcuture
+<ul>
+<li><code>Info (4K) | HeaderOne (4K) | HeaderTwo(4K) | Block (BLOCK_SIZE) | ...</code></li>
+<li>Blocks are all the same fixed size: 256KB</li>
+</ul>
+</li>
+<li>Support for ACID using headers. How?? Didn’t get his explanation.</li>
+<li>Tables are partitioned into row groups.
+<ul>
+<li>Each row group has 120K~ rows.</li>
+<li>Row groups are the parallelism &amp; checkpoint unit.</li>
+</ul>
+</li>
+<li>Compression works very well w/ columnar storage.
+<ul>
+<li>General purpose, heavyweight compression
+<ul>
+<li>Finds patterns in bits</li>
+<li>Eg: gzip, zstd, snappy, lz4</li>
+<li>Simple to apply</li>
+<li>Higher decompression speed slows down execution</li>
+<li>Need to decompress in bulk - no random seeks or compressed execution</li>
+</ul>
+</li>
+<li>Special purpose, lightweight compression
+<ul>
+<li>Find specific patterns in data</li>
+<li>Eg: RLE, bitpacking, dictionary</li>
+<li>Faster than general purpose compression</li>
+<li>Downside: No effect if the patterns aren’t there. So multiple algorithms need to be used.</li>
+<li>Patterns can be exploited during execution</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Compression works per-column per row-group
+<ul>
+<li>Phase 1 : Analyze: Figure out which compression method(s) are best</li>
+<li>Phase 2 : Compress</li>
+</ul>
+</li>
+</ul>
+<h2 id="lightning-round--misc-topics">Lightning Round : Misc Topics<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#lightning-round--misc-topics" class="internal alias"> §</a></h2>
+<ul>
+<li>Buffer Manager
+<ul>
+<li>Custom lock-free buffer manager
+<ul>
+<li>Inspired by <a href="https://www.cs.cit.tum.de/dis/research/leanstore/" class="external alias">lean-store</a></li>
+<li>Doesn’t use LRU since it needs a centralized data structure but similar to it</li>
+</ul>
+</li>
+<li>Granularity: 256KB</li>
+</ul>
+</li>
+<li>Out-Of-Core
+<ul>
+<li>Supports larger than memory execution using a streaming engine.
+<ul>
+<li>Special join, sort &amp; window algorithms.</li>
+</ul>
+</li>
+<li>Goal: Gracefully degrade performance.
+<ul>
+<li>Traditionally, systems just switch over to the slow path (for on disk) once things don’t fit in-memory.</li>
+<li>DuckDB tries to use as much memory as possible &amp; tries to write as little to disk as possible.</li>
+<li>See Paper: <a href="https://ir.cwi.nl/pub/31877/31877.pdf" class="external alias">Efficient External Sorting in DuckDB</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Transactions
+<ul>
+<li>ACID txns.</li>
+<li>Based on Hyper MVCC model
+<ul>
+<li>Optimized for vectorized processing</li>
+</ul>
+</li>
+<li>Supports Snapshot Isolation</li>
+<li>Optimistic concurrency control
+<ul>
+<li>Changes to the same rows -> txn. abort</li>
+</ul>
+</li>
+<li>Paper: <a href="https://db.in.tum.de/~muehlbau/papers/mvcc.pdf" class="external alias">Fast Serializable Multi-Version Concurrency Control for Main-Memory Database Systems</a></li>
+</ul>
+</li>
+<li>Pluggable File System + HTTP/Object Store Reads
+<ul>
+<li>Can be used for querying S3, other files online directly</li>
+</ul>
+</li>
+</ul>
+<h2 id="qa">Q/A<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#qa" class="internal alias"> §</a></h2>
+<ul>
+<li>Does query cancellation work in DuckDB? For eg: Can you stop an ongoing hash table build?
+<ul>
+<li>Query cancellation is supported. Control is returned to the central location from the operator which can cancel the query.</li>
+</ul>
+</li>
+<li>Is compaction done in DuckDB? If a version isn’t used, it it removed? There were users reporting that even after deleting certain tables, the file size wasn’t reduced.
+<ul>
+<li>We don’t do compaction yet. We do re-use the blocks (which are marked free whenever a row group is destroyed)</li>
+<li>MVCC is only done in-memory. We don’t write it out to storage like Postgres or other DBs. Once the system shuts down, the txns are cancelled anyway.</li>
+</ul>
+</li>
+<li>Is checkpointing done in background (periodically) or when the WAL gets full?
+<ul>
+<li>We checkpoint when the WAL crosses a specific threshold.</li>
+<li>We also do optimistic writing. If you’re loading a lot of data, we won’t write to the WAL, we just directly write to the DB file &amp; directly compress stuff which speeds things up.</li>
+</ul>
+</li>
+<li>What do you think is the role of UDF in DuckDB?
+<ul>
+<li>We’re working on implementing UDFs in Python right now. We’ve some Javascript UDFs. We’ll probably implement WASM UDFs as well. You can also build extensions to implement UDFs in DuckDB.</li>
+<li>UDFs are less important in DuckDB compared to Postgres since pulling data out is so fast. Things you’d need a UDF for in Postgres, you can just do by getting the data out of DuckDB.</li>
+</ul>
+</li>
+<li>Is the query optimizer top-down or bottom-up?
+<ul>
+<li>We’ve different query optimizers. We’ve a mix of rule &amp; cost based optimizer but it’s currently in a messy state.</li>
+</ul>
+</li>
+<li>How do you keep track of resources?
+<ul>
+<li>For threads, we’ve our own threadpool. We allow users to use their thread-pool or integrate w/ ours.</li>
+<li>For memory, the buffer manager has fixed memory &amp; unpins pages (if possible) when that memory limit is exceeded.</li>
+</ul>
+</li>
+</ul>
+<h2 id="appendix">Appendix<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#appendix" class="internal alias"> §</a></h2>
+<ul>
+<li><a href="https://duckdb.org/" class="external">https://duckdb.org/</a></li>
+<li><a href="https://github.com/duckdb/duckdb" class="external">https://github.com/duckdb/duckdb</a></li>
+<li>Slides for the talk: <a href="https://15721.courses.cs.cmu.edu/spring2023/slides/22-duckdb.pdf" class="external">https://15721.courses.cs.cmu.edu/spring2023/slides/22-duckdb.pdf</a></li>
+<li>Initial Paper: <a href="https://mytherin.github.io/papers/2019-duckdbdemo.pdf" class="external">https://mytherin.github.io/papers/2019-duckdbdemo.pdf</a></li>
+<li>Older Talk (2020): <a href="https://www.youtube.com/watch?v=PFUZlNQIndo" class="external">https://www.youtube.com/watch?v=PFUZlNQIndo</a></li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

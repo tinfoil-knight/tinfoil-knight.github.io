@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html><head><title>Snowflake Database Architecture Overview (2022)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Snowflake Database Architecture Overview (2022)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/snowflake-database-architecture-overview-2022"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Snowflake Database Architecture Overview (2022)</h1><p class="content-meta ">Feb 11, 2024 | 1283 words</p><ul class="tags "><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/cmudb-seminar" class="internal tag-link">#cmudb-seminar</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=xnuv6vr8USE" class="external" style="color: inherit;">https://www.youtube.com/watch?v=xnuv6vr8USE</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Bowei Chen, Kavinder Dhaliwal, Libo Wang</span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#cloud-storage--compute" data-for="cloud-storage--compute">Cloud Storage / Compute</a></li><li class="depth-0"><a href="#cloud-services-layer" data-for="cloud-services-layer">Cloud Services Layer</a></li><li class="depth-0"><a href="#workload-optimizations" data-for="workload-optimizations">Workload Optimizations</a></li></ul></div></div></div></div><article class="popover-hint"><blockquote>
+<p><strong>Remarks</strong><br/>
+Snowflake has a lot of moving parts so it was great to hear from multiple engineers on different things they’ve worked on.<br/>
+While using aggregations to skip scanning data isn’t new in analytical systems, I liked how aggressively Snowflake filters unnecessary data at every step (data file downloads, join, query optimization) using aggregates on smaller portions of data in a cloud-native context.</p>
+</blockquote>
+<ul>
+<li>Architecture Parts
+<ul>
+<li>Storage Layer
+<ul>
+<li>Cloud Blob Storage (eg. S3)</li>
+</ul>
+</li>
+<li>Compute Layer (Virtual Warehouse)
+<ul>
+<li>Cloud Compute Instances (eg. EC2)</li>
+</ul>
+</li>
+<li>Cloud Service Layer
+<ul>
+<li>Metadata, Query Optimizer, Data Sharing etc.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="../attachments/pasted-image-20240211192932.png" width="auto" height="auto"/></p>
+<h2 id="cloud-storage--compute">Cloud Storage / Compute<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#cloud-storage--compute" class="internal alias"> §</a></h2>
+<ul>
+<li>
+<p>Micro Partitions</p>
+<ul>
+<li>Immutable columnar files for data storage (~10MB)</li>
+<li>Data in each column grouped together
+<ul>
+<li>File header stores the region of each column</li>
+<li>Non-selected columns can be skipped when downloading the file (file header is downloaded first to check this)</li>
+</ul>
+</li>
+<li>Column metadata (eg. MIN/MAX, distinct) of each file is generated
+<ul>
+<li>Avoids unnecessary file download</li>
+<li>Essential for query performance</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Query Execution : Overview</p>
+<ul>
+<li>Columnar
+<ul>
+<li>Data of the same column is grouped together when possible</li>
+<li>Allows effective use of CPU caches, SIMD instructions, and compressions</li>
+</ul>
+</li>
+<li>Vectorized
+<ul>
+<li>Operators handle batches of a few thousand rows in columnar format</li>
+<li>Avoid full materialization</li>
+<li>Improves cache efficiency</li>
+</ul>
+</li>
+<li>Push-based
+<ul>
+<li>Operators push results to the downstream</li>
+<li>Data is processed in a pipelines fashion</li>
+<li>Enables efficient processing of DAG-shaped plans (in addition to tree-shaped plans)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Query Execution : Major Components</p>
+<ul>
+<li>Table Scans
+<ul>
+<li>Responsible for downloading data from remote locations, decompressing &amp; providing input to other operators</li>
+<li>Files are distributed among a set of workers using consistent hashing (to minimize movement if case the warehouse is resized etc.)</li>
+<li>Workers can steal file from others if they finish early</li>
+<li>Files are cached on the local disks for later queries to reuse</li>
+</ul>
+</li>
+<li>Join
+<ul>
+<li>Distributed Hash Join w/ runtime-adaptive distribution method selection (i.e. join method is selected based on the runtime data)</li>
+<li>Build bloom vectors &amp; maintain ranges on the build keys for effective runtime data pruning</li>
+<li>Automatic skew detection &amp; mitigation (hot keys are detected in the build or probe phase &amp; mitigation is done by distributing data to different workers)</li>
+</ul>
+</li>
+<li>Scheduling of Operators
+<ul>
+<li>Pipeline-wise lockstep execution (workers work on the same execution pipeline until they’re done and then move on to the next one), exploiting intra-operator parallelism</li>
+<li>Plan fragments with not much data can be scheduled on single nodes in parallel, exploiting inter-operator parallelism</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="cloud-services-layer">Cloud Services Layer<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#cloud-services-layer" class="internal alias"> §</a></h2>
+<ul>
+<li>Coordinator b/w client, metadata, compilation, warehouses &amp; the cloud provider</li>
+<li>Responsibilities:
+<ul>
+<li>Security: Authorization &amp; Authentication</li>
+<li>Background Services: Clustering, Compaction etc.</li>
+<li>Cloud Infrastructure</li>
+<li>Service Management
+<ul>
+<li>Multi-tenant system w/ a variety of customer workloads</li>
+<li>Challenges
+<ul>
+<li>Ensure no one customer overloads the system</li>
+<li>Ensure failed nodes &amp; jobs are retried</li>
+<li>Providing predictable performance for all workloads</li>
+<li>Ensure enough cloud VMs are available</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Metadata
+<ul>
+<li>Snowflake uses FoundationDB as its metadata storage layer
+<ul>
+<li>FDB is a distributed key/value store w/ ACID properties.</li>
+<li>Metadata for all DB objects is stored in FDB.</li>
+<li>Stores data about tables, columns, users, roles, masking policies, views, schemas</li>
+<li>Partitioned to silo each customer by using account as the top-level key</li>
+<li>Also used to grab locks on table</li>
+</ul>
+</li>
+<li>Cloud service layer retrieves metadata during query compilation</li>
+<li>Bg services run regularly to clean up &amp; compact metadata</li>
+</ul>
+</li>
+<li>Concurrency Control
+<ul>
+<li>Snapshot Isolation &amp; MVCC</li>
+<li>Immutable data files make SI a good choice. Why?</li>
+<li>Table versions are updated for every DML operation
+<ul>
+<li>DML: Data Manipulation Language (insert, update, delete etc.)</li>
+<li>Every DML operation generates new data files</li>
+<li>Can consider the set of files before &amp; after the operation as entirely different version of the table</li>
+<li>Queries use their version &amp; thus don’t end up competing for locks on some resource. They don’t see uncommitted data or read outside their version</li>
+</ul>
+</li>
+<li>Versioning also facilitates time-travel, cloning &amp; result reuse
+<ul>
+<li>Snowflake retains older versions upto some time (on S3) which the customer can use to recover lost data</li>
+<li>Table version is also used in the query cache which allows result re-use if nothing has changed on previous computation</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Query Compilation: Parsing, Optimization &amp; Query Planning</li>
+</ul>
+</li>
+</ul>
+<h3 id="query-compilation-parsing-optimization--query-planning">Query Compilation: Parsing, Optimization &amp; Query Planning<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#query-compilation-parsing-optimization--query-planning" class="internal alias"> §</a></h3>
+<ul>
+<li>Overview<img src="../attachments/pasted-image-20240211203034.png" width="auto" height="auto"/>
+<ul>
+<li>Parsing: generates an AST from the query text.</li>
+<li>Semantic analysis: tables &amp; columns are looked up to verify they exist &amp; type-checking is done on the query</li>
+<li>Logical Rewrites: Parse tree is rewritten</li>
+<li>Pruning: Prune out data files using the predicates for the query with micro-partitions. More pruning is done during plan rewrite since more detailed information is available.</li>
+</ul>
+</li>
+<li>Some Optimizations
+<ul>
+<li><img src="../attachments/pasted-image-20240212155028.png" width="auto" height="auto"/></li>
+<li>(Meta) Data Dependent
+<ul>
+<li>Pruning
+<ul>
+<li>For eg. A query needing all values of c1 > 5 can check the min, max value of the c1 column in data files to eliminate them instead of reading all the files</li>
+</ul>
+</li>
+<li>Constant Folding (if you detect that a column will always have the same value, you can replace it with a constant &amp; save execution time and IO)
+<ul>
+<li>For eg: The min,max value for a column c2 in some data file is 2 then all the values for the column are 2. So that file can just be replaced by a constant value.</li>
+</ul>
+</li>
+<li>Constant File Detection (Compiler was able to detect that for some table scan, all the data files remaining for the table scan have the same values in all their columns so its replaced by a constant set of values)</li>
+</ul>
+</li>
+<li>Adaptive (Query planner doesn’t give a fixed plan &amp; indicates to execution plan that it can make a decision)
+<ul>
+<li>Join Filters
+<ul>
+<li>Filter pushed down from join to run earlier</li>
+</ul>
+</li>
+<li>Aggregation Placement
+<ul>
+<li>Some aggregates can be evaluated earlier or later for better performance</li>
+</ul>
+</li>
+<li>Adaptive Links
+<ul>
+<li>Allows execution engine to determine whether to keep all data in a single worker or distribute it depending upon cardinality</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Some interesting problems
+<ul>
+<li>Compilation Time (balancing w/ execution time)</li>
+<li>Core optimizations
+<ul>
+<li>Snowflake is a newer system that doesn’t have a lot of optimizations that older systems do. Snowflake doesn’t allow customers to disable optimizations so they need to figure out releasing optimizations to all customers w/o regression on varying workloads.</li>
+</ul>
+</li>
+<li>Adaptive optimizations
+<ul>
+<li>Re-optimization</li>
+<li>Runtime pruning</li>
+</ul>
+</li>
+<li>Optimizing non-OLAP workloads (OLTP, Data Science, External Functions, Spark-like)</li>
+</ul>
+</li>
+</ul>
+<h2 id="workload-optimizations">Workload Optimizations<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#workload-optimizations" class="internal alias"> §</a></h2>
+<ul>
+<li>Features that benefit the performance &amp; cost of customer workloads.
+<ul>
+<li>Clustering</li>
+<li>Materialized Views
+<ul>
+<li>Track new data to keep the view updated.</li>
+<li>Do runtime rewrites (combine results from materialized views &amp; new data) to get the final result</li>
+<li>Instead of maintaining a materialized view for every DML, maintain materialized views of different partitions</li>
+</ul>
+</li>
+<li>Result Reuse (exact match caching)</li>
+<li>Query Acceleration Service (QAS)</li>
+</ul>
+</li>
+</ul>
+<h3 id="query-acceleration-service-qas">Query Acceleration Service (QAS)<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#query-acceleration-service-qas" class="internal alias"> §</a></h3>
+<ul>
+<li>Problem : Warehouse size has to be decided by human. Unable to scale based on actual compute demand of each individual query. Workload is different for large &amp; small queries. Keeping a large warehouse has unnecessary costs while a smaller warehouse would have high query execution time for large queries. Table scan is to blame in many cases for these execution times.</li>
+<li>QAS executes a fragment of the plan at larger scale. It targets plan fragments with:
+<ul>
+<li>Large Table Scans</li>
+<li>High reduction (lots of data in -> small amount out after filtering, grouping)</li>
+<li>No data exchange (b/w servers with different fragments) required until the last step when the fragments merge</li>
+</ul>
+</li>
+<li><img src="../attachments/pasted-image-20240212164951.png" width="auto" height="auto"/></li>
+<li>Intermediate results are materialized as regular data files. They can also be re-used.</li>
+<li>QAS Query Execution
+<ul>
+<li>Normally, files for a scan are distributed during compilation time. In a Continuous ScanSet, files are distributed in batches at runtime upon request. (Server asks for files from query coordinator which provided it in batches)</li>
+<li><img src="../attachments/pasted-image-20240212170326.png" width="auto" height="auto"/></li>
+<li>Failed batches are sent to warehouse for retry. Successful ones are checkpointed in the staging area &amp; removed.</li>
+<li>Warehouse fetches the materialized result files after everything is done.</li>
+</ul>
+</li>
+<li>QAS Insert Optimization : For some INSERT queries (where a table scan is being done to insert data into some other table), the entire plan can be accelerated directly.</li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

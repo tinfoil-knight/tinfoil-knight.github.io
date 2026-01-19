@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html><head><title>Odyssey - PostgreSQL Connection Proxy! (2022)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Odyssey - PostgreSQL Connection Proxy! (2022)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/odyssey---postgresql-connection-proxy!-2022"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Odyssey - PostgreSQL Connection Proxy! (2022)</h1><p class="content-meta ">Mar 06, 2024 | 1623 words</p><ul class="tags "><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/cmudb-seminar" class="internal tag-link">#cmudb-seminar</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=VEYdZL0bU-I" class="external" style="color: inherit;">https://www.youtube.com/watch?v=VEYdZL0bU-I</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Andrey Borodin &lt;x4m></span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#why-pool-connections" data-for="why-pool-connections">Why Pool Connections?</a></li><li class="depth-0"><a href="#what-we-tried" data-for="what-we-tried">What We Tried</a></li><li class="depth-0"><a href="#odyssey" data-for="odyssey">Odyssey</a></li><li class="depth-0"><a href="#qa" data-for="qa">Q/A</a></li><li class="depth-0"><a href="#appendix" data-for="appendix">Appendix</a></li></ul></div></div></div></div><article class="popover-hint"><ul>
+<li>Andrey has worked on the database team at Yandex. Also a Postgres contributor since 2016.</li>
+<li>He has worked on a disaster recovery system for DBs: <a href="https://github.com/wal-g/wal-g" class="external">https://github.com/wal-g/wal-g</a> &amp; a stateless postgres query router: <a href="https://github.com/pg-sharding/spqr" class="external">https://github.com/pg-sharding/spqr</a> for sharded pg.</li>
+<li>Oddysey was developed for Yandex services based on Postgres.</li>
+<li>Yandex
+<ul>
+<li>Yandex.Mail
+<ul>
+<li>~ half a billion email. inboxes</li>
+<li>1+ trillion+ rows, 1+ million RPS</li>
+</ul>
+</li>
+<li>Yandex.Cloud
+<ul>
+<li>~10+ PB of Postgres</li>
+</ul>
+</li>
+<li>And other services like taxi, maps, weather forecast, car-sharing, food delivery etc.</li>
+</ul>
+</li>
+<li>Typical Postgres Cluster
+<ul>
+<li>1 primary node, 3 replica nodes, 2 quorum replicated nodes (which only process read-only queries)</li>
+<li>no analytics on postgres, use logical replication to copy the data to Clickhouse or Greenplum</li>
+<li>collect WAL &amp; backups &amp; store in S3-compatible Yandex Object Storage</li>
+</ul>
+</li>
+</ul>
+<h2 id="why-pool-connections">Why Pool Connections?<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#why-pool-connections" class="internal alias"> §</a></h2>
+<ul>
+<li><code>./pgbench -j8 -c 10000 -T 60 postgres</code>
+<ul>
+<li><code>c</code> is for no. of concurrent clients simulated</li>
+<li><code>j</code> is no. of threads</li>
+<li>For out of the box pg, on varying <code>c</code>, (ignoring initial connection time)
+<ul>
+<li><code>-c 10000</code> => 86 TPS</li>
+<li><code>-c 1000</code> =>  548 TPS</li>
+<li><code>-c 100</code> => 996 TPS</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Sidenote: Sometimes setups w/o connection pooling can be faster when the client &amp; server app are on the same machine so not much time is lost due to network latency.</li>
+<li>1 backend (server connection) == 1 (unix) process
+<ul>
+<li>Each process has its own cache for relations (tables, columns etc.), compiled PL/pgSQL data, query plans</li>
+</ul>
+</li>
+<li>OLTP throughput
+<ul>
+<li>Inside the postgres core, many algorithms depend on number of connections</li>
+<li>This was probably the code shown in the slide: <a href="https://github.com/postgres/postgres/blob/eae7be600be715b2f393b018fc4b98c5b89296da/src/backend/storage/ipc/procarray.c#L1474-L1540" class="external">https://github.com/postgres/postgres/blob/eae7be600be715b2f393b018fc4b98c5b89296da/src/backend/storage/ipc/procarray.c#L1474-L1540</a>
+<ul>
+<li>MVCC snapshot traverses the array of connections &amp; checks if the connection is active &amp; analyses it’s state.</li>
+<li>Memory consumed by each connection is pre-allocated on start.</li>
+<li>Many small algorithms depend on the size of proc array so we always want to make the proc array smaller to make those algorithms faster.</li>
+</ul>
+</li>
+<li>Related work
+<ul>
+<li><a href="https://techcommunity.microsoft.com/t5/azure-database-for-postgresql/improving-postgres-connection-scalability-snapshots/ba-p/1806462" class="external alias">Microsoft Azure :  Improving Postgres Connection Scalability: Snapshots</a></li>
+<li><a href="https://www.percona.com/blog/scaling-postgresql-with-pgbouncer-you-may-need-a-connection-pooler-sooner-than-you-expect/" class="external alias">Percona : Scaling PostgreSQL with PgBouncer: You May Need a Connection Pooler</a></li>
+</ul>
+</li>
+<li>Performance is pg degrades even with idle connections.</li>
+<li>The idea of connection pooling is to reduce the number of connections to the global optimum for the database.</li>
+<li>Sidenote: You can set a connection limit for DB users in Postgres.</li>
+</ul>
+</li>
+<li>Where can we pool connection?
+<ul>
+<li>Application-side</li>
+<li>B/w app &amp; DB</li>
+<li>Built-in DB
+<ul>
+<li>Enterprise MySQL has connection pooler built-in.</li>
+</ul>
+</li>
+<li>Combinations</li>
+</ul>
+</li>
+<li>In multi-AZ or sharded setups, you can end up w/ a lot of connections.</li>
+<li><code>./pgbench -j8 -c 10000 -T 60 postgres</code> takes ~15 seconds just for the initial connection time.
+<ul>
+<li>Say we’ve 30K inbound connections &amp; some network switch is rebooted, we’d have to re-establish all those connections which would cost us ~10mins ??? of CPU time just due to some network glitch.</li>
+<li>Q/A : How frequently can this (network connection breaking) happen?
+<ul>
+<li>At Yandex, switches are updated every month in waves.</li>
+<li>Connections b/w multi-AZ are routed through external internet which isn’t predictable.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Cost of having a server connection
+<ul>
+<li>TLS Handshake: upto 100ms</li>
+<li>Pagefaults for fork(): upto 100ms</li>
+<li>Procarray, Snapshot etc. costs on each txn</li>
+<li>Networking code on client’s side</li>
+<li>Copying system catalog for each connection is cache unfriendly</li>
+</ul>
+</li>
+</ul>
+<h2 id="what-we-tried">What We Tried<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#what-we-tried" class="internal alias"> §</a></h2>
+<ul>
+<li>These are some of the proxy poolers that for Postgres:
+<ul>
+<li><a href="https://github.com/CrunchyData/crunchy-proxy" class="external alias">Crunchy-Proxy</a>
+<ul>
+<li>Only session pooling</li>
+</ul>
+</li>
+<li><a href="https://github.com/pgbouncer/pgbouncer" class="external alias">PgBouncer</a>
+<ul>
+<li>Txn. pooling</li>
+<li>Used by most cloud providers</li>
+</ul>
+</li>
+<li>PgCat</li>
+<li>SPQR</li>
+</ul>
+</li>
+<li>Yandex used PgBouncer earlier.</li>
+<li>Issues w/ PgBouncer
+<ul>
+<li>Txn. mode limitations
+<ul>
+<li>Can’t use objects that survive through txn boundaries
+<ul>
+<li>Session params (eg. lock timeouts)</li>
+<li>Temp tables</li>
+<li>Advisory locks</li>
+<li>Prepared statements</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>PgBouncer connections still cost us
+<ul>
+<li>TLS handshake isn’t free</li>
+<li>PgBouncer processes connections in FIFO order</li>
+<li>Most clients impose 3s connection timeout</li>
+</ul>
+</li>
+<li>Inversion of priorities
+<ul>
+<li>If we’ve >100% utilization, we must not shut service entirely &amp; serve new connections first (because they’ve a better chance of surviving the connection timeout).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>HAProxy</strong>
+<ul>
+<li>We initially used HAProxy to process traffic through many PgBouncers.</li>
+<li>Didn’t work well because HAProxy didn’t understand Postgres protocol well &amp; used too many PgBouncer connections sometimes.</li>
+</ul>
+</li>
+<li><strong>Port Reuse</strong>
+<ul>
+<li>Then, we tried using Port Reuse (multiple processes bind to the same port) which worked quite well for some time.</li>
+<li>See <a href="https://lwn.net/Articles/542629/" class="external alias">The SO_REUSEPORT socket option</a></li>
+<li>Transparent for clients. No extra moving parts.</li>
+<li>But if a PgBouncer gets overloaded, it doesn’t accept new connections.</li>
+<li>Fragmentation of idle connections among PgBouncers.</li>
+</ul>
+</li>
+<li><strong>Cascading System</strong>
+<ul>
+<li>We then used a 2-level cascading system where we had an external array of PgBouncer processes, an internal array of PgBouncer processes &amp; then the Postgres instance.</li>
+<li><code>Client --TLS-> PgBouncers[][][][][][] -> PgBouncers[][] -> Postgres</code></li>
+<li>Still transparent for client &amp; can withstand any load peak.</li>
+<li>Also has control over idle connection count &amp; smooth restarts.</li>
+<li>But, maintenance is difficult (CPU gets saturated) &amp; it didn’t provided any control over distribution of load by instances of PgBouncers.</li>
+</ul>
+</li>
+</ul>
+<h3 id="features-we-wanted">Features we wanted<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#features-we-wanted" class="internal alias"> §</a></h3>
+<ul>
+<li>Controllable CPU scaling</li>
+<li>Flexible tuning</li>
+<li>Tracing client session</li>
+<li>Mixed pooling types</li>
+<li>Better error codes forwarding</li>
+</ul>
+<h2 id="odyssey">Odyssey<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#odyssey" class="internal alias"> §</a></h2>
+<ul>
+<li>Written in C (along with some Assembly). Only dependency is openssl.
+<ul>
+<li>The assembly code is used to save the current state of the client connection &amp; swaps the call stack.</li>
+</ul>
+</li>
+<li>Building Blocks
+<ul>
+<li>Kiwi</li>
+<li><a href="https://github.com/yandex/odyssey/tree/ff5b6563108d26fa12967bef249c054f9fe5b69b/third_party/machinarium" class="external alias">Machinarium</a></li>
+</ul>
+</li>
+<li>Machinarium : Cooperative concurrency framework
+<ul>
+<li>Like a state machine that remembers the state of client &amp; server connection and what to do when the next byte arrives</li>
+<li>Mainly responsible for wakeing up the server thread without using system calls.
+<ul>
+<li>We avoid context swap using syscalls &amp; we avoid using several processes to do multi-tasking. Why??</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Kiwi : Format postgres messages</li>
+<li>Internal Architecture
+<ul>
+<li><img src="../attachments/pasted-image-20240306160200.png" width="auto" height="auto"/></li>
+<li>We’ve a system thread which is governing other threads.</li>
+<li>After accepting TCP connect, before starting any TLS connection, it bounds client connection to the system process.</li>
+<li>Process subscribes to IO events using epoll &amp; (runs ?) in response to wake up execution of “front-end” code for each client.</li>
+<li>Main thread is responsible for retiring old server connections &amp; running queries on the console database?.</li>
+</ul>
+</li>
+<li>Multi-threading
+<ul>
+<li>Each OS thread (maps to a Machinarium) has its own context of file descriptors that it must be in response of.</li>
+<li>Details
+<ul>
+<li>Accept(2) in separate thread
+<ul>
+<li>Trying to solve a problem we observed in PgBouncer. We must distribute new connections evenly among all machines.</li>
+</ul>
+</li>
+<li>Pipelining small packets
+<ul>
+<li>Pack many small packets into a large packet.</li>
+</ul>
+</li>
+<li>Cache-friendly pipelining
+<ul>
+<li>Trying to connect the client to the same server connection if possible (server connection isn’t busy)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Some Odyssey feature
+<ul>
+<li>Enhanced txn pooling
+<ul>
+<li>Cancel queries that no on waits for</li>
+<li>Sidenote:
+<ul>
+<li>Mentioned that he probably wouldn’t add this feature if he was re-writing Odyssey since sometimes you cancel queries that are about to succeed &amp; <code>CANCEL</code> in Postgres creates a new fork.</li>
+<li>If you’ve to cancel a lot of small queries, you create a wave of forks to accept cancel request on pg</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Replication support
+<ul>
+<li>Clients can migrate from cloud managed services</li>
+</ul>
+</li>
+<li>PgBouncer console compatibility</li>
+</ul>
+</li>
+<li>Enhanced transaction pooling
+<ul>
+<li>Trying to keep server connection</li>
+<li>Automatic ROLLBACK</li>
+<li>Optimization of parameter setup (SET, DISCARD)</li>
+<li>Protocol-level Prepared Statements support
+<ul>
+<li>Steps: PARSE -> BIND -> DESCRIBE -> EXECUTE -> SYNC
+<ul>
+<li>Prepared Statement is created in the Parse step &amp; is readied for execution using a Bind message.</li>
+</ul>
+</li>
+<li>See: <a href="https://www.postgresql.org/docs/16/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY" class="external alias">Message Flow : Extended Query</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Prepared statement survive through txn boundaries which is why they’re not compatible with txn pooling in PgBouncer.</li>
+<li>How we solve for this:
+<ul>
+<li>From pg docs:
+<blockquote>
+<p>If successfully created, a named prepared-statement object lasts till the end of the current session, unless explicitly destroyed. (From pg docs)</p>
+</blockquote>
+</li>
+<li>Different SQL statements can have the same name in different server connections.</li>
+<li>In Odyssey, we’ve 2 hash-tables
+<ul>
+<li>Client HT: ps_name to sql_hash</li>
+<li>Storage HT: sql_hash to ps_name</li>
+</ul>
+</li>
+<li>ps_name is Prepared Statement Name</li>
+<li>Odyssey doesn’t issue the PARSE statement initially. In the BIND step,
+<ul>
+<li>Lookup cmd_hash by client_ps_name</li>
+<li>Lookup server_ps_name by cmd_hash
+<ul>
+<li>If it doesn’t exists: PARSE server_ps_name “original SQL cmd from client”</li>
+</ul>
+</li>
+<li>Actually BIND server_ps_name</li>
+</ul>
+</li>
+<li>Downsides of this solution:
+<ul>
+<li>Server Prepared statements are allocated forever.
+<ul>
+<li>We don’t allow the server connection to live forever to avoid cache bloat. (expire after 1 hr)</li>
+<li>Mappings (hash-tables) consume RAM.</li>
+<li>Hashing takes some additional time.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Standby lag polling
+<ul>
+<li><a href="https://youtu.be/VEYdZL0bU-I?si=wLKlM29xqf0Od4--&amp;t=2816" class="external alias">https://youtu.be/VEYdZL0bU-I?si=wLKlM29xqf0Od4—&amp;t=2816</a></li>
+<li>Sometimes replicas can show stale data.</li>
+<li>Having a replication lag of more than 1s is usually undesired.</li>
+<li>In Odyssey, you can specify a watchdog query &amp; if this watchdog query returns some value which isn’t acceptable then the client will retry &amp; get other replica which prevents client from seeing stale data.
+<ul>
+<li>See <a href="https://github.com/yandex/odyssey/releases/tag/1.3" class="external">https://github.com/yandex/odyssey/releases/tag/1.3</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Open questions
+<ul>
+<li>Optimum workload : You’ve to specify the no. of concurrent connections for each user at Yandex. We want to be able to do this automatically.</li>
+<li>Read-after-write consistency</li>
+<li>Protocol compression : Compression is currently vulnerable to CRIME attack</li>
+</ul>
+</li>
+<li>Attempt : Lightweight Sharding via Proxies
+<ul>
+<li>Currently existing sharding solutions are based on custom Plan node which decides which shard to route to. For eg: Citus works this way. A lot of time is consumed in checking the query against the system catalog. A proxy wouldn’t have to do this &amp; could be completely stateless.</li>
+<li>Currently, we rewrote Odyssey in Go (SPQR) to prototype PG sharding.
+<ul>
+<li>Sidenote: Mentioned that the Go prototype isn’t much slower than C.</li>
+<li>Not used in production yet.</li>
+</ul>
+</li>
+<li><a href="https://github.com/postgresml/pgcat" class="external alias">PgCat</a> is another project in Rust attempting to do this.</li>
+</ul>
+</li>
+</ul>
+<h2 id="qa">Q/A<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#qa" class="internal alias"> §</a></h2>
+<ul>
+<li>Did you look into kernel bypass, io_uring w/ socket support etc.? Is it something that would help w/ Odyssey?
+<ul>
+<li>Didn’t look into io_uring but we were thinking about moving closer to kernel.</li>
+<li>We did look into dpdk &amp; didn’t find it to be too much of an improvement as per benchmarks.</li>
+</ul>
+</li>
+<li>I’m assuming that you never put the proxy in the same box at Yandex.
+<ul>
+<li>We use connection pooler on the same node as the DB &amp; we use it for high-availability fencing too. When we’re unsure if we should accept connections or not, we take down connection poolers so that no client is able to access the DB. It’s faster to kill the Odyssey pooler for maintenance work.</li>
+</ul>
+</li>
+</ul>
+<h2 id="appendix">Appendix<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#appendix" class="internal alias"> §</a></h2>
+<ul>
+<li><a href="https://www.postgresql.org/docs/current/pgbench.html" class="external alias">pgbench</a></li>
+<li><a href="https://github.com/yandex/odyssey" class="external">https://github.com/yandex/odyssey</a></li>
+<li><a href="https://github.com/yandex/odyssey/blob/ff5b6563108d26fa12967bef249c054f9fe5b69b/documentation/internals.md" class="external alias">Odyssey architecture and internals</a></li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html><head><title>Testing Distributed Systems w Deterministic Simulation (2014)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="Testing Distributed Systems w Deterministic Simulation (2014)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/testing-distributed-systems-w-deterministic-simulation-2014"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">Testing Distributed Systems w Deterministic Simulation (2014)</h1><p class="content-meta ">Sep 01, 2024 | 1361 words</p><ul class="tags "><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/db" class="internal tag-link">#db</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=4fFDFbi3toc" class="external" style="color: inherit;">https://www.youtube.com/watch?v=4fFDFbi3toc</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Will Wilson</span></div></div></div></div><article class="popover-hint"><p>FoundationDB is a distributed stateful system with strong ACID guarantees.</p>
+<p>Debugging distributed systems is notoriously hard. Especially because there are sources of randomness that we don’t control (like the network, disk etc.).</p>
+<p><strong>Don’t debug your system, debug a simulation instead.</strong></p>
+<ul>
+<li>They wrote a totally deterministic simulation of a database first, exhaustively debugged it and then wrote the database which is just the simulation + talking to network and disks for real.
+<ul>
+<li>For a couple of years, there was no database, only a simulation.</li>
+<li>It involved simulating a network of communicating processes plus all the other interactions they’ve with their environment (network, disk, os) all within a single physical process.</li>
+</ul>
+</li>
+</ul>
+<p><strong>3 Ingredients of Deterministic Simulation</strong></p>
+<ol>
+<li>Single-threaded pseudo concurrency
+<ul>
+<li>Actual concurrency is a source of non-determinism.</li>
+<li>They implemented a syntactic extension to C++ (called Flow) to let them use actor model concurrency but compiles to single threaded C++ callbacks.</li>
+<li>Implementation of the actor gets broken up across methods in the class. Everytime there’s a wait statement, a function in the class is going to end and set a callback on that future (which points to the next part of the actor). Then, its going to yield immediately to the centralized scheduler.</li>
+<li>At the very end, it’s going to fulfill the future and clean itself up.</li>
+<li>Note: Other languages might not require an implementation like this.</li>
+</ul>
+</li>
+</ol>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="cpp" data-theme="github-dark github-light"><code data-language="cpp" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// Source</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">ACTOR Future</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&lt;float></span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> asyncAdd</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(Future</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&lt;float></span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> f, </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">float</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> offset) {</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    float</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> value </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> wait</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(f);</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    return</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> value </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">+</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> offset;</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span>
+<span data-line> </span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// Generated</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">class</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> AsyncAddActor</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> : </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">public</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> Actor</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">public</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> FastAllocated</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">&lt;</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">AsyncAddActor</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">> {</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">public:</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">    AsyncAddActor</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">Future</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">&lt;</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">float</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">> </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">const&amp;</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> f</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">float</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> const&amp;</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> offset</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">) : </span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">Actor</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;AsyncAddActor&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">),</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">        f</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(f),</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">        offset</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(offset),</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">        ChooseGroupbody1W1_1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">this</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&amp;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">ChooseGroupbody1W1)</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">    {}</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">    Future</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">&lt;</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">float</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">> </span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">a_start</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">() {</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">        actorReturnValue.</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">setActorToCancel</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">this</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">);</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">        auto</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> f </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> actorReturnValue.</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">getFuture</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">();</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">        a_body1</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">();</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">        return</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> f;</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">    }</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">private:</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">    // Implementation</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">    ...</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">};</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">Future</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">&lt;</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">float</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">> </span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">asyncAdd</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">Future</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">&lt;</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">float</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">> </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">const&amp;</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> f</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">float</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> const&amp;</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> offset</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">) {</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    return</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">new</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> AsyncAddActor</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(f, offset))-></span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">a_start</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">();</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span></code></pre></figure>
+<ol start="2">
+<li>Simulated implementation of all external communication
+<ul>
+<li>They already had a multi-platform program with interfaces for talking to disk, network etc. so they just added a simulated version of those.
+<ul>
+<li>The network implementation waits and simulates latency on the receiving and sending side, copies data around and lets the sender know that it received some bytes.</li>
+<li>Everytime you read from a simulated network, there’s a chance that something terrible will happen. This helps smoke out any code in the system that might’ve been assuming that the network is reliable.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="cpp" data-theme="github-dark github-light"><code data-language="cpp" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// Reads as many bytes as possible from the read buffer into [begin, end] and returns the number of </span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// bytes read (might be 0)</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">// (or may throw an error if the connection dies)</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">virtual</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> int</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> read</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">uint8_t*</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> begin</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">uint8_t*</span><span style="--shiki-dark:#FFAB70;--shiki-light:#E36209;"> end</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">) {</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">    rollRandomClose</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">();</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    int64_t</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> avail </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> receivedBytes.</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">get</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">() </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">-</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> readBytes.</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">get</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">();</span><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">  // SOMEDAY: random?</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    int</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> toRead </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> std</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">::</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">min</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">&lt;</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">int64_t</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">>(end </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">-</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> begin, avail);</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">    ASSERT</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(toRead </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">>=</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 0</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> &amp;&amp;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> toRead </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&lt;=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> recvBuf.</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">size</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">() </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&amp;&amp;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> toRead </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&lt;=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> end </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">-</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> begin);</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    for</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">int</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> i </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 0</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">; i </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&lt;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> toRead; i</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">++</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">)</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">        begin[i] </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> recvBuf[i];</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">    recvBuf.</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">erase</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(recvBuf.</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">begin</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(), recvBuf.</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">begin</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">() </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">+</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> toRead);</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">    readBytes.</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">set</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(readBytes.</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">get</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">() </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">+</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> toRead);</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    return</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> toRead;</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span>
+<span data-line> </span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">void</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> rollRandomClose</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">() {</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">    if</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (g_simulator.enableConnectionFailures </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&amp;&amp;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> g_random-></span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">random01</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">() </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&lt;</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> .00001</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">) {</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">        double</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> a </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> g_random-></span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">random01</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(), b </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> g_random-></span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">random01</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">();</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">        TEST</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">true</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">);</span><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;"> // Simulated connection failure</span></span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">        TraceEvent</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;ConnectionFailure&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, dbgid)</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">        .</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">detail</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;MyAddr&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, process->address)</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">        .</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">detail</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;PeerAddr&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, peerProcess->address)</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">        .</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">detail</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;SendClosed&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, a </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">></span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> .33</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">)</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">        .</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">detail</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;RecvClosed&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, a </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&lt;</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> .66</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">)</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">        .</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">detail</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#9ECBFF;--shiki-light:#032F62;">&quot;Explicit&quot;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, b </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&lt;</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> .3</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">);</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">        </span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">        if</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (a </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&lt;</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> .66</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> &amp;&amp;</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> peer) peer-></span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">closeInternal</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">();</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">        if</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (a </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">></span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> .33</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">) </span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">closeInternal</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">();</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">        // At the moment, we occasionally notice the connection failed immediately.</span></span>
+<span data-line><span style="--shiki-dark:#6A737D;--shiki-light:#6A737D;">        // In principle, this could happen but only after a delay.</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">        if</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (b </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">&lt;</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> .3</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">)</span></span>
+<span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">            throw</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> connection_failed</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">();</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">    }</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span>
+<span data-line> </span></code></pre></figure>
+<ol start="3">
+<li>Determinism
+<ul>
+<li>None of the control flow in your program should depend on anything outside of the program + its inputs.</li>
+<li>For eg: if you’re using a random number generator, you should be able to control it and its seed should be part of the program.</li>
+<li>If you do things like check time, disk space etc., your program becomes non-deterministic.
+<ul>
+<li>They just try to avoid it. ??</li>
+</ul>
+</li>
+<li>A small percentage (~1%) of their simulation runs twice with exactly same inputs and check if their assumptions match what happened.</li>
+</ul>
+</li>
+</ol>
+<p><strong>The Simulator</strong><br/>
+They find bugs with the help of test files. Test files declare</p>
+<ul>
+<li>what the system is going to try to achieve</li>
+<li>what its going to prevent the system from achieving</li>
+</ul>
+<pre><code>testTitle=SwizzledCycleTest
+	testName=Cycle
+	transactionsPerSecond=1000.0
+	testDuration=30.0
+	expectedRate=0.01 // only expecting 1% to complete
+	
+	testName=RandomClogging
+	testDuration=30.0
+	swizzle=1 // takes a subset of network, stops on rolling basis
+	          // and brings back up in reverse order
+	
+	testName=Attrition
+	machinesToKill=10
+	machinesToLeave=3
+	reboot=true
+	testDuration=30.0
+	
+	testName=ChangeConfig // of the database | designed to provoke coordination change
+	maxDelayBeforeChange=30.0
+	coordinators=auto
+</code></pre>
+<p>In a cycle test, they insert a ring of keys and values into the database such that they’re each pointing to the next one (eg. value 1 is pointing to key 2) and then they execute txns. concurrently.<br/>
+Each txn. is going to mutate the keys and values in the database subject to a constraint that each txn. taken as a whole preserves the ring. This provides an easy to check invariant to tell whether ACID was violated.<br/>
+In case of atomicity failure, one of the txns. would partially execute and the ring would be broken. If there was a lack of isolation, the ring would break.</p>
+<p>Other simulated disasters<br/>
+In parallel with the workloads, they run other things like:</p>
+<ul>
+<li>broken machine
+<ul>
+<li>simulate gradual failure</li>
+<li>all future system calls have like 1% chance of returning an error</li>
+</ul>
+</li>
+<li>clogging</li>
+<li>swizzling</li>
+<li>nukes
+<ul>
+<li>database is aware of rack topology etc. so they also simulate killing an entire datacenter</li>
+</ul>
+</li>
+<li>dumb sysadmin
+<ul>
+<li>atomically swap the IP addresses of two machines</li>
+<li>copy data files from 2 computers onto each other and switch their hard drives and see if that results in any data loss</li>
+</ul>
+</li>
+<li>etc.</li>
+</ul>
+<p><strong>How do you find bugs before the customer does?</strong></p>
+<ul>
+<li>Disasters here happens more frequently than in the real world.
+<ul>
+<li>Connections are dropped pretty regularly.</li>
+<li>In the real world, disk fails every 2-3 years. They make it fail after every 2-3 mins.</li>
+<li>If there’s a bug, they’ve many more failures per CPU hour than their customer.</li>
+<li>A lot of the time the cluster might be waiting for a fixed amount of time for something to happen during recovery etc. They make simulated time pass which gives them more real world time to  find bugs.</li>
+</ul>
+</li>
+<li>Buggify!
+<ul>
+<li>Buggify is a macro that randomly changes what your code does with some probability when the code is running under simulation.</li>
+<li>Also see: <a href="https://transactional.blog/simulation/buggify" class="external">https://transactional.blog/simulation/buggify</a></li>
+</ul>
+</li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="cpp" data-theme="github-dark github-light"><code data-language="cpp" data-theme="github-dark github-light" style="display:grid;"><span data-line><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">if</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> (BUGGIFY) toSend </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> std</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">::</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">min</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(toSend, g_random-></span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">randomInt</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">(</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">0</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">, </span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;">1000</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">));</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">when</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">( Void _ </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">=</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> wait</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">( BUGGIFY </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">?</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> Never</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">() </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">:</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;"> delay</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">( g_network-></span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">isSimulated</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">() </span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;">?</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 20</span><span style="--shiki-dark:#F97583;--shiki-light:#D73A49;"> :</span><span style="--shiki-dark:#79B8FF;--shiki-light:#005CC5;"> 900</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;"> ))) {</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">    req.reply.</span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">sendError</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">( </span><span style="--shiki-dark:#B392F0;--shiki-light:#6F42C1;">timed_out</span><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">() );</span></span>
+<span data-line><span style="--shiki-dark:#E1E4E8;--shiki-light:#24292E;">}</span></span></code></pre></figure>
+<ul>
+<li>The Hurst Exponent
+<ul>
+<li>Hardware failures are not random independent events. It could’ve been a bad batch, there might’ve been a humidity problem at the data center etc.</li>
+<li>Multiple cascading failures are hard to test in real life but easy to do in a simulation.</li>
+</ul>
+</li>
+</ul>
+<p>Stepping through code infused with callbacks is horrible. Traditional debugging approach doesn’t work here. Left with printf debugging (but atleast it’s in a deterministic simulation).</p>
+<p><strong>What if the simulation is wrong?</strong></p>
+<ul>
+<li>The simulation isn’t brutal enough.
+<ul>
+<li>There’s a pattern that occurs in the real world but not in the simulation.</li>
+</ul>
+</li>
+<li>Misunderstanding of the contracts of OS and hardware
+<ul>
+<li>Some syscall had a slightly different guarantee on a new platform.</li>
+<li>The OS could have a bug.</li>
+</ul>
+</li>
+</ul>
+<p>They’ve a backup cluster called “Sinkhole” connected to programmable network power supplies. It turns off and on all night while the database is running.</p>
+<ul>
+<li>Network power supplies burn out after 2 days.</li>
+<li>They haven’t found a bug in their database doing this.</li>
+</ul>
+<p>Sinkhole found 2 bugs in other software.</p>
+<ul>
+<li>Power safety bug in Zookeeper
+<ul>
+<li>The bug was fixed but they removed Zookeeper from their stack and wrote their own Paxos in Flow.</li>
+</ul>
+</li>
+<li>Linux package managers (apt) writing conf files don’t sync.</li>
+</ul>
+<p><strong>Future directions</strong></p>
+<ul>
+<li>Dedicated red team
+<ul>
+<li>Have folks intentionally introduce bugs and verify if the simulation catches them or not.</li>
+</ul>
+</li>
+<li>More hardware
+<ul>
+<li>10K simulations are run after changes which takes a lot of time. A larger suite runs 10mn simulations every night.</li>
+<li>This takes a lot of time. Adding more hardware would increase productivity.</li>
+</ul>
+</li>
+<li>Try to catch bugs that “evolve”
+<ul>
+<li>Programmers might get habituated to the simulation framework and code in bugs that’d pass the simulation.</li>
+<li>They’re trying to have 2 different simulations. One for frequent development use and another that runs before a release.</li>
+</ul>
+</li>
+<li>More real world testing</li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>

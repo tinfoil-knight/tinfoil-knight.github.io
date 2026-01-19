@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html><head><title>5 Lessons from 5 Years of Building Databases at Scale (2024)</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta property="og:title" content="5 Lessons from 5 Years of Building Databases at Scale (2024)"/><link rel="icon" href="../static/favicon.ico"/><meta name="generator" content="Quartz"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link href="../index.css" rel="stylesheet" type="text/css" spa-preserve/><link href="https://fonts.googleapis.com/css2?family=IBM Plex Mono&amp;family=Open Sans:wght@400;700&amp;family=Spectral:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet" type="text/css" spa-preserve/><script src="../prescript.js" type="application/javascript" spa-preserve></script><script type="application/javascript" spa-preserve>const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script></head><body data-slug="notes/5-lessons-from-5-years-of-building-databases-at-scale-2024"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h1 class="page-title "><a href="..">Machines Fail</a></h1><div class="spacer mobile-only"></div><div class="search "><div id="search-icon"><p>Search</p><div></div><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search</title><desc id="desc">Search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg></div><div id="search-container"><div id="search-space"><input autocomplete="off" id="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div id="results-container"></div></div></div></div><div class="darkmode "><input class="toggle" id="darkmode-toggle" type="checkbox" tabindex="-1"/><label id="toggle-label-light" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve"><title>Light mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg></label><label id="toggle-label-dark" for="darkmode-toggle" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve"><title>Dark mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></label></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container " aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../notes/">notes</a></div></nav><h1 class="article-title ">5 Lessons from 5 Years of Building Databases at Scale (2024)</h1><p class="content-meta ">Oct 17, 2024 | 1291 words</p><ul class="tags "><li><a href="../tags/db" class="internal tag-link">#db</a></li><li><a href="../tags/talks" class="internal tag-link">#talks</a></li><li><a href="../tags/systems-distributed-conf" class="internal tag-link">#systems-distributed-conf</a></li></ul><div class="content-frontmatter"><div style="list-style: none; margin-left: 0; padding-left: 0;">Source : <a href="https://www.youtube.com/watch?v=8TH3iZgG1PE" class="external" style="color: inherit;">https://www.youtube.com/watch?v=8TH3iZgG1PE</a></div><div style="list-style: none; margin-left: 0; padding-left: 0;">From : <span>Sammy Steele</span></div></div><div class="toc "><button type="button" id="toc" class="collapsed"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="toc-content"><ul class="overflow"><li class="depth-0"><a href="#dbproxy" data-for="dbproxy">DBProxy</a></li><li class="depth-0"><a href="#lessons-learned" data-for="lessons-learned">Lessons Learned</a></li></ul></div></div></div></div><article class="popover-hint"><p>Sammy Steele <a href="mailto:ssteele@figma.com" class="external alias">ssteele@figma.com</a> is currently the Senior Staff Engineer and Tech Lead for Figma’s Databases Team.</p>
+<ul>
+<li>Worked at Dropbox before.</li>
+<li>Was part of the 5 person team that built Dropbox’s petabyte scale search system - Nautilus.</li>
+</ul>
+<p>Dropbox operated data-centers on-prem since managed cloud services weren’t as good yet.</p>
+<p>Dropbox stored petabyte scale metadata and exabyte scale file data. In 2013, the metadata was stored in horizontally sharded MySQL w/ 2000 shards.<br/>
+They were outgrowing this system. A single organization (MIT) was going to outgrow a single database which their system didn’t account for.</p>
+<p>Beyond Sharded SQL</p>
+<ul>
+<li>They ended up building their own Spanner-inspired distributed key-value store in-house (called Panda) since no open-source solutions were scaling to their usage. One org could now be split multiple times to get smaller shard ranges.</li>
+<li>(Project Theseus) Hardest part of the project wasn’t building Panda but running the migration to re-build the entire metadata stack on top of Panda with zero downtime. It took 3 years and a team of 20 engineers.</li>
+<li>Implemented atomic cross-shard txns. (2PC) across MySQL and Panda to enable the migration. Increased %age rollout of cross-shard txns. over time and eventually swapped reads from the legacy system.</li>
+</ul>
+<p>Joined Figma at a time when they were just in the process of scaling out their databases. Back in 2022, Figma was on a single RDS instance. DB Traffic was growing 3x every single year for the last 4 years.</p>
+<p>Build vs. Buy for Database Scalability</p>
+<ul>
+<li>Sammy was pretty anti-build after Dropbox where everything was in-house. While building new systems in fun as an infra engineer, someone has to keep maintaining the system.</li>
+<li>Figma was operating on extremely tight time horizons with a small team and 6 months of runway (before the system grew out of scale).</li>
+<li>Why not NoSQL?
+<ul>
+<li>NoSQL does really well at scale but Figma relied a lot on joins, unique indexes and complicated relational models.</li>
+<li>Would have to rewrite the entire system from scratch to use a NoSQL DB.</li>
+</ul>
+</li>
+<li>Spent 3 months exploring a NewSQL solution (like Cockroach, Vitess or Spanner) but couldn’t get it to work at their scale.</li>
+<li>Team had a lot of expertise and historical context in RDS Postgres. Needed an incremental migration path to deliver value fast.</li>
+<li>Built in-house horizontally shared-system on top of RDS Postgres.</li>
+</ul>
+<p>Logical vs. Physical Sharding</p>
+<ul>
+<li>A physical shard could have multiple logical shards.</li>
+<li>Can logically shard in-place w/ no data movement by using a virtual database layer.</li>
+<li>Benefits of logical sharding:
+<ul>
+<li>Incremental %age based rollouts
+<ul>
+<li>Can use logical shards for reads but let the writes go to the un-sharded database</li>
+</ul>
+</li>
+<li>Low-risk fallback path</li>
+<li>De-risk latency availability, correctness before physical sharding
+<ul>
+<li>All query, txn. logic, application changes that happen with horizontal sharding would already be running in production through the virtual shards.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Figma doesn’t use micro-services. They’ve a few large services including a service in Go that powers the real-time feature and a no. of Ruby services including a large Ruby monolith.</p>
+</blockquote>
+<h2 id="dbproxy">DBProxy<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#dbproxy" class="internal alias"> §</a></h2>
+<ul>
+<li>They already run a slightly modified version of pgBouncer as their database proxy. DBProxy is a Go service that sits b/w application and pgBouncer layers.</li>
+<li>“Brains” of horizontal sharding. Application doesn’t need to know how the backend is actually sharded beyond including a shard key in queries.</li>
+<li>Also enables load-shedding, improved observability, replica hedging etc.
+<ul>
+<li>If a replica goes down, then the request is sent to multiple replicas and returns when the first one succeeds.</li>
+<li>Most critical routes only talk to replicas. Very few of them issue reads.</li>
+</ul>
+</li>
+<li>Lightweight query engine at its core.</li>
+<li>Query parser taken from CockroachDB and it has worked well for them.  Logical and physical planner was built in-house.</li>
+</ul>
+<p><img src="../attachments/pasted-image-20241017190741.png" width="auto" height="auto"/></p>
+<ul>
+<li>(Scatter Gather query) When a shard key isn’t specified, DBProxy aggregates the results from all the shards.</li>
+</ul>
+<p>Query Language</p>
+<ul>
+<li>All single-shard queries are allowed.</li>
+<li>No nested SQL queries.</li>
+<li>Multi-shard writes, aggregation and group-bys are allowed but discouraged.</li>
+<li>Joins are allowed iff the join is on the sharding key.</li>
+</ul>
+<p>Physical Sharding Operation</p>
+<ul>
+<li>Built in-house.</li>
+<li>Uses Postgres Logical Replication to sync state.</li>
+<li>Replica failovers are a no-downtime operation.</li>
+<li>Primary failovers take ~10s of downtime during the critical section (In comparison, AWS RDS may take anywhere from minutes to half an hour for major upgrades).</li>
+</ul>
+<p><img src="../attachments/pasted-image-20241017195432.png" width="auto" height="auto"/></p>
+<ul>
+<li>Multi-step state machine w/ automatic rollback and recovery
+<ul>
+<li>Disable reads at pgBouncer (PGB) layer</li>
+<li>Revoke permissions from source RDS</li>
+<li>Kill active queries
+<ul>
+<li>Since revoking permissions doesn’t stop in-flight queries</li>
+</ul>
+</li>
+<li>Wait for replication sync</li>
+<li>Reverse logical replication
+<ul>
+<li>Was logically replicating from old to new. Now replicating from source back to destination (for rollback).</li>
+</ul>
+</li>
+<li>Re-route pgBouncer instances to point to target</li>
+<li>Re-enable permissions on target RDS</li>
+<li>Re-enable pgBouncer</li>
+</ul>
+</li>
+<li>Core failover operation enables vertical partitoning, horizontal shard-splits and major pg version upgrades.</li>
+</ul>
+<p><img src="../attachments/pasted-image-20241017200103.png" width="auto" height="auto"/></p>
+<h2 id="lessons-learned">Lessons Learned<a aria-hidden="true" tabindex="-1" data-no-popover="true" href="#lessons-learned" class="internal alias"> §</a></h2>
+<ul>
+<li>You can get a long way on one database… Until you can’t
+<ul>
+<li>Figma was on a single pg instance from 2012 to 2020 w/o connection pooling or replicas.</li>
+<li>Very few companies hit the scale where vanilla pg stops working.</li>
+</ul>
+</li>
+<li>Don’t be afraid to cross abstraction boundaries
+<ul>
+<li>Engineers often get stuck behind abstractions.</li>
+<li>If something isn’t working, go read the code yourself. Applies to orgs too. Go talk to product engineers, read product code and review product designs.</li>
+<li>For example, we had issues with Postgres vacuuming. Txn. wrap-around occurred regularly since pg uses a 32-bit integer for txn ids (i.e. 2^32 ~ 4 billion txn. ids). Vacuuming is very expensive and they observed that their servers would hit 100% CPU at the end of a vacuum. They had to read the pg source code to understand why this was happening and find a workaround. (There was a single lock that’s being contended on that read the entire file system into memory because query plans have been invalidated at the very end of a vacuum or analyze operation.)</li>
+</ul>
+</li>
+<li>Data migrations are scary, so work twice as hard to make them safe.
+<ul>
+<li>Do data migrations with the gradual, %age based rollouts and have the ability to rollback from unknowns.</li>
+</ul>
+</li>
+<li>Know your customers and product
+<ul>
+<li>Understand how infra tradeoffs map to your organization’s priorities and ensure they align.</li>
+<li>The databases team had to become experts in Figma’s product to ship horizontal sharding.</li>
+<li>DBProxy does txns. by creating them on every database, issue a SELECT before commit to ensure that the DBs are still alive and then you commit in parallel. There is a span of 5ms where the DB could die and you could have a partial commit failure. At their commit volume, it’d only happen 2-3 times a year so it wasn’t a problem to worry about except for some critical txns. which were fixed.</li>
+</ul>
+</li>
+<li>Certain early company decisions are very hard to walk back
+<ul>
+<li>Your data model, your ORM, and your consistency model are extremely hard to change.
+<ul>
+<li>At Dropbox, they had perfect consistency from day one and folks got used to that. Part of why the project took 3 years was that we couldn’t take that guarantee away from customers and had to keep giving them perfect atomic cross-shard txns.</li>
+<li>At Figma, they gave replicas with nothing but a stale reads guarantee so all the product code was written to deal with that from day one.</li>
+</ul>
+</li>
+<li>There is implicit tension b/w the goal of building products fast in a company’s early days vs. needing to care about scale and reliability once you’re successful. Choose your battles wisely.</li>
+</ul>
+</li>
+<li>Centralized on less technologies done well
+<ul>
+<li>Golden paths enables small infra teams to support large product orgs</li>
+<li>Optimize for the good of the company over individual team’s desires</li>
+<li>More technologies add complexity, reduces reliability and increases developer costs</li>
+<li>Don’t gate-keep if you’re blocking the core business</li>
+</ul>
+</li>
+</ul>
+<p>References</p>
+<ul>
+<li><a href="https://dropbox.tech/infrastructure/panda-metadata-stack-petabyte-scale-transactional-key-value-store" class="external alias">Future-proofing our metadata stack with Panda, a scalable key-value store (2022)</a></li>
+<li><a href="https://www.figma.com/blog/how-figma-scaled-to-multiple-databases/" class="external alias">The growing pains of database architecture (2023)</a></li>
+<li><a href="https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/" class="external alias">How Figma’s databases team lived to tell the scale (2024)</a></li>
+</ul></article></div><div class="right sidebar"></div></div><footer class><hr/><ul style="display:flex;"><li><a href="https://github.com/tinfoil-knight">GitHub</a></li><li><a href="https://twitter.com/machines_fail">Twitter</a></li><li><a href="https://www.linkedin.com/in/kunal-kundu/">LinkedIn</a></li><li style="flex-grow:1;text-align:right;">Built with <a href="https://quartz.jzhao.xyz/">Quartz</a></li></ul></footer></div></body><script type="application/javascript">// quartz/components/scripts/quartz/components/scripts/callout.inline.ts
+function toggleCallout() {
+  const outerBlock = this.parentElement;
+  outerBlock.classList.toggle(`is-collapsed`);
+  const collapsed = outerBlock.classList.contains(`is-collapsed`);
+  const height = collapsed ? this.scrollHeight : outerBlock.scrollHeight;
+  outerBlock.style.maxHeight = height + `px`;
+  let current = outerBlock;
+  let parent = outerBlock.parentElement;
+  while (parent) {
+    if (!parent.classList.contains(`callout`)) {
+      return;
+    }
+    const collapsed2 = parent.classList.contains(`is-collapsed`);
+    const height2 = collapsed2 ? parent.scrollHeight : parent.scrollHeight + current.scrollHeight;
+    parent.style.maxHeight = height2 + `px`;
+    current = parent;
+    parent = parent.parentElement;
+  }
+}
+function setupCallout() {
+  const collapsible = document.getElementsByClassName(
+    `callout is-collapsible`
+  );
+  for (const div of collapsible) {
+    const title = div.firstElementChild;
+    if (title) {
+      title.removeEventListener(`click`, toggleCallout);
+      title.addEventListener(`click`, toggleCallout);
+      const collapsed = div.classList.contains(`is-collapsed`);
+      const height = collapsed ? title.scrollHeight : div.scrollHeight;
+      div.style.maxHeight = height + `px`;
+    }
+  }
+}
+document.addEventListener(`nav`, setupCallout);
+window.addEventListener(`resize`, setupCallout);
+</script><script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+          const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: darkMode ? 'dark' : 'default'
+          });
+          document.addEventListener('nav', async () => {
+            await mermaid.run({
+              querySelector: '.mermaid'
+            })
+          });
+          </script><script src="../postscript.js" type="module"></script></html>
