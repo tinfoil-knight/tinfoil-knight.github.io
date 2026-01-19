@@ -3,7 +3,7 @@ title: kunal
 publish: true
 ---
 
-I'm a software engineer working at [ImageKit](https://imagekit.io/) on media delivery & optimization.
+I'm a software engineer working at (Redacted) on AI native workspaces and reliable infrastructure for GPU-enabled services.
 
 I've been focusing more on things closer to computer systems for the past year.
 I'm studying up on database systems right now. See my notes [here](./notes/).
